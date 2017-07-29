@@ -39,15 +39,14 @@ public class BiometricEngineResourceImplTest extends M2SysBiometricSensitiveTest
 		
 		httpClient = new HttpClient();
 		restOperations = new RestTemplate();
-		administrationService = new AdministrationServiceImpl();
-		administrationDAO = new HibernateAdministrationDAO();
+		//administrationService = new AdministrationServiceImpl();
+		//administrationDAO = new HibernateAdministrationDAO();
 		
-		administrationService.setAdministrationDAO(administrationDAO);
+		//administrationService.setAdministrationDAO(administrationDAO);
 		
 	}
 	
 	@Test
-	@Ignore
 	@Verifies(value = "get response from M2Sys Biometrics", method = "getStatus()")
 	public void shouldGetStatus() throws IOException {
 		ResponseEntity<String> expected, actual;
