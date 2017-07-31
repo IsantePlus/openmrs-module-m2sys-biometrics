@@ -3,6 +3,7 @@ package org.openmrs.module.m2sysbiometrics;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.m2sysbiometrics.util.TokenUtil;
 import org.slf4j.Logger;
@@ -13,6 +14,7 @@ import org.springframework.web.client.RestOperations;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
+import java.util.ResourceBundle;
 
 /**
  * Serves as a base for all implementation of the resource interfaces. Provides method for basic
@@ -91,16 +93,20 @@ public abstract class BaseResource {
 		headers.setContentType(MediaType.APPLICATION_JSON);
 		headers.setAccept(Arrays.asList(MediaType.ALL));
 		LOGGER.debug("{} request body: {}", url, json);
-		String responseJson;
+		String responseJson = "";
 		
 		ResponseEntity<String> responseEntity = null;
 		try {
 			responseEntity = exchange(new URI(url), HttpMethod.POST, json, headers);
+			responseJson = responseEntity.getBody();
+			checkResponse(responseJson);
 		}
 		catch (URISyntaxException e) {
 			throw new RuntimeException(e);
 		}
-		responseJson = responseEntity.getBody();
+		catch (Exception e) {
+			e.getMessage();
+		}
 		
 		return responseJson;
 	}
@@ -132,6 +138,14 @@ public abstract class BaseResource {
 		TokenUtil token = gson.fromJson(response.getBody(), TokenUtil.class);
 		
 		return token;
+	}
+	
+	private void checkResponse(String response) throws Exception {
+		JsonParser parser = new JsonParser();
+		JsonObject responseJson = (JsonObject) parser.parse(response);
+		String responseCode = responseJson.get("ResponseCode").toString();
+		if (!responseJson.get("Success").toString().equals("true"))
+			throw new Exception(ResourceBundle.getBundle("MessageBundle").getString("m2sys.response.error." + responseCode));
 	}
 	
 	private String getCustomerKey() {
