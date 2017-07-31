@@ -1,0 +1,10 @@
+{
+  "subjectId":"1",
+  "fingerprints":[
+    {
+      "image":"Image 1"
+    }, {
+      "image":"Image 2"
+    }
+  ]
+}

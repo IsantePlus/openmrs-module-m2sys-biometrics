@@ -23,7 +23,11 @@ import java.util.ResourceBundle;
 public abstract class BaseResource {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(BaseResource.class);
-	
+
+	private String REGISTRATION_ID_KEY = "RegistrationID";
+	private String NEW_REGISTRATION_ID_KEY = "NewRegistrationID";
+	private String LOCATION_ID_KEY = "LocationID";
+
 	private RestOperations restOperations;
 	
 	private enum EnumBiometricCaptureType {
@@ -49,13 +53,32 @@ public abstract class BaseResource {
 	protected String enroll(String url, String registrationID) {
 		String result;
 		JsonObject requestJson = getRequestJson();
-		
-		requestJson.addProperty("RegistrationID", registrationID);
-		requestJson.addProperty("LocationID", getLocationID());
+
+		requestJson.addProperty(REGISTRATION_ID_KEY, registrationID);
+		requestJson.addProperty(LOCATION_ID_KEY, getLocationID());
 		
 		result = postRequest(url, requestJson.toString());
 		
 		return result;
+	}
+
+	protected String search(String url, String registrationID) {
+		JsonObject requestJson = getRequestJson();
+
+		requestJson.addProperty(REGISTRATION_ID_KEY, registrationID);
+		requestJson.addProperty(LOCATION_ID_KEY, getLocationID());
+
+		return postRequest(url, requestJson.toString());
+	}
+
+	protected String updateID(String url, String oldID, String newID) {
+		JsonObject requestJson = getRequestJson();
+
+		requestJson.addProperty(REGISTRATION_ID_KEY, oldID);
+		requestJson.addProperty(NEW_REGISTRATION_ID_KEY, newID);
+		requestJson.addProperty(LOCATION_ID_KEY, getLocationID());
+
+		return postRequest(url, requestJson.toString());
 	}
 	
 	/**
@@ -163,5 +186,4 @@ public abstract class BaseResource {
 	private String getLocationID() {
 		return Context.getAdministrationService().getGlobalProperty(M2SysBiometricsConstants.M2SYS_LOCATION_ID);
 	}
-	
 }

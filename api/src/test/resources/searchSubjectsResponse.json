@@ -1,0 +1,10 @@
+[
+  {
+    "subjectId":"1",
+    "matchScore":0.5
+  },
+  {
+    "subjectId":"2",
+    "matchScore":1.0
+  }
+]
