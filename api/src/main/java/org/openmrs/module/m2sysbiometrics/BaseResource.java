@@ -8,13 +8,23 @@ import org.openmrs.api.context.Context;
 import org.openmrs.module.m2sysbiometrics.util.TokenUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.*;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.HttpEntity;
 import org.springframework.web.client.RestOperations;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.ResourceBundle;
+import java.util.Map;
+
+import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.ACCESSPOINT_ID;
+import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.BIOMETRIC_WITH;
+import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.CAPTURE_TIMEOUT;
+import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.CUSTOMER_KEY;
 
 /**
  * Serves as a base for all implementation of the resource interfaces. Provides method for basic
@@ -23,11 +33,7 @@ import java.util.ResourceBundle;
 public abstract class BaseResource {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(BaseResource.class);
-
-	private String REGISTRATION_ID_KEY = "RegistrationID";
-	private String NEW_REGISTRATION_ID_KEY = "NewRegistrationID";
-	private String LOCATION_ID_KEY = "LocationID";
-
+	
 	private RestOperations restOperations;
 	
 	private enum EnumBiometricCaptureType {
@@ -50,37 +56,6 @@ public abstract class BaseResource {
 		return result;
 	}
 	
-	protected String enroll(String url, String registrationID) {
-		String result;
-		JsonObject requestJson = getRequestJson();
-
-		requestJson.addProperty(REGISTRATION_ID_KEY, registrationID);
-		requestJson.addProperty(LOCATION_ID_KEY, getLocationID());
-		
-		result = postRequest(url, requestJson.toString());
-		
-		return result;
-	}
-
-	protected String search(String url, String registrationID) {
-		JsonObject requestJson = getRequestJson();
-
-		requestJson.addProperty(REGISTRATION_ID_KEY, registrationID);
-		requestJson.addProperty(LOCATION_ID_KEY, getLocationID());
-
-		return postRequest(url, requestJson.toString());
-	}
-
-	protected String updateID(String url, String oldID, String newID) {
-		JsonObject requestJson = getRequestJson();
-
-		requestJson.addProperty(REGISTRATION_ID_KEY, oldID);
-		requestJson.addProperty(NEW_REGISTRATION_ID_KEY, newID);
-		requestJson.addProperty(LOCATION_ID_KEY, getLocationID());
-
-		return postRequest(url, requestJson.toString());
-	}
-	
 	/**
 	 * Sends a get request to the M2Sys server using the given {@code config}.
 	 * 
@@ -93,16 +68,6 @@ public abstract class BaseResource {
 		}
 		catch (URISyntaxException e) {}
 		return responseJson;
-	}
-	
-	protected JsonObject getRequestJson() {
-		JsonObject requestJson = new JsonObject();
-		requestJson.addProperty("CustomerKey", getCustomerKey());
-		requestJson.addProperty("AccessPointID", getAccessPointID());
-		requestJson.addProperty("CaptureTimeOut", getCaptureTimeOut());
-		requestJson.addProperty("BioMetricWith", EnumBiometricCaptureType.None.toString());
-		
-		return requestJson;
 	}
 	
 	/**
@@ -132,6 +97,21 @@ public abstract class BaseResource {
 		}
 		
 		return responseJson;
+	}
+	
+	protected String prepareJson(Map<String, String> map) {
+		JsonObject requestJson = new JsonObject();
+		
+		requestJson.addProperty(CUSTOMER_KEY, getCustomerKey());
+		requestJson.addProperty(ACCESSPOINT_ID, getAccessPointID());
+		requestJson.addProperty(CAPTURE_TIMEOUT, getCaptureTimeOut());
+		requestJson.addProperty(BIOMETRIC_WITH, EnumBiometricCaptureType.None.toString());
+		
+		for (Map.Entry<String, String> entry : map.entrySet()) {
+			requestJson.addProperty(entry.getKey(), entry.getValue());
+		}
+		
+		return requestJson.toString();
 	}
 	
 	private ResponseEntity<String> exchange(URI url, HttpMethod method) {
@@ -183,7 +163,7 @@ public abstract class BaseResource {
 		return Context.getAdministrationService().getGlobalProperty(M2SysBiometricsConstants.M2SYS_CAPTURE_TIMEOUT);
 	}
 	
-	private String getLocationID() {
+	protected String getLocationID() {
 		return Context.getAdministrationService().getGlobalProperty(M2SysBiometricsConstants.M2SYS_LOCATION_ID);
 	}
 }
