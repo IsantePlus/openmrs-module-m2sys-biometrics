@@ -2,6 +2,7 @@ package org.openmrs.module.m2sysbiometrics;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.m2sysbiometrics.util.TokenUtil;
 import org.slf4j.Logger;
@@ -23,6 +24,10 @@ public abstract class BaseResource {
 	
 	private RestOperations restOperations;
 	
+	private enum EnumBiometricCaptureType {
+		None, BiometricOnly, BothBiometricAndPicture, PictureOnly;
+	}
+	
 	protected BaseResource(RestOperations restOperationsrestOperations) {
 		this.restOperations = restOperations;
 	}
@@ -39,18 +44,40 @@ public abstract class BaseResource {
 		return result;
 	}
 	
+	protected String enroll(String url, String registrationID) {
+		String result;
+		JsonObject requestJson = getRequestJson();
+		
+		requestJson.addProperty("RegistrationID", registrationID);
+		requestJson.addProperty("LocationID", getLocationID());
+		
+		result = postRequest(url, requestJson.toString());
+		
+		return result;
+	}
+	
 	/**
 	 * Sends a get request to the M2Sys server using the given {@code config}.
 	 * 
 	 * @return the response json
 	 */
-	protected String getJson(String url) {
+	protected String getResponseJson(String url) {
 		String responseJson = null;
 		try {
 			responseJson = exchange(new URI(url), HttpMethod.GET).getBody();
 		}
 		catch (URISyntaxException e) {}
 		return responseJson;
+	}
+	
+	protected JsonObject getRequestJson() {
+		JsonObject requestJson = new JsonObject();
+		requestJson.addProperty("CustomerKey", getCustomerKey());
+		requestJson.addProperty("AccessPointID", getAccessPointID());
+		requestJson.addProperty("CaptureTimeOut", getCaptureTimeOut());
+		requestJson.addProperty("BioMetricWith", EnumBiometricCaptureType.None.toString());
+		
+		return requestJson;
 	}
 	
 	/**
@@ -105,6 +132,22 @@ public abstract class BaseResource {
 		TokenUtil token = gson.fromJson(response.getBody(), TokenUtil.class);
 		
 		return token;
+	}
+	
+	private String getCustomerKey() {
+		return Context.getAdministrationService().getGlobalProperty(M2SysBiometricsConstants.M2SYS_CUSTOM_KEY);
+	}
+	
+	private String getAccessPointID() {
+		return Context.getAdministrationService().getGlobalProperty(M2SysBiometricsConstants.M2SYS_ACCESS_POINT_ID);
+	}
+	
+	private String getCaptureTimeOut() {
+		return Context.getAdministrationService().getGlobalProperty(M2SysBiometricsConstants.M2SYS_CAPTURE_TIMEOUT);
+	}
+	
+	private String getLocationID() {
+		return Context.getAdministrationService().getGlobalProperty(M2SysBiometricsConstants.M2SYS_LOCATION_ID);
 	}
 	
 }

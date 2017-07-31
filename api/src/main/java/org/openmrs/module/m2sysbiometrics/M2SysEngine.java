@@ -1,6 +1,5 @@
 package org.openmrs.module.m2sysbiometrics;
 
-import org.apache.commons.httpclient.HttpClient;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.registrationcore.api.biometrics.BiometricEngine;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricEngineStatus;
@@ -8,7 +7,6 @@ import org.openmrs.module.registrationcore.api.biometrics.model.BiometricMatch;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricSubject;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.client.RestTemplate;
 

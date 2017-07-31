@@ -98,6 +98,38 @@
 			The m2sys server password.
 		</description>
 	</globalProperty>
+
+	<globalProperty>
+		<property>${project.parent.artifactId}.locationID</property>
+		<defaultValue></defaultValue>
+		<description>
+			The m2sys server location ID.
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>${project.parent.artifactId}.customKey</property>
+		<defaultValue></defaultValue>
+		<description>
+			The m2sys server CustomKey.
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>${project.parent.artifactId}.accessPointID</property>
+		<defaultValue></defaultValue>
+		<description>
+			The m2sys server AccessPointID.
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>${project.parent.artifactId}.captureTimeout</property>
+		<defaultValue></defaultValue>
+		<description>
+			The m2sys server CaptureTimeout.
+		</description>
+	</globalProperty>
 	<!-- /Required Global Properties -->
 	
 	<!--
