@@ -77,11 +77,11 @@ public class M2SysEngineTest extends M2SysBiometricSensitiveTestBase {
 	public void shouldUpdateSubjectID() throws Exception {
 		BiometricSubject actual, expected;
 		
-		when(Context.getAdministrationService().getGlobalProperty(M2SysBiometricsConstants.M2SYS_SERVER_URL))
-				.thenReturn("http://testServerAPI/");
+		when(Context.getAdministrationService().getGlobalProperty(M2SysBiometricsConstants.M2SYS_SERVER_URL)).thenReturn(
+		    "http://testServerAPI/");
 		
-		doReturn(readJsonFromFile(UPDATE_SUBJECT_ID_RESPONSE)).when(m2SysEngine)
-				.postRequest(eq(M2SysBiometricsConstants.M2SYS_SERVER_URL + M2SYS_CHANGE_ID_ENDPOINT), anyString());
+		doReturn(readJsonFromFile(UPDATE_SUBJECT_ID_RESPONSE)).when(m2SysEngine).postRequest(
+		    eq(M2SysBiometricsConstants.M2SYS_SERVER_URL + M2SYS_CHANGE_ID_ENDPOINT), anyString());
 		
 		actual = m2SysEngine.updateSubjectId("2", "1");
 		expected = prepareDummyBiometricSubject();
@@ -102,8 +102,8 @@ public class M2SysEngineTest extends M2SysBiometricSensitiveTestBase {
 		
 		when(administrationService.getGlobalProperty(M2SysBiometricsConstants.M2SYS_SERVER_URL)).thenReturn(
 		    "http://testServerAPI/");
-		doReturn(readJsonFromFile(SEARCH_SUBJECT_RESPONSE)).when(m2SysEngine)
-				.postRequest(eq(M2SysBiometricsConstants.M2SYS_SERVER_URL + M2SYS_REGISTER_ENDPOINT), anyString());
+		doReturn(readJsonFromFile(SEARCH_SUBJECT_RESPONSE)).when(m2SysEngine).postRequest(
+		    eq(M2SysBiometricsConstants.M2SYS_SERVER_URL + M2SYS_REGISTER_ENDPOINT), anyString());
 		
 		actual = m2SysEngine.search(prepareDummyBiometricSubject());
 		expected = prepareSearchResults();

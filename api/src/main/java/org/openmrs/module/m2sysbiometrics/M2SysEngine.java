@@ -16,16 +16,19 @@ import org.springframework.web.client.RestTemplate;
 import java.lang.reflect.Type;
 import java.util.List;
 
-import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.M2SYS_LOOKUP_ENDPOINT;
-import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.M2SYS_CHANGE_ID_ENDPOINT;
-import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.M2SYS_SERVER_URL;
-import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.LOCATION_ID;
-import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.M2SYS_REGISTER_ENDPOINT;
-import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.REGISTRATION_ID;
-import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.NEW_REGISTRATION_ID;
-
 import java.util.HashMap;
 import java.util.Map;
+
+import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.ERROR_CODE_OF_SUBJECT_NOT_EXIST;
+import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.LOCATION_ID;
+import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.M2SYS_CHANGE_ID_ENDPOINT;
+import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.M2SYS_LOOKUP_ENDPOINT;
+import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.M2SYS_REGISTER_ENDPOINT;
+import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.M2SYS_SERVER_URL;
+import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.M2SYS_UPDATE_ENDPOINT;
+import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.NEW_REGISTRATION_ID;
+import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.REGISTRATION_ID;
+import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.getErrorMessage;
 
 @Component("m2sysbiometrics.M2SysEngine")
 public class M2SysEngine extends BaseResource implements BiometricEngine {
@@ -67,12 +70,30 @@ public class M2SysEngine extends BaseResource implements BiometricEngine {
 		return parseResponse(response, BiometricSubject.class);
 	}
 	
+	/**
+	 * Updates subject on M2Sys server.
+	 * 
+	 * @param subject to update
+	 * @should updates subject on M2Sys Biometrics
+	 * @return updated subject
+	 */
 	public BiometricSubject update(BiometricSubject subject) {
-		return new BiometricSubject();
+		Map<String, String> jsonElements = new HashMap<>();
+		jsonElements.put(REGISTRATION_ID, subject.getSubjectId());
+		jsonElements.put(LOCATION_ID, getLocationID());
+
+		BiometricSubject existingSubject = lookup(subject.getSubjectId());
+		if (existingSubject == null) {
+			throw new IllegalArgumentException(getErrorMessage(ERROR_CODE_OF_SUBJECT_NOT_EXIST));
+		}
+		existingSubject.setFingerprints(subject.getFingerprints());
+		String response = postRequest(adminService.getGlobalProperty(M2SYS_SERVER_URL) + M2SYS_UPDATE_ENDPOINT, prepareJson(jsonElements));
+
+		return parseResponse(response, BiometricSubject.class);
 	}
 	
 	/**
-	 * Updates subject identifier on M2Sys server
+	 * Updates subject identifier on M2Sys server.
 	 * 
 	 * @param oldId an old ID
 	 * @param newId a new ID
@@ -91,7 +112,7 @@ public class M2SysEngine extends BaseResource implements BiometricEngine {
 	}
 	
 	/**
-	 * Searching a biometric data using a given pattern subject
+	 * Searching a biometric data using a given pattern subject.
 	 * 
 	 * @param subject a pattern subject
 	 * @should searches a data on M2Sys Server using a subject

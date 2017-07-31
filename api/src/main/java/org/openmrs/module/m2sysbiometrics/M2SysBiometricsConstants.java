@@ -1,5 +1,7 @@
 package org.openmrs.module.m2sysbiometrics;
 
+import java.util.ResourceBundle;
+
 public class M2SysBiometricsConstants {
 	
 	public static final String M2SYS_BIOMETRICS_READER_ID = "m2sys-biometrics.readerId";
@@ -16,13 +18,15 @@ public class M2SysBiometricsConstants {
 	
 	public static final String M2SYS_ACCESS_POINT_ID = "m2sys-biometrics.accessPointID";
 	
+	public static final String M2SYS_CAPTURE_TIMEOUT = "m2sys-biometrics.captureTimeout";
+	
 	public static final String M2SYS_LOOKUP_ENDPOINT = "/api/Biometric/Identify";
 	
 	public static final String M2SYS_REGISTER_ENDPOINT = "/api/Biometric/Register";
 	
-	public static final String M2SYS_CHANGE_ID_ENDPOINT = "api/Biometric/ChangeID";
+	public static final String M2SYS_UPDATE_ENDPOINT = "/api/Biometric/Update";
 	
-	public static final String M2SYS_CAPTURE_TIMEOUT = "m2sys-biometrics.captureTimeout";
+	public static final String M2SYS_CHANGE_ID_ENDPOINT = "api/Biometric/ChangeID";
 	
 	//Names
 	public static final String CUSTOMER_KEY = "CustomerKey";
@@ -38,4 +42,10 @@ public class M2SysBiometricsConstants {
 	public static final String CAPTURE_TIMEOUT = "CaptureTimeOut";
 	
 	public static final String BIOMETRIC_WITH = "BioMetricWith";
+	
+	public static final String ERROR_CODE_OF_SUBJECT_NOT_EXIST = "CS004";
+	
+	public static String getErrorMessage(String errorCode) {
+		return ResourceBundle.getBundle("MessageBundle").getString("m2sys.response.error." + errorCode);
+	}
 }

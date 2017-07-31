@@ -18,13 +18,14 @@ import org.springframework.web.client.RestOperations;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
-import java.util.ResourceBundle;
 import java.util.Map;
 
 import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.ACCESSPOINT_ID;
 import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.BIOMETRIC_WITH;
 import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.CAPTURE_TIMEOUT;
 import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.CUSTOMER_KEY;
+
+import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.getErrorMessage;
 
 /**
  * Serves as a base for all implementation of the resource interfaces. Provides method for basic
@@ -148,7 +149,7 @@ public abstract class BaseResource {
 		JsonObject responseJson = (JsonObject) parser.parse(response);
 		String responseCode = responseJson.get("ResponseCode").toString();
 		if (!responseJson.get("Success").toString().equals("true"))
-			throw new Exception(ResourceBundle.getBundle("MessageBundle").getString("m2sys.response.error." + responseCode));
+			throw new Exception(getErrorMessage(responseCode));
 	}
 	
 	private String getCustomerKey() {
