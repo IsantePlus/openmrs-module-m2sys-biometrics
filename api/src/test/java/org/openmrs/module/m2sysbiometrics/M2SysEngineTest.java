@@ -25,6 +25,7 @@ import org.springframework.http.HttpStatus;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -33,6 +34,7 @@ import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.*;
 
@@ -41,6 +43,8 @@ public class M2SysEngineTest extends M2SysBiometricSensitiveTestBase {
 	private final String SEARCH_SUBJECT_RESPONSE = "/searchSubjectsResponse.json";
 	
 	private final String UPDATE_SUBJECT_ID_RESPONSE = "/updateSubjectIdResponse.json";
+
+	private final String DELETE_RESPONSE = "/deleteResponse.json";
 	
 	private final String UPDATE_RESPONSE = "/updateResponse.json";
 	
@@ -150,7 +154,24 @@ public class M2SysEngineTest extends M2SysBiometricSensitiveTestBase {
 			assertEquals(expected.get(i).getMatchScore(), actual.get(i).getMatchScore());
 		}
 	}
-	
+
+	@Test
+	@Verifies(value = "delete biometrics subject with specific id from M2Sys Biometrics", method = "delete(String)")
+	public void shouldDeleteSubject() throws IOException {
+		final String DUMMY_URL = "http://testServerAPI/";
+		final String DUMMY_REGISTRATION_ID = "1";
+
+		when(administrationService.getGlobalProperty(M2SysBiometricsConstants.M2SYS_SERVER_URL))
+			.thenReturn(DUMMY_URL);
+		doReturn(readJsonFromFile(DELETE_RESPONSE)).when(m2SysEngine).postRequest(eq(DUMMY_URL), anyString());
+
+		m2SysEngine.delete(DUMMY_REGISTRATION_ID);
+
+		verify(m2SysEngine).prepareJson(eq(new HashMap<String, String>() {{
+			put("RegistrationID", DUMMY_REGISTRATION_ID);
+		}}));
+	}
+
 	private BiometricSubject prepareDummyBiometricSubject() {
 		BiometricSubject subject = new BiometricSubject();
 		List<Fingerprint> fingerprints = new ArrayList<>();
@@ -188,7 +209,7 @@ public class M2SysEngineTest extends M2SysBiometricSensitiveTestBase {
 		return results ;
 	}
 	
-	private String readJsonFromFile(String filename) throws Exception {
+	private String readJsonFromFile(String filename) throws IOException {
 		Resource resource = new ClassPathResource(filename);
 		String json;
 		try(InputStream is = resource.getInputStream()) {

@@ -1,0 +1,21 @@
+{
+  "ClientPlatform": 1,
+  "APIVersion": "",
+  "ClientVersion": "",
+  "Success": true,
+  "Message": "",
+  "ResponseCode": "",
+  "RegistrationID": "",
+  "NewRegistrationID": "",
+  "TransactionID": "",
+  "AccessPointID": "",
+  "DeviceName": "",
+  "PictureData": "",
+  "TemplateData": "",
+  "TemplateData2": "",
+  "LeftTemplate": "",
+  "RightTemplate": "",
+  "MatchingResult": "<Results><result score=\"0\" value=\"DS\" Instance=\"1\"/></Results>",
+  "CustomerKey": "",
+  "LocationID": 1
+}

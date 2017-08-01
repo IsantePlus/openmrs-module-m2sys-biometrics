@@ -129,8 +129,16 @@ public class M2SysEngine extends BaseResource implements BiometricEngine {
 		String response = postRequest(getServerUrl() + M2SYS_LOOKUP_ENDPOINT, prepareJson(jsonElements));
 		return parseResponse(response, BiometricSubject.class);
 	}
-	
+
+	/**
+	 * Deleting a biometric subject with a specific id
+	 *
+	 * @param subjectId a biometric subject id
+	 */
 	public void delete(String subjectId) {
+		Map<String, String> jsonElements = new HashMap<>();
+		jsonElements.put(REGISTRATION_ID, subjectId);
+		postRequest(adminService.getGlobalProperty(M2SYS_SERVER_URL) + M2SYS_LOOKUP_ENDPOINT, prepareJson(jsonElements));
 	}
 	
 	protected <T> T parseResponse(String json, Type type) {
