@@ -153,7 +153,7 @@ public abstract class BaseResource {
 	}
 	
 	private String getCustomerKey() {
-		return Context.getAdministrationService().getGlobalProperty(M2SysBiometricsConstants.M2SYS_CUSTOM_KEY);
+		return Context.getAdministrationService().getGlobalProperty(M2SysBiometricsConstants.M2SYS_CUSTOMER_KEY);
 	}
 	
 	private String getAccessPointID() {

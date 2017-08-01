@@ -14,7 +14,7 @@ public class M2SysBiometricsConstants {
 	
 	public static final String M2SYS_LOCATION_ID = "m2sys-biometrics.locationID";
 	
-	public static final String M2SYS_CUSTOM_KEY = "m2sys-biometrics.customKey";
+	public static final String M2SYS_CUSTOMER_KEY = "m2sys-biometrics.customKey";
 	
 	public static final String M2SYS_ACCESS_POINT_ID = "m2sys-biometrics.accessPointID";
 	
