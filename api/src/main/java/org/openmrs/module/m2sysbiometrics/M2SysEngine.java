@@ -86,7 +86,6 @@ public class M2SysEngine extends BaseResource implements BiometricEngine {
 		if (existingSubject == null) {
 			throw new IllegalArgumentException(getErrorMessage(ERROR_CODE_OF_SUBJECT_NOT_EXIST));
 		}
-		existingSubject.setFingerprints(subject.getFingerprints());
 		String response = postRequest(adminService.getGlobalProperty(M2SYS_SERVER_URL) + M2SYS_UPDATE_ENDPOINT, prepareJson(jsonElements));
 
 		return parseResponse(response, BiometricSubject.class);

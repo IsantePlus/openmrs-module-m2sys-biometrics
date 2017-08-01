@@ -42,6 +42,8 @@ public class M2SysEngineTest extends M2SysBiometricSensitiveTestBase {
 	
 	private final String UPDATE_SUBJECT_ID_RESPONSE = "/updateSubjectIdResponse.json";
 	
+	private final String UPDATE_RESPONSE = "/updateResponse.json";
+	
 	@Mock
 	private AdministrationService administrationService;
 	
@@ -89,6 +91,35 @@ public class M2SysEngineTest extends M2SysBiometricSensitiveTestBase {
 		actual = m2SysEngine.updateSubjectId("2", "1");
 		expected = prepareDummyBiometricSubject();
 		
+		assertNotNull(actual);
+		assertEquals(expected.getSubjectId(), actual.getSubjectId());
+		assertEquals(expected.getFingerprints().size(), actual.getFingerprints().size());
+		for (int i = 0; i < expected.getFingerprints().size(); i++) {
+			assertEquals(expected.getFingerprints().get(i).getImage(), actual.getFingerprints().get(i).getImage());
+		}
+	}
+	
+	@Test
+	@Verifies(value = "updates subject on M2Sys Biometrics", method = "update(BiometricSubject)")
+	public void shouldUpdateBiometricSubject() throws Exception {
+		BiometricSubject actual, expected;
+
+		expected = prepareDummyBiometricSubject();
+		List<Fingerprint> fingerprints = new ArrayList<>();
+		Fingerprint fingerprint1 = new Fingerprint();
+		fingerprint1.setImage("Image 3");
+		expected.setFingerprints(fingerprints);
+
+		when(Context.getAdministrationService().getGlobalProperty(M2SysBiometricsConstants.M2SYS_SERVER_URL)).thenReturn(
+				"http://testServerAPI/");
+
+		doReturn(readJsonFromFile(UPDATE_RESPONSE)).when(m2SysEngine).postRequest(
+				eq(M2SysBiometricsConstants.M2SYS_SERVER_URL + M2SYS_UPDATE_ENDPOINT), anyString());
+
+		PowerMockito.when(m2SysEngine, "parseResponse", anyString(), anyObject()).thenReturn(expected);
+
+		actual = m2SysEngine.update(expected);
+
 		assertNotNull(actual);
 		assertEquals(expected.getSubjectId(), actual.getSubjectId());
 		assertEquals(expected.getFingerprints().size(), actual.getFingerprints().size());
