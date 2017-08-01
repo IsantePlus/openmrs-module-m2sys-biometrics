@@ -52,7 +52,7 @@ public class M2SysEngine extends BaseResource implements BiometricEngine {
 	public BiometricEngineStatus getStatus() {
 		BiometricEngineStatus result = new BiometricEngineStatus();
 		
-		ResponseEntity<String> responseEntity = getServerStatus(adminService.getGlobalProperty(M2SYS_SERVER_URL));
+		ResponseEntity<String> responseEntity = getServerStatus(getServerUrl());
 		if (null != responseEntity) {
 			result.setStatusMessage(responseEntity.getStatusCode() + " " + responseEntity.getStatusCode().getReasonPhrase());
 		}
@@ -65,7 +65,7 @@ public class M2SysEngine extends BaseResource implements BiometricEngine {
 		jsonElements.put(REGISTRATION_ID, subject.getSubjectId());
 		jsonElements.put(LOCATION_ID, getLocationID());
 
-		String response = postRequest(adminService.getGlobalProperty(M2SYS_SERVER_URL) + M2SYS_REGISTER_ENDPOINT, prepareJson(jsonElements));
+		String response = postRequest(getServerUrl() + M2SYS_REGISTER_ENDPOINT, prepareJson(jsonElements));
 
 		return parseResponse(response, BiometricSubject.class);
 	}
@@ -86,7 +86,7 @@ public class M2SysEngine extends BaseResource implements BiometricEngine {
 		if (existingSubject == null) {
 			throw new IllegalArgumentException(getErrorMessage(ERROR_CODE_OF_SUBJECT_NOT_EXIST));
 		}
-		String response = postRequest(adminService.getGlobalProperty(M2SYS_SERVER_URL) + M2SYS_UPDATE_ENDPOINT, prepareJson(jsonElements));
+		String response = postRequest(getServerUrl() + M2SYS_UPDATE_ENDPOINT, prepareJson(jsonElements));
 
 		return parseResponse(response, BiometricSubject.class);
 	}
@@ -106,7 +106,7 @@ public class M2SysEngine extends BaseResource implements BiometricEngine {
 		jsonElements.put(NEW_REGISTRATION_ID, newId);
 		jsonElements.put(LOCATION_ID, getLocationID());
 
-		String response = postRequest(adminService.getGlobalProperty(M2SYS_SERVER_URL) + M2SYS_CHANGE_ID_ENDPOINT, prepareJson(jsonElements));
+		String response = postRequest(getServerUrl() + M2SYS_CHANGE_ID_ENDPOINT, prepareJson(jsonElements));
 		return parseResponse(response, BiometricSubject.class);
 	}
 	
@@ -122,7 +122,7 @@ public class M2SysEngine extends BaseResource implements BiometricEngine {
 		jsonElements.put(REGISTRATION_ID, subject.getSubjectId());
 		jsonElements.put(LOCATION_ID, getLocationID());
 
-		String response = postRequest(adminService.getGlobalProperty(M2SYS_SERVER_URL) + M2SYS_LOOKUP_ENDPOINT, prepareJson(jsonElements));
+		String response = postRequest(getServerUrl() + M2SYS_LOOKUP_ENDPOINT, prepareJson(jsonElements));
 		return parseResponse(response, new TypeToken<List<BiometricMatch>>() {}.getType());
 	}
 	
@@ -131,7 +131,7 @@ public class M2SysEngine extends BaseResource implements BiometricEngine {
 		jsonElements.put(REGISTRATION_ID, subjectId);
 		jsonElements.put(LOCATION_ID, getLocationID());
 
-		String response = postRequest(adminService.getGlobalProperty(M2SYS_SERVER_URL) + M2SYS_LOOKUP_ENDPOINT, prepareJson(jsonElements));
+		String response = postRequest(getServerUrl() + M2SYS_LOOKUP_ENDPOINT, prepareJson(jsonElements));
 		return parseResponse(response, BiometricSubject.class);
 	}
 	
@@ -141,5 +141,9 @@ public class M2SysEngine extends BaseResource implements BiometricEngine {
 	protected <T> T parseResponse(String json, Type type) {
 		Gson gson = new Gson();
 		return gson.fromJson(json, type);
+	}
+
+	private String getServerUrl() {
+		return adminService.getGlobalProperty(M2SYS_SERVER_URL);
 	}
 }
