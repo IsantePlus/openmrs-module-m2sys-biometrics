@@ -80,7 +80,7 @@ public abstract class BaseResource {
 		headers.setContentType(MediaType.APPLICATION_JSON);
 		headers.setAccept(Arrays.asList(MediaType.ALL));
 		LOGGER.debug("{} request body: {}", url, json);
-		String responseJson = "";
+		String responseJson;
 		
 		ResponseEntity<String> responseEntity;
 		try {
