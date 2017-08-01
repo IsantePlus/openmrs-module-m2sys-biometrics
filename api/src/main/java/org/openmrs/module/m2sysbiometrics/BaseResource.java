@@ -1,10 +1,12 @@
 package org.openmrs.module.m2sysbiometrics;
 
+import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.m2sysbiometrics.model.BiometricCaptureType;
 import org.openmrs.module.m2sysbiometrics.util.TokenUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,11 +38,9 @@ public abstract class BaseResource {
 	private static final Logger LOGGER = LoggerFactory.getLogger(BaseResource.class);
 	
 	private RestOperations restOperations;
-	
-	private enum EnumBiometricCaptureType {
-		None, BiometricOnly, BothBiometricAndPicture, PictureOnly;
-	}
-	
+
+	private Gson gson = buildGson();
+
 	protected BaseResource(RestOperations restOperationsrestOperations) {
 		this.restOperations = restOperations;
 	}
@@ -100,7 +100,7 @@ public abstract class BaseResource {
 		requestJson.addProperty(CUSTOMER_KEY, getCustomerKey());
 		requestJson.addProperty(ACCESSPOINT_ID, getAccessPointID());
 		requestJson.addProperty(CAPTURE_TIMEOUT, getCaptureTimeOut());
-		requestJson.addProperty(BIOMETRIC_WITH, EnumBiometricCaptureType.None.toString());
+		requestJson.addProperty(BIOMETRIC_WITH, BiometricCaptureType.None.toString());
 		
 		for (Map.Entry<String, String> entry : map.entrySet()) {
 			requestJson.addProperty(entry.getKey(), entry.getValue());
@@ -108,7 +108,11 @@ public abstract class BaseResource {
 		
 		return requestJson.toString();
 	}
-	
+
+	protected String getLocationID() {
+		return Context.getAdministrationService().getGlobalProperty(M2SysBiometricsConstants.M2SYS_LOCATION_ID);
+	}
+
 	private ResponseEntity<String> exchange(URI url, HttpMethod method) {
 		return exchange(url, method, null, new HttpHeaders());
 	}
@@ -116,7 +120,7 @@ public abstract class BaseResource {
 	private ResponseEntity<String> exchange(URI url, HttpMethod method, String body, HttpHeaders headers) {
 		TokenUtil token = getToken();
 
-		headers.add("Authorization", token.getToken_type() + " " + token.getAccess_token());
+		headers.add("Authorization", token.getTokenType() + " " + token.getAccessToken());
 
         return restOperations.exchange(url, method, new HttpEntity<>(body, headers), String.class);
     }
@@ -131,8 +135,6 @@ public abstract class BaseResource {
 		
 		ResponseEntity<String> response = restOperations.exchange(M2SysBiometricsConstants.M2SYS_SERVER_URL + "/cstoken",
 		    HttpMethod.POST, new HttpEntity<Object>(body, headers), String.class);
-		
-		Gson gson = new GsonBuilder().create();
 
 		return gson.fromJson(response.getBody(), TokenUtil.class);
 	}
@@ -157,8 +159,9 @@ public abstract class BaseResource {
 	private String getCaptureTimeOut() {
 		return Context.getAdministrationService().getGlobalProperty(M2SysBiometricsConstants.M2SYS_CAPTURE_TIMEOUT);
 	}
-	
-	protected String getLocationID() {
-		return Context.getAdministrationService().getGlobalProperty(M2SysBiometricsConstants.M2SYS_LOCATION_ID);
+
+	private Gson buildGson() {
+		return new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.UPPER_CAMEL_CASE)
+				.create();
 	}
 }
