@@ -46,8 +46,6 @@ public class M2SysEngine extends BaseResource implements BiometricEngine {
 	/**
 	 * Gets a status of biometric server.
 	 * 
-	 * @should get response from M2Sys Biometrics
-	 * @return a status of biometric engine
 	 */
 	public BiometricEngineStatus getStatus() {
 		BiometricEngineStatus result = new BiometricEngineStatus();
@@ -74,7 +72,6 @@ public class M2SysEngine extends BaseResource implements BiometricEngine {
 	 * Updates subject on M2Sys server.
 	 * 
 	 * @param subject to update
-	 * @should updates subject on M2Sys Biometrics
 	 * @return updated subject
 	 */
 	public BiometricSubject update(BiometricSubject subject) {
@@ -96,7 +93,6 @@ public class M2SysEngine extends BaseResource implements BiometricEngine {
 	 * 
 	 * @param oldId an old ID
 	 * @param newId a new ID
-	 * @should updates an ID of subject on M2Sys Biometrics
 	 * @return updated subject
 	 */
 	public BiometricSubject updateSubjectId(String oldId, String newId) {
@@ -114,7 +110,6 @@ public class M2SysEngine extends BaseResource implements BiometricEngine {
 	 * Searching a biometric data using a given pattern subject.
 	 * 
 	 * @param subject a pattern subject
-	 * @should searches a data on M2Sys Server using a subject
 	 * @return a list of matching data from M2Sys Server
 	 */
 	public List<BiometricMatch> search(BiometricSubject subject) {
