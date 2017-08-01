@@ -1,56 +1,46 @@
 package org.openmrs.module.m2sysbiometrics;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import org.openmrs.api.AdministrationService;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.m2sysbiometrics.http.M2SysHttpClient;
+import org.openmrs.module.m2sysbiometrics.model.BiometricCaptureType;
+import org.openmrs.module.m2sysbiometrics.model.M2SysRequest;
+import org.openmrs.module.m2sysbiometrics.model.M2SysResponse;
+import org.openmrs.module.m2sysbiometrics.model.ChangeIdRequest;
 import org.openmrs.module.registrationcore.api.biometrics.BiometricEngine;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricEngineStatus;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricMatch;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricSubject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestOperations;
-import org.springframework.web.client.RestTemplate;
 
-import java.lang.reflect.Type;
 import java.util.List;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.ERROR_CODE_OF_SUBJECT_NOT_EXIST;
-import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.LOCATION_ID;
 import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.M2SYS_CHANGE_ID_ENDPOINT;
+import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.M2SYS_DELETE_ID_ENDPOINT;
 import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.M2SYS_LOOKUP_ENDPOINT;
 import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.M2SYS_REGISTER_ENDPOINT;
 import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.M2SYS_SERVER_URL;
 import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.M2SYS_UPDATE_ENDPOINT;
-import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.NEW_REGISTRATION_ID;
-import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.REGISTRATION_ID;
 import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.getErrorMessage;
 
 @Component("m2sysbiometrics.M2SysEngine")
-public class M2SysEngine extends BaseResource implements BiometricEngine {
+public class M2SysEngine implements BiometricEngine {
 	
 	private AdministrationService adminService = Context.getAdministrationService();
 	
-	protected M2SysEngine() {
-		this(new RestTemplate());
-	}
-	
-	protected M2SysEngine(RestOperations restOperations) {
-		super(restOperations);
-	}
+	@Autowired
+	private M2SysHttpClient httpClient;
 	
 	/**
 	 * Gets a status of biometric server.
-	 * 
 	 */
 	public BiometricEngineStatus getStatus() {
 		BiometricEngineStatus result = new BiometricEngineStatus();
 		
-		ResponseEntity<String> responseEntity = getServerStatus(getServerUrl());
+		ResponseEntity<String> responseEntity = httpClient.getServerStatus(getServerUrl());
 		if (null != responseEntity) {
 			result.setStatusMessage(responseEntity.getStatusCode() + " " + responseEntity.getStatusCode().getReasonPhrase());
 		}
@@ -59,13 +49,13 @@ public class M2SysEngine extends BaseResource implements BiometricEngine {
 	}
 	
 	public BiometricSubject enroll(BiometricSubject subject) {
-		Map<String, String> jsonElements = new HashMap<>();
-		jsonElements.put(REGISTRATION_ID, subject.getSubjectId());
-		jsonElements.put(LOCATION_ID, getLocationID());
-
-		String response = postRequest(getServerUrl() + M2SYS_REGISTER_ENDPOINT, prepareJson(jsonElements));
-
-		return parseResponse(response, BiometricSubject.class);
+		M2SysRequest request = new M2SysRequest();
+		addCommonValues(request);
+		request.setRegistrationId(subject.getSubjectId());
+		
+		M2SysResponse response = httpClient.postRequest(url(M2SYS_REGISTER_ENDPOINT), request);
+		
+		return response.toBiometricSubject();
 	}
 	
 	/**
@@ -75,17 +65,18 @@ public class M2SysEngine extends BaseResource implements BiometricEngine {
 	 * @return updated subject
 	 */
 	public BiometricSubject update(BiometricSubject subject) {
-		Map<String, String> jsonElements = new HashMap<>();
-		jsonElements.put(REGISTRATION_ID, subject.getSubjectId());
-		jsonElements.put(LOCATION_ID, getLocationID());
-
 		BiometricSubject existingSubject = lookup(subject.getSubjectId());
 		if (existingSubject == null) {
 			throw new IllegalArgumentException(getErrorMessage(ERROR_CODE_OF_SUBJECT_NOT_EXIST));
 		}
-		String response = postRequest(getServerUrl() + M2SYS_UPDATE_ENDPOINT, prepareJson(jsonElements));
-
-		return parseResponse(response, BiometricSubject.class);
+		
+		M2SysRequest request = new M2SysRequest();
+		addCommonValues(request);
+		request.setRegistrationId(subject.getSubjectId());
+		
+		M2SysResponse response = httpClient.postRequest(url(M2SYS_UPDATE_ENDPOINT), request);
+		
+		return response.toBiometricSubject();
 	}
 	
 	/**
@@ -96,14 +87,14 @@ public class M2SysEngine extends BaseResource implements BiometricEngine {
 	 * @return updated subject
 	 */
 	public BiometricSubject updateSubjectId(String oldId, String newId) {
-		Map<String, String> jsonElements = new HashMap<>();
-
-		jsonElements.put(REGISTRATION_ID, oldId);
-		jsonElements.put(NEW_REGISTRATION_ID, newId);
-		jsonElements.put(LOCATION_ID, getLocationID());
-
-		String response = postRequest(getServerUrl() + M2SYS_CHANGE_ID_ENDPOINT, prepareJson(jsonElements));
-		return parseResponse(response, BiometricSubject.class);
+		ChangeIdRequest request = new ChangeIdRequest();
+		addCommonValues(request);
+		request.setRegistrationId(oldId);
+		request.setNewRegistrationId(newId);
+		
+		M2SysResponse response = httpClient.postRequest(url(M2SYS_CHANGE_ID_ENDPOINT), request);
+		
+		return response.toBiometricSubject();
 	}
 	
 	/**
@@ -113,40 +104,67 @@ public class M2SysEngine extends BaseResource implements BiometricEngine {
 	 * @return a list of matching data from M2Sys Server
 	 */
 	public List<BiometricMatch> search(BiometricSubject subject) {
-		Map<String, String> jsonElements = new HashMap<>();
-		jsonElements.put(REGISTRATION_ID, subject.getSubjectId());
-		jsonElements.put(LOCATION_ID, getLocationID());
-
-		String response = postRequest(getServerUrl() + M2SYS_LOOKUP_ENDPOINT, prepareJson(jsonElements));
-		return parseResponse(response, new TypeToken<List<BiometricMatch>>() {}.getType());
+		M2SysRequest request = new M2SysRequest();
+		addCommonValues(request);
+		request.setRegistrationId(subject.getSubjectId());
+		
+		M2SysResponse response = httpClient.postRequest(url(M2SYS_LOOKUP_ENDPOINT), request);
+		
+		return response.toMatchList();
 	}
 	
 	public BiometricSubject lookup(String subjectId) {
-		Map<String, String> jsonElements = new HashMap<>();
-		jsonElements.put(REGISTRATION_ID, subjectId);
-		jsonElements.put(LOCATION_ID, getLocationID());
-
-		String response = postRequest(getServerUrl() + M2SYS_LOOKUP_ENDPOINT, prepareJson(jsonElements));
-		return parseResponse(response, BiometricSubject.class);
+		M2SysRequest request = new M2SysRequest();
+		addCommonValues(request);
+		request.setRegistrationId(subjectId);
+		
+		M2SysResponse response = httpClient.postRequest(url(M2SYS_LOOKUP_ENDPOINT), request);
+		return response.toBiometricSubject();
 	}
-
+	
 	/**
 	 * Deleting a biometric subject with a specific id
-	 *
+	 * 
 	 * @param subjectId a biometric subject id
 	 */
 	public void delete(String subjectId) {
-		Map<String, String> jsonElements = new HashMap<>();
-		jsonElements.put(REGISTRATION_ID, subjectId);
-		postRequest(getServerUrl() + M2SYS_LOOKUP_ENDPOINT, prepareJson(jsonElements));
+		M2SysRequest request = new M2SysRequest();
+		addCommonValues(request);
+		request.setRegistrationId(subjectId);
+		httpClient.postRequest(url(M2SYS_DELETE_ID_ENDPOINT), request);
 	}
 	
-	protected <T> T parseResponse(String json, Type type) {
-		Gson gson = new Gson();
-		return gson.fromJson(json, type);
+	private void addCommonValues(M2SysRequest request) {
+		request.setAccessPointId(getAccessPointID());
+		request.setCaptureTimeout(getCaptureTimeOut());
+		request.setCustomerKey(getCustomerKey());
+		
+		request.setLocationId(getLocationID());
+		
+		request.setBiometricWith(BiometricCaptureType.None); // TODO; why none?
 	}
-
+	
+	private String url(String path) {
+		return getServerUrl() + path;
+	}
+	
 	private String getServerUrl() {
 		return adminService.getGlobalProperty(M2SYS_SERVER_URL);
+	}
+	
+	private String getCustomerKey() {
+		return Context.getAdministrationService().getGlobalProperty(M2SysBiometricsConstants.M2SYS_CUSTOMER_KEY);
+	}
+	
+	private String getAccessPointID() {
+		return Context.getAdministrationService().getGlobalProperty(M2SysBiometricsConstants.M2SYS_ACCESS_POINT_ID);
+	}
+	
+	private String getCaptureTimeOut() {
+		return Context.getAdministrationService().getGlobalProperty(M2SysBiometricsConstants.M2SYS_CAPTURE_TIMEOUT);
+	}
+	
+	private String getLocationID() {
+		return Context.getAdministrationService().getGlobalProperty(M2SysBiometricsConstants.M2SYS_LOCATION_ID);
 	}
 }

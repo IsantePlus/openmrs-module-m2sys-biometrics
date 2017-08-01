@@ -25,25 +25,10 @@ public class M2SysBiometricsConstants {
 	public static final String M2SYS_REGISTER_ENDPOINT = "/api/Biometric/Register";
 	
 	public static final String M2SYS_UPDATE_ENDPOINT = "/api/Biometric/Update";
-
+	
 	public static final String M2SYS_DELETE_ID_ENDPOINT = "api/Biometric/DeleteID";
-
+	
 	public static final String M2SYS_CHANGE_ID_ENDPOINT = "api/Biometric/ChangeID";
-	
-	//Names
-	public static final String CUSTOMER_KEY = "CustomerKey";
-	
-	public static final String REGISTRATION_ID = "RegistrationID";
-	
-	public static final String NEW_REGISTRATION_ID = "NewRegistrationID";
-	
-	public static final String LOCATION_ID = "LocationID";
-	
-	public static final String ACCESSPOINT_ID = "AccessPointID";
-	
-	public static final String CAPTURE_TIMEOUT = "CaptureTimeOut";
-	
-	public static final String BIOMETRIC_WITH = "BioMetricWith";
 	
 	public static final String ERROR_CODE_OF_SUBJECT_NOT_EXIST = "CS004";
 	

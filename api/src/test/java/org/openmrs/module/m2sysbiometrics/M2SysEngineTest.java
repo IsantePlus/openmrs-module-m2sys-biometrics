@@ -1,229 +1,173 @@
 package org.openmrs.module.m2sysbiometrics;
 
-import org.apache.commons.io.IOUtils;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.Spy;
 import org.openmrs.api.AdministrationService;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.m2sysbiometrics.http.M2SysHttpClient;
+import org.openmrs.module.m2sysbiometrics.model.BiometricCaptureType;
+import org.openmrs.module.m2sysbiometrics.model.M2SysRequest;
+import org.openmrs.module.m2sysbiometrics.model.M2SysResponse;
+import org.openmrs.module.m2sysbiometrics.model.ChangeIdRequest;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricEngineStatus;
-import org.openmrs.module.registrationcore.api.biometrics.model.BiometricMatch;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricSubject;
-import org.openmrs.module.registrationcore.api.biometrics.model.Fingerprint;
 import org.openmrs.test.Verifies;
-import org.powermock.api.mockito.PowerMockito;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.mockito.Matchers.anyObject;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.timeout;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.*;
 
 public class M2SysEngineTest extends M2SysBiometricSensitiveTestBase {
 	
-	private final String SEARCH_SUBJECT_RESPONSE = "/searchSubjectsResponse.json";
+	private static final String SERVER_URL = "http://testServerAPI/";
 	
-	private final String UPDATE_SUBJECT_ID_RESPONSE = "/updateSubjectIdResponse.json";
-
-	private final String DELETE_RESPONSE = "/deleteResponse.json";
+	private static final String LOCATION_ID = "location_id_1";
 	
-	private final String UPDATE_RESPONSE = "/updateResponse.json";
+	private static final String CUSTOMER_KEY = "DO-NOT-COMMIT-ME-TO-GH";
+	
+	private static final String CAPTURE_TIMEOUT = "110s";
+	
+	private static final String ACCESS_POINT_ID = "A01";
 	
 	@Mock
 	private AdministrationService administrationService;
 	
-	@Spy
+	@Mock
+	private M2SysHttpClient httpClient;
+	
+	@Mock
+	private M2SysResponse response;
+	
+	@Mock
+	private BiometricSubject expectedSubject;
+	
 	@InjectMocks
 	private M2SysEngine m2SysEngine;
+	
+	@Captor
+	private ArgumentCaptor<M2SysRequest> requestCaptor;
 	
 	@Before
 	public void init() {
 		MockitoAnnotations.initMocks(this);
+		when(administrationService.getGlobalProperty(M2SysBiometricsConstants.M2SYS_SERVER_URL)).thenReturn(SERVER_URL);
+		when(administrationService.getGlobalProperty(M2SysBiometricsConstants.M2SYS_LOCATION_ID)).thenReturn(LOCATION_ID);
+		when(administrationService.getGlobalProperty(M2SysBiometricsConstants.M2SYS_CUSTOMER_KEY)).thenReturn(CUSTOMER_KEY);
+		when(administrationService.getGlobalProperty(M2SysBiometricsConstants.M2SYS_CAPTURE_TIMEOUT)).thenReturn(
+		    CAPTURE_TIMEOUT);
+		when(administrationService.getGlobalProperty(M2SysBiometricsConstants.M2SYS_ACCESS_POINT_ID)).thenReturn(
+		    ACCESS_POINT_ID);
+		
+		when(response.toBiometricSubject()).thenReturn(expectedSubject);
 	}
 	
 	@Test
 	@Verifies(value = "get response from M2Sys Biometrics", method = "getStatus()")
 	public void shouldGetStatus() throws IOException {
-		BiometricEngineStatus actual, expected;
 		
-		when(administrationService.getGlobalProperty(M2SysBiometricsConstants.M2SYS_SERVER_URL)).thenReturn(
-		    "http://testServerAPI/");
+		doReturn(new ResponseEntity<String>(HttpStatus.OK)).when(httpClient).getServerStatus(SERVER_URL);
 		
-		doReturn(new ResponseEntity<String>(HttpStatus.OK)).when(m2SysEngine).getServerStatus(anyString());
+		BiometricEngineStatus status = m2SysEngine.getStatus();
 		
-		actual = m2SysEngine.getStatus();
-		
-		expected = prepareDummyGetStatusResponse();
-		
-		assertNotNull(actual);
-		assertEquals(expected.getStatusMessage(), actual.getStatusMessage());
-		assertEquals(expected.getDescription(), actual.getDescription());
+		assertNotNull(status);
+		assertEquals("200 OK", status.getStatusMessage());
 	}
 	
 	@Test
 	@Verifies(value = "updates an ID of subject on M2Sys Biometrics", method = "updateSubjectId(String, String)")
 	public void shouldUpdateSubjectID() throws Exception {
-		BiometricSubject actual, expected;
+		final String url = SERVER_URL + M2SysBiometricsConstants.M2SYS_CHANGE_ID_ENDPOINT;
+		when(httpClient.postRequest(eq(url), any(ChangeIdRequest.class))).thenReturn(response);
 		
-		when(Context.getAdministrationService().getGlobalProperty(M2SysBiometricsConstants.M2SYS_SERVER_URL)).thenReturn(
-		    "http://testServerAPI/");
+		BiometricSubject subject = m2SysEngine.updateSubjectId("2", "1");
 		
-		doReturn(readJsonFromFile(UPDATE_SUBJECT_ID_RESPONSE)).when(m2SysEngine).postRequest(
-		    eq(M2SysBiometricsConstants.M2SYS_SERVER_URL + M2SYS_CHANGE_ID_ENDPOINT), anyString());
+		assertEquals(expectedSubject, subject);
+		verify(httpClient).postRequest(eq(url), requestCaptor.capture());
 		
-		PowerMockito.when(m2SysEngine, "parseResponse", anyString(), anyObject()).thenReturn(prepareDummyBiometricSubject());
-		
-		actual = m2SysEngine.updateSubjectId("2", "1");
-		expected = prepareDummyBiometricSubject();
-		
-		assertNotNull(actual);
-		assertEquals(expected.getSubjectId(), actual.getSubjectId());
-		assertEquals(expected.getFingerprints().size(), actual.getFingerprints().size());
-		for (int i = 0; i < expected.getFingerprints().size(); i++) {
-			assertEquals(expected.getFingerprints().get(i).getImage(), actual.getFingerprints().get(i).getImage());
-		}
+		ChangeIdRequest request = (ChangeIdRequest) requestCaptor.getValue();
+		verifyRequestCommonFields(request);
+		assertEquals("2", request.getRegistrationId());
+		assertEquals("1", request.getNewRegistrationId());
 	}
 	
 	@Test
 	@Verifies(value = "updates subject on M2Sys Biometrics", method = "update(BiometricSubject)")
 	public void shouldUpdateBiometricSubject() throws Exception {
-		BiometricSubject actual, expected;
-
-		expected = prepareDummyBiometricSubject();
-		List<Fingerprint> fingerprints = new ArrayList<>();
-		Fingerprint fingerprint1 = new Fingerprint();
-		fingerprint1.setImage("Image 3");
-		expected.setFingerprints(fingerprints);
-
-		when(Context.getAdministrationService().getGlobalProperty(M2SysBiometricsConstants.M2SYS_SERVER_URL)).thenReturn(
-				"http://testServerAPI/");
-
-		doReturn(readJsonFromFile(UPDATE_RESPONSE)).when(m2SysEngine).postRequest(
-				eq(M2SysBiometricsConstants.M2SYS_SERVER_URL + M2SYS_UPDATE_ENDPOINT), anyString());
-
-		PowerMockito.when(m2SysEngine, "parseResponse", anyString(), anyObject()).thenReturn(expected);
-
-		actual = m2SysEngine.update(expected);
-
-		assertNotNull(actual);
-		assertEquals(expected.getSubjectId(), actual.getSubjectId());
-		assertEquals(expected.getFingerprints().size(), actual.getFingerprints().size());
-		for (int i = 0; i < expected.getFingerprints().size(); i++) {
-			assertEquals(expected.getFingerprints().get(i).getImage(), actual.getFingerprints().get(i).getImage());
-		}
+		final String url = SERVER_URL + M2SYS_UPDATE_ENDPOINT;
+		final String lookupUrl = SERVER_URL + M2SYS_LOOKUP_ENDPOINT;
+		
+		when(httpClient.postRequest(eq(url), any(M2SysRequest.class))).thenReturn(response);
+		when(httpClient.postRequest(eq(lookupUrl), any(M2SysRequest.class))).thenReturn(response);
+		
+		BiometricSubject reqSubject = new BiometricSubject("ID1");
+		BiometricSubject subject = m2SysEngine.update(reqSubject);
+		
+		assertEquals(expectedSubject, subject);
+		verify(httpClient, times(2)).postRequest(anyString(), requestCaptor.capture());
+		
+		M2SysRequest lookupRequest = requestCaptor.getAllValues().get(0);
+		verifyRequestCommonFields(lookupRequest);
+		assertEquals("ID1", lookupRequest.getRegistrationId());
+		
+		M2SysRequest request = requestCaptor.getAllValues().get(1);
+		verifyRequestCommonFields(request);
+		assertEquals("ID1", request.getRegistrationId());
 	}
 	
-	@Test
-	@Verifies(value = "searches a data on M2Sys Server using a subject", method = "search(BiometricSubject)")
-	public void shouldSearchBiometricSubject() throws Exception {
-		List<BiometricMatch> expected, actual;
+	@Test(expected = IllegalArgumentException.class)
+	@Verifies(value = "updating a non-existent subject", method = "update(BiometricSubject)")
+	public void shouldNotUpdateBiometricSubjectIfItDoesNotExist() throws Exception {
+		final String url = SERVER_URL + M2SYS_UPDATE_ENDPOINT;
+		final String lookupUrl = SERVER_URL + M2SYS_LOOKUP_ENDPOINT;
 		
-		when(administrationService.getGlobalProperty(M2SysBiometricsConstants.M2SYS_SERVER_URL)).thenReturn(
-		    "http://testServerAPI/");
-		doReturn(readJsonFromFile(SEARCH_SUBJECT_RESPONSE)).when(m2SysEngine).postRequest(
-		    eq(M2SysBiometricsConstants.M2SYS_SERVER_URL + M2SYS_REGISTER_ENDPOINT), anyString());
+		when(httpClient.postRequest(eq(url), any(M2SysRequest.class))).thenReturn(response);
+		when(httpClient.postRequest(eq(lookupUrl), any(M2SysRequest.class))).thenReturn(mock(M2SysResponse.class)); // won't return subject
 		
-		PowerMockito.when(m2SysEngine, "parseResponse", anyString(), anyObject()).thenReturn(prepareSearchResults());
-		
-		actual = m2SysEngine.search(prepareDummyBiometricSubject());
-		expected = prepareSearchResults();
-		
-		assertNotNull(actual);
-		assertEquals(expected.size(), actual.size());
-		for (int i = 0; i < expected.size(); i++) {
-			assertEquals(expected.get(i).getSubjectId(), actual.get(i).getSubjectId());
-			assertEquals(expected.get(i).getMatchScore(), actual.get(i).getMatchScore());
-		}
+		BiometricSubject reqSubject = new BiometricSubject("ID1");
+		BiometricSubject subject = m2SysEngine.update(reqSubject);
 	}
-
+	
 	@Test
 	@Verifies(value = "delete biometrics subject with specific id from M2Sys Biometrics", method = "delete(String)")
 	public void shouldDeleteSubject() throws IOException {
-		final String DUMMY_URL = "http://testServerAPI/";
-		final String DUMMY_REGISTRATION_ID = "1";
-
-		when(administrationService.getGlobalProperty(M2SysBiometricsConstants.M2SYS_SERVER_URL))
-			.thenReturn(DUMMY_URL);
-		doReturn(readJsonFromFile(DELETE_RESPONSE)).when(m2SysEngine).postRequest(eq(DUMMY_URL), anyString());
-
-		m2SysEngine.delete(DUMMY_REGISTRATION_ID);
-
-		verify(m2SysEngine).prepareJson(eq(new HashMap<String, String>() {{
-			put("RegistrationID", DUMMY_REGISTRATION_ID);
-		}}));
-	}
-
-	private BiometricSubject prepareDummyBiometricSubject() {
-		BiometricSubject subject = new BiometricSubject();
-		List<Fingerprint> fingerprints = new ArrayList<>();
-
-		subject.setSubjectId("1");
-
-		Fingerprint fingerprint1 = new Fingerprint();
-		fingerprint1.setImage("Image 1");
-
-		Fingerprint fingerprint2 = new Fingerprint();
-		fingerprint2.setImage("Image 2");
-
-		fingerprints.add(fingerprint1);
-		fingerprints.add(fingerprint2);
-
-		subject.setFingerprints(fingerprints);
-
-		return subject;
+		final String url = SERVER_URL + M2SYS_DELETE_ID_ENDPOINT;
+		
+		when(httpClient.postRequest(eq(url), any(M2SysRequest.class))).thenReturn(response);
+		
+		m2SysEngine.delete("XXX");
+		
+		verify(httpClient).postRequest(eq(url), requestCaptor.capture());
+		
+		M2SysRequest request = requestCaptor.getValue();
+		verifyRequestCommonFields(request);
+		assertEquals("XXX", request.getRegistrationId());
+		
 	}
 	
-	private List<BiometricMatch> prepareSearchResults() {
-		List<BiometricMatch> results = new ArrayList<>();
-
-		BiometricMatch match1 = new BiometricMatch();
-		match1.setSubjectId("1");
-		match1.setMatchScore(0.5);
-
-		BiometricMatch match2 = new BiometricMatch();
-		match2.setSubjectId("2");
-		match2.setMatchScore(1.0);
-
-		results.add(match1);
-		results.add(match2);
-
-		return results ;
-	}
-	
-	private String readJsonFromFile(String filename) throws IOException {
-		Resource resource = new ClassPathResource(filename);
-		String json;
-		try(InputStream is = resource.getInputStream()) {
-			json = IOUtils.toString(is);
-		}
-
-		return json;
-	}
-	
-	private BiometricEngineStatus prepareDummyGetStatusResponse() {
-		BiometricEngineStatus result = new BiometricEngineStatus();
-		ResponseEntity<String> response = new ResponseEntity<>(HttpStatus.OK);
-
-		result.setStatusMessage(response.getStatusCode() + " " + response.getStatusCode().getReasonPhrase());
-		return result;
+	private void verifyRequestCommonFields(M2SysRequest request) {
+		assertEquals(CUSTOMER_KEY, request.getCustomerKey());
+		assertEquals(CAPTURE_TIMEOUT, request.getCaptureTimeout());
+		assertEquals(LOCATION_ID, request.getLocationId());
+		assertEquals(ACCESS_POINT_ID, request.getAccessPointId());
+		assertEquals(BiometricCaptureType.None, request.getBiometricWith());
 	}
 }
