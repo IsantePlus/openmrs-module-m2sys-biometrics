@@ -16,6 +16,7 @@ import org.openmrs.module.registrationcore.api.biometrics.model.BiometricMatch;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricSubject;
 import org.openmrs.module.registrationcore.api.biometrics.model.Fingerprint;
 import org.openmrs.test.Verifies;
+import org.powermock.api.mockito.PowerMockito;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +29,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doReturn;
@@ -72,7 +74,6 @@ public class M2SysEngineTest extends M2SysBiometricSensitiveTestBase {
 	}
 	
 	@Test
-	@Ignore
 	@Verifies(value = "updates an ID of subject on M2Sys Biometrics", method = "updateSubjectId(String, String)")
 	public void shouldUpdateSubjectID() throws Exception {
 		BiometricSubject actual, expected;
@@ -82,6 +83,8 @@ public class M2SysEngineTest extends M2SysBiometricSensitiveTestBase {
 		
 		doReturn(readJsonFromFile(UPDATE_SUBJECT_ID_RESPONSE)).when(m2SysEngine).postRequest(
 		    eq(M2SysBiometricsConstants.M2SYS_SERVER_URL + M2SYS_CHANGE_ID_ENDPOINT), anyString());
+		
+		PowerMockito.when(m2SysEngine, "parseResponse", anyString(), anyObject()).thenReturn(prepareDummyBiometricSubject());
 		
 		actual = m2SysEngine.updateSubjectId("2", "1");
 		expected = prepareDummyBiometricSubject();
@@ -95,7 +98,6 @@ public class M2SysEngineTest extends M2SysBiometricSensitiveTestBase {
 	}
 	
 	@Test
-	@Ignore
 	@Verifies(value = "searches a data on M2Sys Server using a subject", method = "search(BiometricSubject)")
 	public void shouldSearchBiometricSubject() throws Exception {
 		List<BiometricMatch> expected, actual;
@@ -104,6 +106,8 @@ public class M2SysEngineTest extends M2SysBiometricSensitiveTestBase {
 		    "http://testServerAPI/");
 		doReturn(readJsonFromFile(SEARCH_SUBJECT_RESPONSE)).when(m2SysEngine).postRequest(
 		    eq(M2SysBiometricsConstants.M2SYS_SERVER_URL + M2SYS_REGISTER_ENDPOINT), anyString());
+		
+		PowerMockito.when(m2SysEngine, "parseResponse", anyString(), anyObject()).thenReturn(prepareSearchResults());
 		
 		actual = m2SysEngine.search(prepareDummyBiometricSubject());
 		expected = prepareSearchResults();

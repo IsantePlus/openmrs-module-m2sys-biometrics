@@ -139,7 +139,7 @@ public class M2SysEngine extends BaseResource implements BiometricEngine {
 	public void delete(String subjectId) {
 	}
 	
-	private <T> T parseResponse(String json, Type type) {
+	protected <T> T parseResponse(String json, Type type) {
 		Gson gson = new Gson();
 		return gson.fromJson(json, type);
 	}
