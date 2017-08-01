@@ -140,7 +140,6 @@ public class M2SysEngine extends BaseResource implements BiometricEngine {
 	 * Deleting a biometric subject with a specific id
 	 *
 	 * @param subjectId a biometric subject id
-	 * @should deletes a biometric subject with a specific id on M2Sys Server
 	 */
 	public void delete(String subjectId) {
 		Map<String, String> jsonElements = new HashMap<>();
