@@ -46,15 +46,13 @@ public abstract class BaseResource {
 	}
 	
 	protected ResponseEntity<String> getServerStatus(String url) {
-		ResponseEntity<String> result;
 		try {
-			result = exchange(new URI(url), HttpMethod.GET);
+			return exchange(new URI(url), HttpMethod.GET);
 		}
 		catch (URISyntaxException e) {
 			throw new RuntimeException(e);
 		}
 		
-		return result;
 	}
 	
 	/**
@@ -63,12 +61,12 @@ public abstract class BaseResource {
 	 * @return the response json
 	 */
 	protected String getResponseJson(String url) {
-		String responseJson = null;
 		try {
-			responseJson = exchange(new URI(url), HttpMethod.GET).getBody();
+			return exchange(new URI(url), HttpMethod.GET).getBody();
 		}
-		catch (URISyntaxException e) {}
-		return responseJson;
+		catch (URISyntaxException e) {
+			throw new RuntimeException(e);
+		}
 	}
 	
 	/**
@@ -84,19 +82,15 @@ public abstract class BaseResource {
 		LOGGER.debug("{} request body: {}", url, json);
 		String responseJson = "";
 		
-		ResponseEntity<String> responseEntity = null;
+		ResponseEntity<String> responseEntity;
 		try {
 			responseEntity = exchange(new URI(url), HttpMethod.POST, json, headers);
 			responseJson = responseEntity.getBody();
 			checkResponse(responseJson);
 		}
-		catch (URISyntaxException e) {
+		catch (Exception e) {
 			throw new RuntimeException(e);
 		}
-		catch (Exception e) {
-			e.getMessage();
-		}
-		
 		return responseJson;
 	}
 	
@@ -139,17 +133,17 @@ public abstract class BaseResource {
 		    HttpMethod.POST, new HttpEntity<Object>(body, headers), String.class);
 		
 		Gson gson = new GsonBuilder().create();
-		TokenUtil token = gson.fromJson(response.getBody(), TokenUtil.class);
-		
-		return token;
+
+		return gson.fromJson(response.getBody(), TokenUtil.class);
 	}
 	
-	private void checkResponse(String response) throws Exception {
+	private void checkResponse(String response) {
 		JsonParser parser = new JsonParser();
 		JsonObject responseJson = (JsonObject) parser.parse(response);
 		String responseCode = responseJson.get("ResponseCode").toString();
-		if (!responseJson.get("Success").toString().equals("true"))
-			throw new Exception(getErrorMessage(responseCode));
+		if (!responseJson.get("Success").toString().equals("true")) {
+			throw new RuntimeException(getErrorMessage(responseCode));
+		}
 	}
 	
 	private String getCustomerKey() {
