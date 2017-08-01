@@ -37,6 +37,7 @@ public class M2SysEngine implements BiometricEngine {
     /**
      * Gets a status of biometric server.
      */
+    @Override
     public BiometricEngineStatus getStatus() {
         BiometricEngineStatus result = new BiometricEngineStatus();
 
@@ -48,6 +49,7 @@ public class M2SysEngine implements BiometricEngine {
         return result;
     }
 
+    @Override
     public BiometricSubject enroll(BiometricSubject subject) {
         M2SysRequest request = new M2SysRequest();
         addCommonValues(request);
@@ -64,6 +66,7 @@ public class M2SysEngine implements BiometricEngine {
      * @param subject to update
      * @return updated subject
      */
+    @Override
     public BiometricSubject update(BiometricSubject subject) {
         BiometricSubject existingSubject = lookup(subject.getSubjectId());
         if (existingSubject == null) {
@@ -86,6 +89,7 @@ public class M2SysEngine implements BiometricEngine {
      * @param newId a new ID
      * @return updated subject
      */
+    @Override
     public BiometricSubject updateSubjectId(String oldId, String newId) {
         ChangeIdRequest request = new ChangeIdRequest();
         addCommonValues(request);
@@ -103,6 +107,7 @@ public class M2SysEngine implements BiometricEngine {
      * @param subject a pattern subject
      * @return a list of matching data from M2Sys Server
      */
+    @Override
     public List<BiometricMatch> search(BiometricSubject subject) {
         M2SysRequest request = new M2SysRequest();
         addCommonValues(request);
@@ -113,6 +118,7 @@ public class M2SysEngine implements BiometricEngine {
         return response.toMatchList();
     }
 
+    @Override
     public BiometricSubject lookup(String subjectId) {
         M2SysRequest request = new M2SysRequest();
         addCommonValues(request);
@@ -127,6 +133,7 @@ public class M2SysEngine implements BiometricEngine {
      *
      * @param subjectId a biometric subject id
      */
+    @Override
     public void delete(String subjectId) {
         M2SysRequest request = new M2SysRequest();
         addCommonValues(request);
