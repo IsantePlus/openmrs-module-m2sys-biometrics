@@ -136,7 +136,7 @@ public class M2SysEngineTest extends M2SysBiometricSensitiveTestBase {
 	@Test
 	public void shouldLookupBiometricSubject() throws Exception {
 		final String url = SERVER_URL + M2SYS_LOOKUP_ENDPOINT;
-
+		
 		when(httpClient.postRequest(eq(url), any(M2SysRequest.class), eq(token))).thenReturn(response);
 		
 		BiometricSubject reqSubject = new BiometricSubject("ID1");

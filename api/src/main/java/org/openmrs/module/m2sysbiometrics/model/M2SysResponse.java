@@ -22,7 +22,7 @@ public class M2SysResponse implements Serializable {
 	private Integer clientPlatform;
 	
 	@JsonProperty("ClientVersion")
-	private String cientVersion;
+	private String clientVersion;
 	
 	@JsonProperty("Success")
 	private Boolean success;
@@ -100,12 +100,12 @@ public class M2SysResponse implements Serializable {
 		this.clientPlatform = clientPlatform;
 	}
 	
-	public String getCientVersion() {
-		return cientVersion;
+	public String getClientVersion() {
+		return clientVersion;
 	}
 	
-	public void setCientVersion(String cientVersion) {
-		this.cientVersion = cientVersion;
+	public void setClientVersion(String clientVersion) {
+		this.clientVersion = clientVersion;
 	}
 	
 	public Boolean getSuccess() {
@@ -287,7 +287,7 @@ public class M2SysResponse implements Serializable {
 			fingerprint.setImage(getRightTemplate());
 			subject.addFingerprint(fingerprint);
 		}
-
+		
 		return subject;
 	}
 	
