@@ -7,6 +7,7 @@ import org.openmrs.module.m2sysbiometrics.model.BiometricCaptureType;
 import org.openmrs.module.m2sysbiometrics.model.M2SysRequest;
 import org.openmrs.module.m2sysbiometrics.model.M2SysResponse;
 import org.openmrs.module.m2sysbiometrics.model.ChangeIdRequest;
+import org.openmrs.module.m2sysbiometrics.util.Token;
 import org.openmrs.module.registrationcore.api.biometrics.BiometricEngine;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricEngineStatus;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricMatch;
@@ -41,7 +42,7 @@ public class M2SysEngine implements BiometricEngine {
 	public BiometricEngineStatus getStatus() {
 		BiometricEngineStatus result = new BiometricEngineStatus();
 		
-		ResponseEntity<String> responseEntity = httpClient.getServerStatus(getServerUrl());
+		ResponseEntity<String> responseEntity = httpClient.getServerStatus(getServerUrl(), getToken());
 		if (null != responseEntity) {
 			result.setStatusMessage(responseEntity.getStatusCode() + " " + responseEntity.getStatusCode().getReasonPhrase());
 		}
@@ -55,7 +56,7 @@ public class M2SysEngine implements BiometricEngine {
 		addCommonValues(request);
 		request.setRegistrationId(subject.getSubjectId());
 		
-		M2SysResponse response = httpClient.postRequest(url(M2SYS_REGISTER_ENDPOINT), request);
+		M2SysResponse response = httpClient.postRequest(url(M2SYS_REGISTER_ENDPOINT), request, getToken());
 		
 		return response.toBiometricSubject();
 	}
@@ -77,7 +78,7 @@ public class M2SysEngine implements BiometricEngine {
 		addCommonValues(request);
 		request.setRegistrationId(subject.getSubjectId());
 		
-		M2SysResponse response = httpClient.postRequest(url(M2SYS_UPDATE_ENDPOINT), request);
+		M2SysResponse response = httpClient.postRequest(url(M2SYS_UPDATE_ENDPOINT), request, getToken());
 		
 		return response.toBiometricSubject();
 	}
@@ -96,7 +97,7 @@ public class M2SysEngine implements BiometricEngine {
 		request.setRegistrationId(oldId);
 		request.setNewRegistrationId(newId);
 		
-		M2SysResponse response = httpClient.postRequest(url(M2SYS_CHANGE_ID_ENDPOINT), request);
+		M2SysResponse response = httpClient.postRequest(url(M2SYS_CHANGE_ID_ENDPOINT), request, getToken());
 		
 		return response.toBiometricSubject();
 	}
@@ -113,7 +114,7 @@ public class M2SysEngine implements BiometricEngine {
 		addCommonValues(request);
 		request.setRegistrationId(subject.getSubjectId());
 		
-		M2SysResponse response = httpClient.postRequest(url(M2SYS_LOOKUP_ENDPOINT), request);
+		M2SysResponse response = httpClient.postRequest(url(M2SYS_LOOKUP_ENDPOINT), request, getToken());
 		
 		return response.toMatchList();
 	}
@@ -130,7 +131,7 @@ public class M2SysEngine implements BiometricEngine {
 		addCommonValues(request);
 		request.setRegistrationId(subjectId);
 		
-		M2SysResponse response = httpClient.postRequest(url(M2SYS_LOOKUP_ENDPOINT), request);
+		M2SysResponse response = httpClient.postRequest(url(M2SYS_LOOKUP_ENDPOINT), request, getToken());
 		return response.toBiometricSubject();
 	}
 	
@@ -144,7 +145,7 @@ public class M2SysEngine implements BiometricEngine {
 		M2SysRequest request = new M2SysRequest();
 		addCommonValues(request);
 		request.setRegistrationId(subjectId);
-		httpClient.postRequest(url(M2SYS_DELETE_ID_ENDPOINT), request);
+		httpClient.postRequest(url(M2SYS_DELETE_ID_ENDPOINT), request, getToken());
 	}
 	
 	private void addCommonValues(M2SysRequest request) {
@@ -180,4 +181,11 @@ public class M2SysEngine implements BiometricEngine {
 	private String getLocationID() {
 		return Context.getAdministrationService().getGlobalProperty(M2SysBiometricsConstants.M2SYS_LOCATION_ID);
 	}
+	
+	private Token getToken() {
+		String username = Context.getAdministrationService().getGlobalProperty(M2SysBiometricsConstants.M2SYS_USER);
+		String password = Context.getAdministrationService().getGlobalProperty(M2SysBiometricsConstants.M2SYS_PASSWORD);
+		return httpClient.getToken(username, password);
+	}
+	
 }

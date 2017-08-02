@@ -1,6 +1,6 @@
 package org.openmrs.module.m2sysbiometrics.util;
 
-import org.codehaus.jackson.annotate.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.io.Serializable;
 

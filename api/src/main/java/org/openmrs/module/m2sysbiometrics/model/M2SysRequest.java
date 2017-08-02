@@ -1,9 +1,11 @@
 package org.openmrs.module.m2sysbiometrics.model;
 
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.annotate.JsonProperty;
 
 import java.io.Serializable;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class M2SysRequest implements Serializable {
 	
 	private static final long serialVersionUID = -8902210266672985893L;
