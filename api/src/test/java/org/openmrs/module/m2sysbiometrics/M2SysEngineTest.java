@@ -119,12 +119,19 @@ public class M2SysEngineTest extends M2SysBiometricSensitiveTestBase {
 		BiometricSubject reqSubject = new BiometricSubject("ID1");
 		BiometricSubject subject = m2SysEngine.enroll(reqSubject);
 		
-		assertEquals(expectedSubject, subject);
-		verify(httpClient).postRequest(eq(url), requestCaptor.capture());
+		verifyBiometricSubjectRequest(url, subject);
+	}
+	
+	@Test
+	public void shouldLookupBiometricSubject() throws Exception {
+		final String url = SERVER_URL + M2SYS_LOOKUP_ENDPOINT;
 		
-		M2SysRequest request = requestCaptor.getValue();
-		verifyRequestCommonFields(request);
-		assertEquals("ID1", request.getRegistrationId());
+		when(httpClient.postRequest(eq(url), any(M2SysRequest.class))).thenReturn(response);
+		
+		BiometricSubject reqSubject = new BiometricSubject("ID1");
+		BiometricSubject subject = m2SysEngine.lookup(reqSubject.getSubjectId());
+		
+		verifyBiometricSubjectRequest(url, subject);
 	}
 	
 	@Test
@@ -187,5 +194,14 @@ public class M2SysEngineTest extends M2SysBiometricSensitiveTestBase {
 		assertEquals(LOCATION_ID, request.getLocationId());
 		assertEquals(ACCESS_POINT_ID, request.getAccessPointId());
 		assertEquals(BiometricCaptureType.None, request.getBiometricWith());
+	}
+	
+	private void verifyBiometricSubjectRequest(String url, BiometricSubject subject) {
+		assertEquals(expectedSubject, subject);
+		verify(httpClient).postRequest(eq(url), requestCaptor.capture());
+		
+		M2SysRequest request = requestCaptor.getValue();
+		verifyRequestCommonFields(request);
+		assertEquals("ID1", request.getRegistrationId());
 	}
 }

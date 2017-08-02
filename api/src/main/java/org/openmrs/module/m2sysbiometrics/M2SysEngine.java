@@ -118,6 +118,12 @@ public class M2SysEngine implements BiometricEngine {
 		return response.toMatchList();
 	}
 	
+	/**
+	 * Lookup a biometric data using a given id of pattern subject.
+	 * 
+	 * @param subjectId a pattern subject Id
+	 * @return a biometric subject object
+	 */
 	@Override
 	public BiometricSubject lookup(String subjectId) {
 		M2SysRequest request = new M2SysRequest();
