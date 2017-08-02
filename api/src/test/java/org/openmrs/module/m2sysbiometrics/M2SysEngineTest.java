@@ -110,6 +110,24 @@ public class M2SysEngineTest extends M2SysBiometricSensitiveTestBase {
 	}
 	
 	@Test
+	@Verifies(value = "register subject on M2Sys Biometrics", method = "enroll(BiometricSubject)")
+	public void shouldRegisterBiometricSubject() throws Exception {
+		final String url = SERVER_URL + M2SYS_REGISTER_ENDPOINT;
+		
+		when(httpClient.postRequest(eq(url), any(M2SysRequest.class))).thenReturn(response);
+		
+		BiometricSubject reqSubject = new BiometricSubject("ID1");
+		BiometricSubject subject = m2SysEngine.enroll(reqSubject);
+		
+		assertEquals(expectedSubject, subject);
+		verify(httpClient).postRequest(eq(url), requestCaptor.capture());
+		
+		M2SysRequest request = requestCaptor.getValue();
+		verifyRequestCommonFields(request);
+		assertEquals("ID1", request.getRegistrationId());
+	}
+	
+	@Test
 	@Verifies(value = "updates subject on M2Sys Biometrics", method = "update(BiometricSubject)")
 	public void shouldUpdateBiometricSubject() throws Exception {
 		final String url = SERVER_URL + M2SYS_UPDATE_ENDPOINT;

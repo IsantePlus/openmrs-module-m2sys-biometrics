@@ -214,8 +214,21 @@ public class M2SysResponse implements Serializable {
 	
 	public BiometricSubject toBiometricSubject() {
 		BiometricSubject subject = new BiometricSubject(registrationId);
-		
-		// TODO: add fingerprints
+
+		Fingerprint fingerprint = new Fingerprint();
+
+		fingerprint.setImage(getTemplateData());
+		subject.addFingerprint(fingerprint);
+
+		fingerprint.setImage(getTemplateData2());
+		subject.addFingerprint(fingerprint);
+
+		fingerprint.setImage(getLeftTemplate());
+		subject.addFingerprint(fingerprint);
+
+		fingerprint.setImage(getRightTemplate());
+		subject.addFingerprint(fingerprint);
+
 		// TODO: if lookup fails, we expect null return
 		
 		return subject;
