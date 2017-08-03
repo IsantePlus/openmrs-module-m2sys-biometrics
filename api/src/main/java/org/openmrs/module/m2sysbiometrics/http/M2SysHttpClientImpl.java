@@ -3,6 +3,7 @@ package org.openmrs.module.m2sysbiometrics.http;
 import org.apache.commons.lang.BooleanUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants;
+import org.openmrs.module.m2sysbiometrics.exception.M2SysBiometricsException;
 import org.openmrs.module.m2sysbiometrics.model.M2SysRequest;
 import org.openmrs.module.m2sysbiometrics.model.M2SysResponse;
 import org.openmrs.module.m2sysbiometrics.util.Token;
@@ -38,7 +39,7 @@ public class M2SysHttpClientImpl implements M2SysHttpClient {
     try {
       return exchange(new URI(url), HttpMethod.GET, String.class, token);
     } catch (URISyntaxException e) {
-      throw new RuntimeException(e);
+      throw new M2SysBiometricsException(e);
     }
   }
 
@@ -63,7 +64,7 @@ public class M2SysHttpClientImpl implements M2SysHttpClient {
       checkResponse(response);
       return response;
     } catch (Exception e) {
-      throw new RuntimeException(e);
+      throw new M2SysBiometricsException(e);
     }
   }
 
@@ -92,7 +93,7 @@ public class M2SysHttpClientImpl implements M2SysHttpClient {
 
   private void checkResponse(M2SysResponse response) {
     if (BooleanUtils.isNotTrue(response.getSuccess())) {
-      throw new RuntimeException("Failure response: " + response.getResponseCode());
+      throw new M2SysBiometricsException("Failure response: " + response.getResponseCode());
     }
   }
 
@@ -102,7 +103,7 @@ public class M2SysHttpClientImpl implements M2SysHttpClient {
         String json = new ObjectMapper().writeValueAsString(request);
         LOGGER.debug("{} request body: {}", url, json);
       } catch (IOException e) {
-        throw new RuntimeException(e);
+        throw new M2SysBiometricsException(e);
       }
     }
   }
