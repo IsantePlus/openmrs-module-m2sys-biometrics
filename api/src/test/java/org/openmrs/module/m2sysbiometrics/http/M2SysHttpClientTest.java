@@ -1,6 +1,7 @@
 package org.openmrs.module.m2sysbiometrics.http;
 
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
+import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.io.IOUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Rule;
@@ -39,7 +40,7 @@ public class M2SysHttpClientTest {
 		        .withHeader("Authorization", equalTo("Bearer XXX"))
 		        //.withRequestBody(equalTo(readFile("sampleRequest.json")))
 		        .willReturn(
-		            aResponse().withStatus(200).withHeader("Content-Type", "application/json")
+		            aResponse().withStatus(HttpStatus.SC_OK).withHeader("Content-Type", "application/json")
 		                    .withBody(readFile("sampleResponse.json"))));
 		M2SysRequest request = objectMapper.readValue(readFile("sampleRequest.json"), M2SysRequest.class);
 		

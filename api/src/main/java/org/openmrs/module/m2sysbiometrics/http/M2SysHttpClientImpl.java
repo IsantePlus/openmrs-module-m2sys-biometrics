@@ -2,7 +2,6 @@ package org.openmrs.module.m2sysbiometrics.http;
 
 import org.apache.commons.lang.BooleanUtils;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.openmrs.api.context.Context;
 import org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants;
 import org.openmrs.module.m2sysbiometrics.model.M2SysRequest;
 import org.openmrs.module.m2sysbiometrics.model.M2SysResponse;
@@ -74,12 +73,13 @@ public class M2SysHttpClientImpl implements M2SysHttpClient {
 		return exchange(url, method, null, new HttpHeaders(), responseClass, token);
 	}
 	
-	private <T> ResponseEntity<T> exchange(URI url, HttpMethod method, Object body, HttpHeaders headers,
-                                           Class<T> responseClass, Token token) {
-        headers.add("Authorization", token.getTokenType() + " " + token.getAccessToken());
+	private <T> ResponseEntity<T> exchange(URI url, HttpMethod method, Object body,
+    HttpHeaders headers, Class<T> responseClass, Token token) {
 
-        return restOperations.exchange(url, method, new HttpEntity<>(body, headers), responseClass);
-    }
+    headers.add("Authorization", token.getTokenType() + " " + token.getAccessToken());
+
+    return restOperations.exchange(url, method, new HttpEntity<>(body, headers), responseClass);
+  }
 	
 	@Override
 	public Token getToken(String username, String password) {

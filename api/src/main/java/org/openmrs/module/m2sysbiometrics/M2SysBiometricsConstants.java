@@ -2,7 +2,7 @@ package org.openmrs.module.m2sysbiometrics;
 
 import java.util.ResourceBundle;
 
-public class M2SysBiometricsConstants {
+public final class M2SysBiometricsConstants {
 	
 	public static final String M2SYS_BIOMETRICS_READER_ID = "m2sys-biometrics.readerId";
 	
