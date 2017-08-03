@@ -2,7 +2,6 @@ package org.openmrs.module.m2sysbiometrics.http;
 
 import org.apache.commons.lang.BooleanUtils;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.openmrs.api.context.Context;
 import org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants;
 import org.openmrs.module.m2sysbiometrics.model.M2SysRequest;
 import org.openmrs.module.m2sysbiometrics.model.M2SysResponse;
@@ -35,9 +34,9 @@ public class M2SysHttpClientImpl implements M2SysHttpClient {
 	private RestOperations restOperations = new RestTemplate();
 	
 	@Override
-	public ResponseEntity<String> getServerStatus(String url) {
+	public ResponseEntity<String> getServerStatus(String url, Token token) {
 		try {
-			return exchange(new URI(url), HttpMethod.GET, String.class);
+			return exchange(new URI(url), HttpMethod.GET, String.class, token);
 		}
 		catch (URISyntaxException e) {
 			throw new RuntimeException(e);
@@ -51,7 +50,7 @@ public class M2SysHttpClientImpl implements M2SysHttpClient {
 	 * @return the response json
 	 */
 	@Override
-	public M2SysResponse postRequest(String url, M2SysRequest request) {
+	public M2SysResponse postRequest(String url, M2SysRequest request, Token token) {
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
 		headers.setAccept(Collections.singletonList(MediaType.ALL));
@@ -60,7 +59,7 @@ public class M2SysHttpClientImpl implements M2SysHttpClient {
 		
 		try {
 			ResponseEntity<M2SysResponse> responseEntity = exchange(new URI(url), HttpMethod.POST, request, headers,
-			    M2SysResponse.class);
+			    M2SysResponse.class, token);
 			M2SysResponse response = responseEntity.getBody();
 			checkResponse(response);
 			return response;
@@ -70,23 +69,20 @@ public class M2SysHttpClientImpl implements M2SysHttpClient {
 		}
 	}
 	
-	private <T> ResponseEntity<T> exchange(URI url, HttpMethod method, Class<T> responseClass) {
-		return exchange(url, method, null, new HttpHeaders(), responseClass);
+	private <T> ResponseEntity<T> exchange(URI url, HttpMethod method, Class<T> responseClass, Token token) {
+		return exchange(url, method, null, new HttpHeaders(), responseClass, token);
 	}
 	
-	private <T> ResponseEntity<T> exchange(URI url, HttpMethod method, Object body, HttpHeaders headers,
-                                           Class<T> responseClass) {
-        Token token = getToken();
+	private <T> ResponseEntity<T> exchange(URI url, HttpMethod method, Object body,
+    HttpHeaders headers, Class<T> responseClass, Token token) {
 
-        headers.add("Authorization", token.getTokenType() + " " + token.getAccessToken());
+    headers.add("Authorization", token.getTokenType() + " " + token.getAccessToken());
 
-        return restOperations.exchange(url, method, new HttpEntity<>(body, headers), responseClass);
-    }
+    return restOperations.exchange(url, method, new HttpEntity<>(body, headers), responseClass);
+  }
 	
-	private Token getToken() {
-		String username = Context.getAdministrationService().getGlobalProperty(M2SysBiometricsConstants.M2SYS_USER);
-		String password = Context.getAdministrationService().getGlobalProperty(M2SysBiometricsConstants.M2SYS_PASSWORD);
-		
+	@Override
+	public Token getToken(String username, String password) {
 		HttpHeaders headers = new HttpHeaders();
 		headers.add("Content-Type", "application/x-www-form-urlencoded");
 		String body = "grant_type=password&username=" + username + "&Password=" + password;
@@ -97,8 +93,8 @@ public class M2SysHttpClientImpl implements M2SysHttpClient {
 	}
 	
 	private void checkResponse(M2SysResponse response) {
-		if (BooleanUtils.isTrue(response.getSuccess())) {
-			throw new RuntimeException(response.getResponseCode());
+		if (BooleanUtils.isNotTrue(response.getSuccess())) {
+			throw new RuntimeException("Failure response: " + response.getResponseCode());
 		}
 	}
 	

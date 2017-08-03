@@ -1,17 +1,22 @@
 package org.openmrs.module.m2sysbiometrics.model;
 
-import org.codehaus.jackson.annotate.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricMatch;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricSubject;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricTemplateFormat;
 import org.openmrs.module.registrationcore.api.biometrics.model.Fingerprint;
 
 import java.io.Serializable;
+<<<<<<< HEAD
 import java.util.ArrayList;
 import java.util.Arrays;
+=======
+>>>>>>> 5238614aa7e8924d7dbd7430d930daf430f55cd1
 import java.util.Collections;
 import java.util.List;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class M2SysResponse implements Serializable {
 	
 	private static final long serialVersionUID = 5297535433389093052L;
@@ -23,7 +28,7 @@ public class M2SysResponse implements Serializable {
 	private Integer clientPlatform;
 	
 	@JsonProperty("ClientVersion")
-	private String cientVersion;
+	private String clientVersion;
 	
 	@JsonProperty("Success")
 	private Boolean success;
@@ -70,6 +75,21 @@ public class M2SysResponse implements Serializable {
 	@JsonProperty("LocationID")
 	private Integer locationId;
 	
+	@JsonProperty("ServerTime")
+	private String serverTime;
+	
+	@JsonProperty("NewRegistrationID")
+	private String newRegistrationId;
+	
+	@JsonProperty("TransactionTime")
+	private String transactionTime;
+	
+	@JsonProperty("LeftTemplatePosition")
+	private Integer leftTemplatePosition;
+	
+	@JsonProperty("RightTemplatePosition")
+	private Integer rightTemplatePosition;
+	
 	public String getApiVersion() {
 		return apiVersion;
 	}
@@ -86,12 +106,12 @@ public class M2SysResponse implements Serializable {
 		this.clientPlatform = clientPlatform;
 	}
 	
-	public String getCientVersion() {
-		return cientVersion;
+	public String getClientVersion() {
+		return clientVersion;
 	}
 	
-	public void setCientVersion(String cientVersion) {
-		this.cientVersion = cientVersion;
+	public void setClientVersion(String clientVersion) {
+		this.clientVersion = clientVersion;
 	}
 	
 	public Boolean getSuccess() {
@@ -214,19 +234,62 @@ public class M2SysResponse implements Serializable {
 		this.locationId = locationId;
 	}
 	
+	public Integer getLeftTemplatePosition() {
+		return leftTemplatePosition;
+	}
+	
+	public void setLeftTemplatePosition(Integer leftTemplatePosition) {
+		this.leftTemplatePosition = leftTemplatePosition;
+	}
+	
+	public Integer getRightTemplatePosition() {
+		return rightTemplatePosition;
+	}
+	
+	public void setRightTemplatePosition(Integer rightTemplatePosition) {
+		this.rightTemplatePosition = rightTemplatePosition;
+	}
+	
+	public String getServerTime() {
+		return serverTime;
+	}
+	
+	public void setServerTime(String serverTime) {
+		this.serverTime = serverTime;
+	}
+	
+	public String getNewRegistrationId() {
+		return newRegistrationId;
+	}
+	
+	public void setNewRegistrationId(String newRegistrationId) {
+		this.newRegistrationId = newRegistrationId;
+	}
+	
+	public String getTransactionTime() {
+		return transactionTime;
+	}
+	
+	public void setTransactionTime(String transactionTime) {
+		this.transactionTime = transactionTime;
+	}
+	
 	public BiometricSubject toBiometricSubject() {
-		BiometricSubject subject = new BiometricSubject(registrationId);
+		BiometricSubject subject = null;
+		
+		if (success) {
+			subject = new BiometricSubject(registrationId);
 
-		List<String> fingerprints = new ArrayList<>();
-		fingerprints.add(getTemplateData());
-		fingerprints.add(getLeftTemplate());
-		fingerprints.add(getRightTemplate());
+			List<String> fingerprints = new ArrayList<>();
+			fingerprints.add(getTemplateData());
+			fingerprints.add(getLeftTemplate());
+			fingerprints.add(getRightTemplate());
 
-		for(String value : fingerprints) {
-			Fingerprint fingerprint = new Fingerprint(value, BiometricTemplateFormat.ISO, value);
-			subject.addFingerprint(fingerprint);
+			for(String value : fingerprints) {
+				Fingerprint fingerprint = new Fingerprint(value, BiometricTemplateFormat.ISO, value);
+				subject.addFingerprint(fingerprint);
+			}
 		}
-		// TODO: if lookup fails, we expect null return
 		
 		return subject;
 	}
