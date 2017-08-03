@@ -37,8 +37,7 @@ public class M2SysHttpClientImpl implements M2SysHttpClient {
 	public ResponseEntity<String> getServerStatus(String url, Token token) {
 		try {
 			return exchange(new URI(url), HttpMethod.GET, String.class, token);
-		}
-		catch (URISyntaxException e) {
+		} catch (URISyntaxException e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -58,13 +57,12 @@ public class M2SysHttpClientImpl implements M2SysHttpClient {
 		debugRequest(url, request);
 		
 		try {
-			ResponseEntity<M2SysResponse> responseEntity = exchange(new URI(url), HttpMethod.POST, request, headers,
-			    M2SysResponse.class, token);
+			ResponseEntity<M2SysResponse> responseEntity = exchange(new URI(url), HttpMethod.POST,
+					request, headers, M2SysResponse.class, token);
 			M2SysResponse response = responseEntity.getBody();
 			checkResponse(response);
 			return response;
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -103,8 +101,7 @@ public class M2SysHttpClientImpl implements M2SysHttpClient {
 			try {
 				String json = new ObjectMapper().writeValueAsString(request);
 				LOGGER.debug("{} request body: {}", url, json);
-			}
-			catch (IOException e) {
+			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}
 		}

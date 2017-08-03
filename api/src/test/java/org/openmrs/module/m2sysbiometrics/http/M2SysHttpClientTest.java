@@ -44,8 +44,8 @@ public class M2SysHttpClientTest {
 		                    .withBody(readFile("sampleResponse.json"))));
 		M2SysRequest request = objectMapper.readValue(readFile("sampleRequest.json"), M2SysRequest.class);
 		
-		M2SysResponse response = httpClient.postRequest(SERVER_URL + M2SysBiometricsConstants.M2SYS_REGISTER_ENDPOINT,
-		    request, token());
+		M2SysResponse response = httpClient.postRequest(SERVER_URL
+						+ M2SysBiometricsConstants.M2SYS_REGISTER_ENDPOINT, request, token());
 		
 		assertNotNull(response);
 	}

@@ -78,13 +78,16 @@ public class M2SysEngineTest extends M2SysBiometricSensitiveTestBase {
 	@Before
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
-		when(administrationService.getGlobalProperty(M2SysBiometricsConstants.M2SYS_SERVER_URL)).thenReturn(SERVER_URL);
-		when(administrationService.getGlobalProperty(M2SysBiometricsConstants.M2SYS_LOCATION_ID)).thenReturn(LOCATION_ID);
-		when(administrationService.getGlobalProperty(M2SysBiometricsConstants.M2SYS_CUSTOMER_KEY)).thenReturn(CUSTOMER_KEY);
-		when(administrationService.getGlobalProperty(M2SysBiometricsConstants.M2SYS_CAPTURE_TIMEOUT)).thenReturn(
-		    CAPTURE_TIMEOUT);
-		when(administrationService.getGlobalProperty(M2SysBiometricsConstants.M2SYS_ACCESS_POINT_ID)).thenReturn(
-		    ACCESS_POINT_ID);
+		when(administrationService.getGlobalProperty(M2SysBiometricsConstants.M2SYS_SERVER_URL)).
+				thenReturn(SERVER_URL);
+		when(administrationService.getGlobalProperty(M2SysBiometricsConstants.M2SYS_LOCATION_ID)).
+				thenReturn(LOCATION_ID);
+		when(administrationService.getGlobalProperty(M2SysBiometricsConstants.M2SYS_CUSTOMER_KEY)).
+				thenReturn(CUSTOMER_KEY);
+		when(administrationService.getGlobalProperty(M2SysBiometricsConstants.M2SYS_CAPTURE_TIMEOUT)).
+				thenReturn(CAPTURE_TIMEOUT);
+		when(administrationService.getGlobalProperty(M2SysBiometricsConstants.M2SYS_ACCESS_POINT_ID)).
+				thenReturn(ACCESS_POINT_ID);
 		
 		when(response.toBiometricSubject()).thenReturn(expectedSubject);
 		

@@ -8,11 +8,7 @@ import org.openmrs.module.registrationcore.api.biometrics.model.BiometricTemplat
 import org.openmrs.module.registrationcore.api.biometrics.model.Fingerprint;
 
 import java.io.Serializable;
-<<<<<<< HEAD
 import java.util.ArrayList;
-import java.util.Arrays;
-=======
->>>>>>> 5238614aa7e8924d7dbd7430d930daf430f55cd1
 import java.util.Collections;
 import java.util.List;
 
@@ -275,24 +271,24 @@ public class M2SysResponse implements Serializable {
 	}
 	
 	public BiometricSubject toBiometricSubject() {
-		BiometricSubject subject = null;
-		
-		if (success) {
-			subject = new BiometricSubject(registrationId);
+        BiometricSubject subject = null;
 
-			List<String> fingerprints = new ArrayList<>();
-			fingerprints.add(getTemplateData());
-			fingerprints.add(getLeftTemplate());
-			fingerprints.add(getRightTemplate());
+        if (success) {
+            subject = new BiometricSubject(registrationId);
 
-			for(String value : fingerprints) {
-				Fingerprint fingerprint = new Fingerprint(value, BiometricTemplateFormat.ISO, value);
-				subject.addFingerprint(fingerprint);
-			}
-		}
-		
-		return subject;
-	}
+            List<String> fingerprints = new ArrayList<>();
+            fingerprints.add(getTemplateData());
+            fingerprints.add(getLeftTemplate());
+            fingerprints.add(getRightTemplate());
+
+            for (String value : fingerprints) {
+                Fingerprint fingerprint = new Fingerprint(value, BiometricTemplateFormat.ISO, value);
+                subject.addFingerprint(fingerprint);
+            }
+        }
+
+        return subject;
+    }
 	
 	public List<BiometricMatch> toMatchList() {
 		// TODO:

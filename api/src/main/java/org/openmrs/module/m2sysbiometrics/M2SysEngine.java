@@ -44,7 +44,8 @@ public class M2SysEngine implements BiometricEngine {
 		
 		ResponseEntity<String> responseEntity = httpClient.getServerStatus(getServerUrl(), getToken());
 		if (null != responseEntity) {
-			result.setStatusMessage(responseEntity.getStatusCode() + " " + responseEntity.getStatusCode().getReasonPhrase());
+			result.setStatusMessage(responseEntity.getStatusCode()
+					+ " " + responseEntity.getStatusCode().getReasonPhrase());
 		}
 		
 		return result;
@@ -183,8 +184,10 @@ public class M2SysEngine implements BiometricEngine {
 	}
 	
 	private Token getToken() {
-		String username = Context.getAdministrationService().getGlobalProperty(M2SysBiometricsConstants.M2SYS_USER);
-		String password = Context.getAdministrationService().getGlobalProperty(M2SysBiometricsConstants.M2SYS_PASSWORD);
+		String username = Context.getAdministrationService().
+				getGlobalProperty(M2SysBiometricsConstants.M2SYS_USER);
+		String password = Context.getAdministrationService().
+				getGlobalProperty(M2SysBiometricsConstants.M2SYS_PASSWORD);
 		return httpClient.getToken(username, password);
 	}
 	
