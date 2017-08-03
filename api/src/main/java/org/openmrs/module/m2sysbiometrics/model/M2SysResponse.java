@@ -3,9 +3,11 @@ package org.openmrs.module.m2sysbiometrics.model;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricMatch;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricSubject;
+import org.openmrs.module.registrationcore.api.biometrics.model.BiometricTemplateFormat;
 import org.openmrs.module.registrationcore.api.biometrics.model.Fingerprint;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -215,20 +217,15 @@ public class M2SysResponse implements Serializable {
 	public BiometricSubject toBiometricSubject() {
 		BiometricSubject subject = new BiometricSubject(registrationId);
 
-		Fingerprint fingerprint = new Fingerprint();
+		List<String> fingerprints = new ArrayList<>();
+		fingerprints.add(getTemplateData());
+		fingerprints.add(getLeftTemplate());
+		fingerprints.add(getRightTemplate());
 
-		fingerprint.setImage(getTemplateData());
-		subject.addFingerprint(fingerprint);
-
-		fingerprint.setImage(getTemplateData2());
-		subject.addFingerprint(fingerprint);
-
-		fingerprint.setImage(getLeftTemplate());
-		subject.addFingerprint(fingerprint);
-
-		fingerprint.setImage(getRightTemplate());
-		subject.addFingerprint(fingerprint);
-
+		for(String value : fingerprints) {
+			Fingerprint fingerprint = new Fingerprint(value, BiometricTemplateFormat.ISO, value);
+			subject.addFingerprint(fingerprint);
+		}
 		// TODO: if lookup fails, we expect null return
 		
 		return subject;
