@@ -21,45 +21,45 @@ import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static org.junit.Assert.assertNotNull;
 
 public class M2SysHttpClientTest {
-	
-	private static final int SERVER_PORT = 8034;
-	
-	private static final String SERVER_URL = "http://localhost:" + SERVER_PORT;
-	
-	private M2SysHttpClient httpClient = new M2SysHttpClientImpl();
-	
-	@Rule
-	public WireMockRule wireMockRule = new WireMockRule(SERVER_PORT);
-	
-	private ObjectMapper objectMapper = new ObjectMapper();
-	
-	@Test
-	public void shouldPostAndGetM2SysResponse() throws IOException {
-		stubFor(post(M2SysBiometricsConstants.M2SYS_REGISTER_ENDPOINT)
-		        .withHeader("Content-Type", equalTo("application/json"))
-		        .withHeader("Authorization", equalTo("Bearer XXX"))
-		        //.withRequestBody(equalTo(readFile("sampleRequest.json")))
-		        .willReturn(
-		            aResponse().withStatus(HttpStatus.SC_OK).withHeader("Content-Type", "application/json")
-		                    .withBody(readFile("sampleResponse.json"))));
-		M2SysRequest request = objectMapper.readValue(readFile("sampleRequest.json"), M2SysRequest.class);
-		
-		M2SysResponse response = httpClient.postRequest(SERVER_URL
-						+ M2SysBiometricsConstants.M2SYS_REGISTER_ENDPOINT, request, token());
-		
-		assertNotNull(response);
-	}
-	
-	private String readFile(String file) throws IOException {
+
+  private static final int SERVER_PORT = 8034;
+
+  private static final String SERVER_URL = "http://localhost:" + SERVER_PORT;
+
+  private M2SysHttpClient httpClient = new M2SysHttpClientImpl();
+
+  @Rule
+  public WireMockRule wireMockRule = new WireMockRule(SERVER_PORT);
+
+  private ObjectMapper objectMapper = new ObjectMapper();
+
+  @Test
+  public void shouldPostAndGetM2SysResponse() throws IOException {
+    stubFor(post(M2SysBiometricsConstants.M2SYS_REGISTER_ENDPOINT)
+            .withHeader("Content-Type", equalTo("application/json"))
+            .withHeader("Authorization", equalTo("Bearer XXX"))
+            //.withRequestBody(equalTo(readFile("sampleRequest.json")))
+            .willReturn(
+                aResponse().withStatus(HttpStatus.SC_OK).withHeader("Content-Type", "application/json")
+                        .withBody(readFile("sampleResponse.json"))));
+    M2SysRequest request = objectMapper.readValue(readFile("sampleRequest.json"), M2SysRequest.class);
+
+    M2SysResponse response = httpClient.postRequest(SERVER_URL + M2SysBiometricsConstants.M2SYS_REGISTER_ENDPOINT,
+        request, token());
+
+    assertNotNull(response);
+  }
+
+  private String readFile(String file) throws IOException {
         try (InputStream in = getClass().getClassLoader().getResourceAsStream(file)) {
             return IOUtils.toString(in);
         }
     }
-	
-	private Token token() {
-		Token token = new Token();
-		token.setAccessToken("XXX");
-		token.setTokenType("Bearer");
-		return token;
-	}
+
+  private Token token() {
+    Token token = new Token();
+    token.setAccessToken("XXX");
+    token.setTokenType("Bearer");
+    return token;
+  }
 }
