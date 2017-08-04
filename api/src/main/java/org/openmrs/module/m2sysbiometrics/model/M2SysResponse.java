@@ -273,15 +273,13 @@ public class M2SysResponse extends M2SysData {
         if (success) {
             subject = new BiometricSubject(registrationId);
 
-            List<String> fingerprints = new ArrayList<>();
-            fingerprints.add(getTemplateData());
-            fingerprints.add(getLeftTemplate());
-            fingerprints.add(getRightTemplate());
+            subject.addFingerprint(new Fingerprint(
+                    getTemplateData(), BiometricTemplateFormat.ISO, getLeftTemplate()
+            ));
 
-            for (String value : fingerprints) {
-                Fingerprint fingerprint = new Fingerprint(value, BiometricTemplateFormat.ISO, value);
-                subject.addFingerprint(fingerprint);
-            }
+            subject.addFingerprint(new Fingerprint(
+                    getTemplateData2(), BiometricTemplateFormat.ISO, getRightTemplate()
+            ));
         }
 
         return subject;
