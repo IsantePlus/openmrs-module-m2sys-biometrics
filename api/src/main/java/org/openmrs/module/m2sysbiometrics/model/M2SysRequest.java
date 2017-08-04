@@ -1,12 +1,9 @@
 package org.openmrs.module.m2sysbiometrics.model;
 
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-import org.codehaus.jackson.annotate.JsonProperty;
 
-import java.io.Serializable;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class M2SysRequest implements Serializable {
+public class M2SysRequest extends M2SysData {
 
   private static final long serialVersionUID = -8902210266672985893L;
 
@@ -17,7 +14,7 @@ public class M2SysRequest implements Serializable {
   private String accessPointId;
 
   @JsonProperty("CaptureTimeOut")
-  private String captureTimeout;
+  private Float captureTimeout;
 
   @JsonProperty("BioMetricWith")
   private BiometricCaptureType biometricWith;
@@ -26,7 +23,7 @@ public class M2SysRequest implements Serializable {
   private String registrationId;
 
   @JsonProperty("LocationID")
-  private String locationId;
+  private Integer locationId;
 
   public String getCustomerKey() {
     return customerKey;
@@ -44,11 +41,11 @@ public class M2SysRequest implements Serializable {
     this.accessPointId = accessPointId;
   }
 
-  public String getCaptureTimeout() {
+  public Float getCaptureTimeout() {
     return captureTimeout;
   }
 
-  public void setCaptureTimeout(String captureTimeout) {
+  public void setCaptureTimeout(Float captureTimeout) {
     this.captureTimeout = captureTimeout;
   }
 
@@ -68,11 +65,11 @@ public class M2SysRequest implements Serializable {
     this.registrationId = registrationId;
   }
 
-  public String getLocationId() {
+  public Integer getLocationId() {
     return locationId;
   }
 
-  public void setLocationId(String locationId) {
+  public void setLocationId(Integer locationId) {
     this.locationId = locationId;
   }
 

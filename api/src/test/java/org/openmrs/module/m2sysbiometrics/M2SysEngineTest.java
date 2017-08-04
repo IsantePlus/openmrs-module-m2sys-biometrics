@@ -42,17 +42,17 @@ public class M2SysEngineTest extends M2SysBiometricSensitiveTestBase {
 
   private static final String SERVER_URL = "http://testServerAPI/";
 
-  private static final String LOCATION_ID = "location_id_1";
+  private static final String LOCATION_ID = "13";
 
   private static final String CUSTOMER_KEY = "DO-NOT-COMMIT-ME-TO-GH";
 
-  private static final String CAPTURE_TIMEOUT = "110s";
+  private static final String CAPTURE_TIMEOUT = "110.4";
 
   private static final String ACCESS_POINT_ID = "A01";
 
   private static final String USERNAME = "user";
 
-  private static final String PASSWRD = "pass";
+  private static final String PASSWORD = "pass";
 
   @Mock
   private AdministrationService administrationService;
@@ -89,9 +89,9 @@ public class M2SysEngineTest extends M2SysBiometricSensitiveTestBase {
     when(response.toBiometricSubject()).thenReturn(expectedSubject);
 
     when(administrationService.getGlobalProperty(M2SysBiometricsConstants.M2SYS_USER)).thenReturn(USERNAME);
-    when(administrationService.getGlobalProperty(M2SysBiometricsConstants.M2SYS_PASSWORD)).thenReturn(PASSWRD);
+    when(administrationService.getGlobalProperty(M2SysBiometricsConstants.M2SYS_PASSWORD)).thenReturn(PASSWORD);
 
-    when(httpClient.getToken(USERNAME, PASSWRD)).thenReturn(token);
+    when(httpClient.getToken(USERNAME, PASSWORD)).thenReturn(token);
   }
 
   @Test
@@ -183,7 +183,7 @@ public class M2SysEngineTest extends M2SysBiometricSensitiveTestBase {
             .thenReturn(mock(M2SysResponse.class)); // won't return subject
 
     BiometricSubject reqSubject = new BiometricSubject("ID1");
-    BiometricSubject subject = m2SysEngine.update(reqSubject);
+    m2SysEngine.update(reqSubject);
   }
 
   @Test
@@ -205,8 +205,8 @@ public class M2SysEngineTest extends M2SysBiometricSensitiveTestBase {
 
   private void verifyRequestCommonFields(M2SysRequest request) {
     assertEquals(CUSTOMER_KEY, request.getCustomerKey());
-    assertEquals(CAPTURE_TIMEOUT, request.getCaptureTimeout());
-    assertEquals(LOCATION_ID, request.getLocationId());
+    assertEquals(Float.valueOf(CAPTURE_TIMEOUT), request.getCaptureTimeout());
+    assertEquals(Integer.valueOf(LOCATION_ID), request.getLocationId());
     assertEquals(ACCESS_POINT_ID, request.getAccessPointId());
     assertEquals(BiometricCaptureType.None, request.getBiometricWith());
   }

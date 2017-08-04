@@ -1,19 +1,16 @@
 package org.openmrs.module.m2sysbiometrics.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricMatch;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricSubject;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricTemplateFormat;
 import org.openmrs.module.registrationcore.api.biometrics.model.Fingerprint;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class M2SysResponse implements Serializable {
+public class M2SysResponse extends M2SysData {
 
   private static final long serialVersionUID = 5297535433389093052L;
 

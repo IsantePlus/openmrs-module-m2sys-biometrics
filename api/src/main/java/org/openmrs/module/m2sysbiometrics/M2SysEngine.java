@@ -174,12 +174,14 @@ public class M2SysEngine implements BiometricEngine {
     return Context.getAdministrationService().getGlobalProperty(M2SysBiometricsConstants.M2SYS_ACCESS_POINT_ID);
   }
 
-  private String getCaptureTimeOut() {
-    return Context.getAdministrationService().getGlobalProperty(M2SysBiometricsConstants.M2SYS_CAPTURE_TIMEOUT);
+  private float getCaptureTimeOut() {
+    return Float.parseFloat(Context.getAdministrationService()
+            .getGlobalProperty(M2SysBiometricsConstants.M2SYS_CAPTURE_TIMEOUT));
   }
 
-  private String getLocationID() {
-    return Context.getAdministrationService().getGlobalProperty(M2SysBiometricsConstants.M2SYS_LOCATION_ID);
+  private int getLocationID() {
+    return Integer.parseInt(Context.getAdministrationService()
+            .getGlobalProperty(M2SysBiometricsConstants.M2SYS_LOCATION_ID));
   }
 
   private Token getToken() {
