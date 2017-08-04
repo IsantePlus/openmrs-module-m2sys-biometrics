@@ -6,7 +6,6 @@ import org.openmrs.module.registrationcore.api.biometrics.model.BiometricSubject
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricTemplateFormat;
 import org.openmrs.module.registrationcore.api.biometrics.model.Fingerprint;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
