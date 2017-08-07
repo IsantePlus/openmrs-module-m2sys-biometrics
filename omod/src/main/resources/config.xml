@@ -83,7 +83,7 @@
     </globalProperty>
 
     <globalProperty>
-        <property>${project.parent.artifactId}.user</property>
+        <property>${project.parent.artifactId}.server.user</property>
         <defaultValue></defaultValue>
         <description>
             The m2sys server username.
@@ -91,7 +91,7 @@
     </globalProperty>
 
     <globalProperty>
-        <property>${project.parent.artifactId}.password</property>
+        <property>${project.parent.artifactId}.server.password</property>
         <defaultValue></defaultValue>
         <description>
             The m2sys server password.
