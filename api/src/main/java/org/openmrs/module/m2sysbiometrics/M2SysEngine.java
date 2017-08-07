@@ -18,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.UUID;
 
 import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.ERROR_CODE_OF_SUBJECT_NOT_EXIST;
 import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.M2SYS_CHANGE_ID_ENDPOINT;
@@ -54,6 +55,10 @@ public class M2SysEngine implements BiometricEngine {
 
     @Override
     public BiometricSubject enroll(BiometricSubject subject) {
+        if (subject.getSubjectId() == null) {
+            subject.setSubjectId(UUID.randomUUID().toString());
+        }
+
         M2SysRequest request = new M2SysRequest();
         addCommonValues(request);
         request.setRegistrationId(subject.getSubjectId());
