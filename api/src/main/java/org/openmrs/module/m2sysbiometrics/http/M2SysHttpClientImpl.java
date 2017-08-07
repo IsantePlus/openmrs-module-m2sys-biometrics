@@ -2,6 +2,7 @@ package org.openmrs.module.m2sysbiometrics.http;
 
 import org.apache.commons.lang.BooleanUtils;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.openmrs.api.context.Context;
 import org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants;
 import org.openmrs.module.m2sysbiometrics.exception.M2SysBiometricsException;
 import org.openmrs.module.m2sysbiometrics.model.M2SysRequest;
@@ -85,8 +86,9 @@ public class M2SysHttpClientImpl implements M2SysHttpClient {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", "application/x-www-form-urlencoded");
         String body = "grant_type=password&username=" + username + "&Password=" + password;
+        String serverUrl = Context.getAdministrationService().getGlobalProperty(M2SysBiometricsConstants.M2SYS_SERVER_URL);
 
-        return restOperations.exchange(M2SysBiometricsConstants.M2SYS_SERVER_URL + "/cstoken", HttpMethod.POST,
+        return restOperations.exchange(serverUrl + "/cstoken", HttpMethod.POST,
                 new HttpEntity<Object>(body, headers), Token.class).getBody();
 
     }
