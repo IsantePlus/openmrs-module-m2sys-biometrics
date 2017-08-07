@@ -30,81 +30,81 @@ import java.util.Collections;
 @Component
 public class M2SysHttpClientImpl implements M2SysHttpClient {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(M2SysHttpClientImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(M2SysHttpClientImpl.class);
 
-  private RestOperations restOperations = new RestTemplate();
+    private RestOperations restOperations = new RestTemplate();
 
-  @Override
-  public ResponseEntity<String> getServerStatus(String url, Token token) {
-    try {
-      return exchange(new URI(url), HttpMethod.GET, String.class, token);
-    } catch (URISyntaxException e) {
-      throw new M2SysBiometricsException(e);
+    @Override
+    public ResponseEntity<String> getServerStatus(String url, Token token) {
+        try {
+            return exchange(new URI(url), HttpMethod.GET, String.class, token);
+        } catch (URISyntaxException e) {
+            throw new M2SysBiometricsException(e);
+        }
     }
-  }
 
-  /**
-   * Sends a post request to the M2Sys server.
-   *
-   * @param request the request to be sent
-   * @return the response json
-   */
-  @Override
-  public M2SysResponse postRequest(String url, M2SysRequest request, Token token) {
-    HttpHeaders headers = new HttpHeaders();
-    headers.setContentType(MediaType.APPLICATION_JSON);
-    headers.setAccept(Collections.singletonList(MediaType.ALL));
+    /**
+     * Sends a post request to the M2Sys server.
+     *
+     * @param request the request to be sent
+     * @return the response json
+     */
+    @Override
+    public M2SysResponse postRequest(String url, M2SysRequest request, Token token) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setAccept(Collections.singletonList(MediaType.ALL));
 
-    debugRequest(url, request);
+        debugRequest(url, request);
 
-    try {
-      ResponseEntity<M2SysResponse> responseEntity = exchange(new URI(url), HttpMethod.POST, request, headers,
-          M2SysResponse.class, token);
-      M2SysResponse response = responseEntity.getBody();
-      checkResponse(response);
-      return response;
-    } catch (Exception e) {
-      throw new M2SysBiometricsException(e);
+        try {
+            ResponseEntity<M2SysResponse> responseEntity = exchange(new URI(url), HttpMethod.POST, request, headers,
+                    M2SysResponse.class, token);
+            M2SysResponse response = responseEntity.getBody();
+            checkResponse(response);
+            return response;
+        } catch (Exception e) {
+            throw new M2SysBiometricsException(e);
+        }
     }
-  }
 
-  private <T> ResponseEntity<T> exchange(URI url, HttpMethod method, Class<T> responseClass, Token token) {
-    return exchange(url, method, null, new HttpHeaders(), responseClass, token);
-  }
-
-  private <T> ResponseEntity<T> exchange(URI url, HttpMethod method, Object body,
-    HttpHeaders headers, Class<T> responseClass, Token token) {
-
-    headers.add("Authorization", token.getTokenType() + " " + token.getAccessToken());
-
-    return restOperations.exchange(url, method, new HttpEntity<>(body, headers), responseClass);
-  }
-
-  @Override
-  public Token getToken(String username, String password) {
-    HttpHeaders headers = new HttpHeaders();
-    headers.add("Content-Type", "application/x-www-form-urlencoded");
-    String body = "grant_type=password&username=" + username + "&Password=" + password;
-
-    return restOperations.exchange(M2SysBiometricsConstants.M2SYS_SERVER_URL + "/cstoken", HttpMethod.POST,
-        new HttpEntity<Object>(body, headers), Token.class).getBody();
-
-  }
-
-  private void checkResponse(M2SysResponse response) {
-    if (BooleanUtils.isNotTrue(response.getSuccess())) {
-      throw new M2SysBiometricsException("Failure response: " + response.getResponseCode());
+    private <T> ResponseEntity<T> exchange(URI url, HttpMethod method, Class<T> responseClass, Token token) {
+        return exchange(url, method, null, new HttpHeaders(), responseClass, token);
     }
-  }
 
-  private void debugRequest(String url, Object request) {
-    if (LOGGER.isDebugEnabled()) {
-      try {
-        String json = new ObjectMapper().writeValueAsString(request);
-        LOGGER.debug("{} request body: {}", url, json);
-      } catch (IOException e) {
-        throw new M2SysBiometricsException(e);
-      }
+    private <T> ResponseEntity<T> exchange(URI url, HttpMethod method, Object body,
+                                           HttpHeaders headers, Class<T> responseClass, Token token) {
+
+        headers.add("Authorization", token.getTokenType() + " " + token.getAccessToken());
+
+        return restOperations.exchange(url, method, new HttpEntity<>(body, headers), responseClass);
     }
-  }
+
+    @Override
+    public Token getToken(String username, String password) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Type", "application/x-www-form-urlencoded");
+        String body = "grant_type=password&username=" + username + "&Password=" + password;
+
+        return restOperations.exchange(M2SysBiometricsConstants.M2SYS_SERVER_URL + "/cstoken", HttpMethod.POST,
+                new HttpEntity<Object>(body, headers), Token.class).getBody();
+
+    }
+
+    private void checkResponse(M2SysResponse response) {
+        if (BooleanUtils.isNotTrue(response.getSuccess())) {
+            throw new M2SysBiometricsException("Failure response: " + response.getResponseCode());
+        }
+    }
+
+    private void debugRequest(String url, Object request) {
+        if (LOGGER.isDebugEnabled()) {
+            try {
+                String json = new ObjectMapper().writeValueAsString(request);
+                LOGGER.debug("{} request body: {}", url, json);
+            } catch (IOException e) {
+                throw new M2SysBiometricsException(e);
+            }
+        }
+    }
 }

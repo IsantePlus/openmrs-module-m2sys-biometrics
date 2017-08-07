@@ -22,14 +22,14 @@ import org.openmrs.module.BaseModuleActivator;
  */
 public class M2SysBiometricsActivator extends BaseModuleActivator {
 
-  private Log log = LogFactory.getLog(this.getClass());
+    private Log log = LogFactory.getLog(this.getClass());
 
-  public void startup() {
-    log.info("Starting m2sys Biometrics Module");
-  }
+    public void startup() {
+        log.info("Starting m2sys Biometrics Module");
+    }
 
-  public void shutdown() {
-    log.info("Shutting down m2sys Biometrics Module");
-  }
+    public void shutdown() {
+        log.info("Shutting down m2sys Biometrics Module");
+    }
 
 }
