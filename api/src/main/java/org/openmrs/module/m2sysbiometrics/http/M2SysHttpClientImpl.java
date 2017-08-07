@@ -1,9 +1,10 @@
 package org.openmrs.module.m2sysbiometrics.http;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang.BooleanUtils;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants;
 import org.openmrs.module.m2sysbiometrics.exception.M2SysBiometricsException;
+import org.openmrs.module.m2sysbiometrics.model.LoggingMixin;
 import org.openmrs.module.m2sysbiometrics.model.M2SysRequest;
 import org.openmrs.module.m2sysbiometrics.model.M2SysResponse;
 import org.openmrs.module.m2sysbiometrics.util.Token;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.client.RestTemplate;
 
+import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -33,6 +35,15 @@ public class M2SysHttpClientImpl implements M2SysHttpClient {
     private static final Logger LOGGER = LoggerFactory.getLogger(M2SysHttpClientImpl.class);
 
     private RestOperations restOperations = new RestTemplate();
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
+    @PostConstruct
+    public void init() {
+        // don't log customer key
+        objectMapper.addMixIn(M2SysRequest.class, LoggingMixin.class);
+        objectMapper.addMixIn(M2SysResponse.class, LoggingMixin.class);
+    }
 
     @Override
     public ResponseEntity<String> getServerStatus(String url, Token token) {
@@ -99,11 +110,16 @@ public class M2SysHttpClientImpl implements M2SysHttpClient {
 
     private void debugRequest(String url, Object request) {
         if (LOGGER.isDebugEnabled()) {
-            try {
-                String json = new ObjectMapper().writeValueAsString(request);
-                LOGGER.debug("{} request body: {}", url, json);
-            } catch (IOException e) {
-                throw new M2SysBiometricsException(e);
+            if (request == null) {
+                LOGGER.debug("{} called");
+            } else {
+                try {
+                    String json = objectMapper.writerWithDefaultPrettyPrinter()
+                            .writeValueAsString(request);
+                    LOGGER.debug("{} called, request body:\n {}", url, json);
+                } catch (IOException e) {
+                    throw new M2SysBiometricsException(e);
+                }
             }
         }
     }
