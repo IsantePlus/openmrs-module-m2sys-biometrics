@@ -1,6 +1,6 @@
 package org.openmrs.module.m2sysbiometrics.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.codehaus.jackson.annotate.JsonIgnore;
 
 public abstract class LoggingMixin {
 

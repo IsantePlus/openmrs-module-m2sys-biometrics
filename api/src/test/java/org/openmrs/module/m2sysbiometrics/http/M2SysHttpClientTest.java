@@ -1,15 +1,21 @@
 package org.openmrs.module.m2sysbiometrics.http;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.io.IOUtils;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants;
 import org.openmrs.module.m2sysbiometrics.model.M2SysRequest;
 import org.openmrs.module.m2sysbiometrics.model.M2SysResponse;
 import org.openmrs.module.m2sysbiometrics.model.Token;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.http.converter.json.MappingJacksonHttpMessageConverter;
+import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.web.client.RestOperations;
+import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -38,6 +44,11 @@ public class M2SysHttpClientTest {
     public WireMockRule wireMockRule = new WireMockRule(SERVER_PORT);
 
     private ObjectMapper objectMapper = new ObjectMapper();
+
+    @Before
+    public void setUp() {
+        replaceJacksonMessageConverter();
+    }
 
     @Test
     public void shouldPostAndGetM2SysResponse() throws IOException {
@@ -108,5 +119,20 @@ public class M2SysHttpClientTest {
         token.setAccessToken("XXX");
         token.setTokenType("Bearer");
         return token;
+    }
+
+    // hack to make RestTemplate use old Jackson libs
+    // even though we have newer ones on the classpath, because of Wiremock
+    private void replaceJacksonMessageConverter() {
+        MappingJacksonHttpMessageConverter messageConverter = new MappingJacksonHttpMessageConverter();
+        messageConverter.setPrettyPrint(false);
+        messageConverter.setObjectMapper(objectMapper);
+
+        RestTemplate restTemplate = (RestTemplate) ReflectionTestUtils.getField(httpClient,
+                "restOperations");
+
+        restTemplate.getMessageConverters().removeIf(m -> m.getClass().getName().equals(
+                MappingJackson2HttpMessageConverter.class.getName()));
+        restTemplate.getMessageConverters().add(messageConverter);
     }
 }

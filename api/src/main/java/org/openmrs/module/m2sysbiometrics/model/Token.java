@@ -1,6 +1,6 @@
 package org.openmrs.module.m2sysbiometrics.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import org.codehaus.jackson.annotate.JsonProperty;
 
 public class Token extends M2SysData {
 

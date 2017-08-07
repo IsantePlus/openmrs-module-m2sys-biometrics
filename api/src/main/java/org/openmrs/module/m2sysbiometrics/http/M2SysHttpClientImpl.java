@@ -1,7 +1,7 @@
 package org.openmrs.module.m2sysbiometrics.http;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang.BooleanUtils;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.openmrs.module.m2sysbiometrics.exception.M2SysBiometricsException;
 import org.openmrs.module.m2sysbiometrics.model.LoggingMixin;
 import org.openmrs.module.m2sysbiometrics.model.M2SysRequest;
@@ -40,8 +40,8 @@ public class M2SysHttpClientImpl implements M2SysHttpClient {
     @PostConstruct
     public void init() {
         // don't log customer key
-        objectMapper.addMixIn(M2SysRequest.class, LoggingMixin.class);
-        objectMapper.addMixIn(M2SysResponse.class, LoggingMixin.class);
+        objectMapper.getSerializationConfig().addMixInAnnotations(M2SysRequest.class, LoggingMixin.class);
+        objectMapper.getSerializationConfig().addMixInAnnotations(M2SysResponse.class, LoggingMixin.class);
     }
 
     @Override
