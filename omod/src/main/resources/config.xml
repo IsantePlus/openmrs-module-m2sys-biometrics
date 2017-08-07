@@ -67,14 +67,6 @@
 
     <!-- Required Global Properties  -->
     <globalProperty>
-        <property>${project.parent.artifactId}.readerId</property>
-        <defaultValue></defaultValue>
-        <description>
-            The fingerprint reader ID used by m2Sys easy scan application.
-        </description>
-    </globalProperty>
-
-    <globalProperty>
         <property>${project.parent.artifactId}.server.url</property>
         <defaultValue></defaultValue>
         <description>
