@@ -30,7 +30,8 @@ import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.getErr
 @Component("m2sysbiometrics.M2SysEngine")
 public class M2SysEngine implements BiometricEngine {
 
-    private AdministrationService adminService = Context.getAdministrationService();
+    @Autowired
+    private AdministrationService adminService;
 
     @Autowired
     private M2SysHttpClient httpClient;
