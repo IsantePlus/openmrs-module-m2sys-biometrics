@@ -9,7 +9,7 @@ import org.junit.Test;
 import org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants;
 import org.openmrs.module.m2sysbiometrics.model.M2SysRequest;
 import org.openmrs.module.m2sysbiometrics.model.M2SysResponse;
-import org.openmrs.module.m2sysbiometrics.util.Token;
+import org.openmrs.module.m2sysbiometrics.model.Token;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -77,6 +77,24 @@ public class M2SysHttpClientTest {
         assertEquals(Integer.valueOf(LOCATION_ID), response.getLocationId());
         assertEquals(Integer.valueOf(LEFT_TEMPLATE_POSITION), response.getLeftTemplatePosition());
         assertEquals(Integer.valueOf(RIGHT_TEMPLATE_POSITION), response.getRightTemplatePosition());
+    }
+
+    @Test
+    public void shouldGetToken() throws IOException {
+        stubFor(post("/cstoken")
+            .withHeader("Content-Type", equalTo("application/x-www-form-urlencoded"))
+            .withRequestBody(equalTo("grant_type=password&username=username&Password=password"))
+            .willReturn(
+                    aResponse().withStatus(HttpStatus.SC_OK)
+                        .withHeader("Content-Type", "application/json;charset=UTF-8")
+                        .withBody(readFile("token.json"))));
+
+        Token token = httpClient.getToken(SERVER_URL,"username", "password");
+
+        assertNotNull(token);
+        assertEquals("This is a token", token.getAccessToken());
+        assertEquals("bearer", token.getTokenType());
+        assertEquals(Integer.valueOf(10799), token.getExpiresIn());
     }
 
     private String readFile(String file) throws IOException {

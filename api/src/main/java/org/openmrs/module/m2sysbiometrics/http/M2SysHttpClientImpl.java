@@ -2,12 +2,11 @@ package org.openmrs.module.m2sysbiometrics.http;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang.BooleanUtils;
-import org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants;
 import org.openmrs.module.m2sysbiometrics.exception.M2SysBiometricsException;
 import org.openmrs.module.m2sysbiometrics.model.LoggingMixin;
 import org.openmrs.module.m2sysbiometrics.model.M2SysRequest;
 import org.openmrs.module.m2sysbiometrics.model.M2SysResponse;
-import org.openmrs.module.m2sysbiometrics.util.Token;
+import org.openmrs.module.m2sysbiometrics.model.Token;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -92,12 +91,12 @@ public class M2SysHttpClientImpl implements M2SysHttpClient {
     }
 
     @Override
-    public Token getToken(String username, String password) {
+    public Token getToken(String host, String username, String password) {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", "application/x-www-form-urlencoded");
         String body = "grant_type=password&username=" + username + "&Password=" + password;
 
-        return restOperations.exchange(M2SysBiometricsConstants.M2SYS_SERVER_URL + "/cstoken", HttpMethod.POST,
+        return restOperations.exchange(host + "/cstoken", HttpMethod.POST,
                 new HttpEntity<Object>(body, headers), Token.class).getBody();
 
     }

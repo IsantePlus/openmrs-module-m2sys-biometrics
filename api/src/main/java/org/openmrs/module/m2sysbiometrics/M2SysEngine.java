@@ -7,7 +7,7 @@ import org.openmrs.module.m2sysbiometrics.model.BiometricCaptureType;
 import org.openmrs.module.m2sysbiometrics.model.M2SysRequest;
 import org.openmrs.module.m2sysbiometrics.model.M2SysResponse;
 import org.openmrs.module.m2sysbiometrics.model.ChangeIdRequest;
-import org.openmrs.module.m2sysbiometrics.util.Token;
+import org.openmrs.module.m2sysbiometrics.model.Token;
 import org.openmrs.module.registrationcore.api.biometrics.BiometricEngine;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricEngineStatus;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricMatch;
@@ -188,7 +188,6 @@ public class M2SysEngine implements BiometricEngine {
     private Token getToken() {
         String username = Context.getAdministrationService().getGlobalProperty(M2SysBiometricsConstants.M2SYS_USER);
         String password = Context.getAdministrationService().getGlobalProperty(M2SysBiometricsConstants.M2SYS_PASSWORD);
-        return httpClient.getToken(username, password);
+        return httpClient.getToken(getServerUrl(), username, password);
     }
-
 }
