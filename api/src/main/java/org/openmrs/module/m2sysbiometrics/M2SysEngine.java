@@ -1,7 +1,8 @@
 package org.openmrs.module.m2sysbiometrics;
 
+import org.apache.commons.lang.StringUtils;
+import org.openmrs.api.APIException;
 import org.openmrs.api.AdministrationService;
-import org.openmrs.api.context.Context;
 import org.openmrs.module.m2sysbiometrics.http.M2SysHttpClient;
 import org.openmrs.module.m2sysbiometrics.model.BiometricCaptureType;
 import org.openmrs.module.m2sysbiometrics.model.M2SysRequest;
@@ -164,31 +165,36 @@ public class M2SysEngine implements BiometricEngine {
     }
 
     private String getServerUrl() {
-        return adminService.getGlobalProperty(M2SYS_SERVER_URL);
+        return getProperty(M2SYS_SERVER_URL);
     }
 
     private String getCustomerKey() {
-        return Context.getAdministrationService().getGlobalProperty(M2SysBiometricsConstants.M2SYS_CUSTOMER_KEY);
+        return getProperty(M2SysBiometricsConstants.M2SYS_CUSTOMER_KEY);
     }
 
     private String getAccessPointID() {
-        return Context.getAdministrationService().getGlobalProperty(M2SysBiometricsConstants.M2SYS_ACCESS_POINT_ID);
+        return getProperty(M2SysBiometricsConstants.M2SYS_ACCESS_POINT_ID);
     }
 
     private float getCaptureTimeOut() {
-        return Float.parseFloat(Context.getAdministrationService()
-                .getGlobalProperty(M2SysBiometricsConstants.M2SYS_CAPTURE_TIMEOUT));
+        return Float.parseFloat(getProperty(M2SysBiometricsConstants.M2SYS_CAPTURE_TIMEOUT));
     }
 
     private int getLocationID() {
-        return Integer.parseInt(Context.getAdministrationService()
-                .getGlobalProperty(M2SysBiometricsConstants.M2SYS_LOCATION_ID));
+        return Integer.parseInt(getProperty(M2SysBiometricsConstants.M2SYS_LOCATION_ID));
     }
 
     private Token getToken() {
-        String username = Context.getAdministrationService().getGlobalProperty(M2SysBiometricsConstants.M2SYS_USER);
-        String password = Context.getAdministrationService().getGlobalProperty(M2SysBiometricsConstants.M2SYS_PASSWORD);
+        String username = getProperty(M2SysBiometricsConstants.M2SYS_USER);
+        String password = getProperty(M2SysBiometricsConstants.M2SYS_PASSWORD);
         return httpClient.getToken(username, password);
     }
 
+    private String getProperty(String propertyName) {
+        String propertyValue = adminService.getGlobalProperty(propertyName);
+        if (StringUtils.isBlank(propertyValue)) {
+            throw new APIException("Property value for '" + propertyName + "' is not set");
+        }
+        return propertyValue;
+    }
 }
