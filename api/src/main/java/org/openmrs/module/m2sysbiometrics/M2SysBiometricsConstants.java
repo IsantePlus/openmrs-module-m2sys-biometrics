@@ -4,8 +4,6 @@ import java.util.ResourceBundle;
 
 public final class M2SysBiometricsConstants {
 
-    public static final String M2SYS_BIOMETRICS_READER_ID = "m2sys-biometrics.readerId";
-
     public static final String M2SYS_SERVER_URL = "m2sys-biometrics.server.url";
 
     public static final String M2SYS_USER = "m2sys-biometrics.server.user";
