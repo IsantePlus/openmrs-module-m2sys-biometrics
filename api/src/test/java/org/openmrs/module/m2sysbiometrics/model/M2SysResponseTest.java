@@ -2,6 +2,7 @@ package org.openmrs.module.m2sysbiometrics.model;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
+import org.openmrs.module.m2sysbiometrics.exception.M2SysBiometricsException;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricMatch;
 
 import java.io.IOException;
@@ -10,6 +11,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class M2SysResponseTest {
 
@@ -42,7 +44,47 @@ public class M2SysResponseTest {
         assertEquals(1.0, matches.get(1).getMatchScore()   , 0.1);
         assertEquals("10002X", matches.get(2).getSubjectId());
         assertEquals(102.0, matches.get(2).getMatchScore()   , 0.1);
+    }
 
+    @Test
+    public void shouldReturnEmptyListForNonMatchResult() throws IOException {
+        M2SysResponse response = new M2SysResponse();
+        response.setMatchingResult(readFile("noMatches.xml"));
+
+        List<BiometricMatch> matches = response.toMatchList();
+
+        assertNotNull(matches);
+        assertTrue(matches.isEmpty());
+    }
+
+    @Test
+    public void shouldReturnEmptyListForEmptyResult() throws IOException {
+        M2SysResponse response = new M2SysResponse();
+        response.setMatchingResult("");
+
+        List<BiometricMatch> matches = response.toMatchList();
+
+        assertNotNull(matches);
+        assertTrue(matches.isEmpty());
+    }
+
+    @Test
+    public void shouldReturnEmptyListForNullResult() throws IOException {
+        M2SysResponse response = new M2SysResponse();
+        response.setMatchingResult(null);
+
+        List<BiometricMatch> matches = response.toMatchList();
+
+        assertNotNull(matches);
+        assertTrue(matches.isEmpty());
+    }
+
+    @Test(expected = M2SysBiometricsException.class)
+    public void shouldThrowExcepionForInvalidEngineResult() throws IOException {
+        M2SysResponse response = new M2SysResponse();
+        response.setMatchingResult(readFile("invalidEngine.xml"));
+
+        response.toMatchList();
     }
 
     private String readFile(String file) throws IOException {
