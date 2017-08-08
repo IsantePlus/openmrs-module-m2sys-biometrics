@@ -1,10 +1,8 @@
-package org.openmrs.module.m2sysbiometrics.util;
+package org.openmrs.module.m2sysbiometrics.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import org.codehaus.jackson.annotate.JsonProperty;
 
-import java.io.Serializable;
-
-public class Token implements Serializable {
+public class Token extends M2SysData {
 
     private static final long serialVersionUID = 2642478741110327810L;
 
@@ -15,13 +13,13 @@ public class Token implements Serializable {
     private String tokenType;
 
     @JsonProperty("expires_in")
-    private String expiresIn;
+    private Integer expiresIn;
 
     public String getAccessToken() {
         return accessToken;
     }
 
-    public String getExpiresIn() {
+    public Integer getExpiresIn() {
         return expiresIn;
     }
 
@@ -37,7 +35,7 @@ public class Token implements Serializable {
         this.tokenType = tokenType;
     }
 
-    public void setExpiresIn(String expiresIn) {
+    public void setExpiresIn(Integer expiresIn) {
         this.expiresIn = expiresIn;
     }
 }

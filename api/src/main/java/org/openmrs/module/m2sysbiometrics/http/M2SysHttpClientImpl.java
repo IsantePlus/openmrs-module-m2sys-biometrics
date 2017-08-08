@@ -2,12 +2,11 @@ package org.openmrs.module.m2sysbiometrics.http;
 
 import org.apache.commons.lang.BooleanUtils;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.openmrs.api.context.Context;
-import org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants;
 import org.openmrs.module.m2sysbiometrics.exception.M2SysBiometricsException;
+import org.openmrs.module.m2sysbiometrics.model.LoggingMixin;
 import org.openmrs.module.m2sysbiometrics.model.M2SysRequest;
 import org.openmrs.module.m2sysbiometrics.model.M2SysResponse;
-import org.openmrs.module.m2sysbiometrics.util.Token;
+import org.openmrs.module.m2sysbiometrics.model.Token;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +18,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.client.RestTemplate;
 
+import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -34,6 +34,15 @@ public class M2SysHttpClientImpl implements M2SysHttpClient {
     private static final Logger LOGGER = LoggerFactory.getLogger(M2SysHttpClientImpl.class);
 
     private RestOperations restOperations = new RestTemplate();
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
+    @PostConstruct
+    public void init() {
+        // don't log customer key
+        objectMapper.getSerializationConfig().addMixInAnnotations(M2SysRequest.class, LoggingMixin.class);
+        objectMapper.getSerializationConfig().addMixInAnnotations(M2SysResponse.class, LoggingMixin.class);
+    }
 
     @Override
     public ResponseEntity<String> getServerStatus(String url, Token token) {
@@ -82,15 +91,13 @@ public class M2SysHttpClientImpl implements M2SysHttpClient {
     }
 
     @Override
-    public Token getToken(String username, String password) {
+    public Token getToken(String host, String username, String password) {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", "application/x-www-form-urlencoded");
         String body = "grant_type=password&username=" + username + "&Password=" + password;
-        String serverUrl = Context.getAdministrationService().getGlobalProperty(M2SysBiometricsConstants.M2SYS_SERVER_URL);
 
-        return restOperations.exchange(serverUrl + "/cstoken", HttpMethod.POST,
+        return restOperations.exchange(host + "/cstoken", HttpMethod.POST,
                 new HttpEntity<Object>(body, headers), Token.class).getBody();
-
     }
 
     private void checkResponse(M2SysResponse response) {
@@ -101,11 +108,16 @@ public class M2SysHttpClientImpl implements M2SysHttpClient {
 
     private void debugRequest(String url, Object request) {
         if (LOGGER.isDebugEnabled()) {
-            try {
-                String json = new ObjectMapper().writeValueAsString(request);
-                LOGGER.debug("{} request body: {}", url, json);
-            } catch (IOException e) {
-                throw new M2SysBiometricsException(e);
+            if (request == null) {
+                LOGGER.debug("{} called");
+            } else {
+                try {
+                    String json = objectMapper.writerWithDefaultPrettyPrinter()
+                            .writeValueAsString(request);
+                    LOGGER.debug("{} called, request body:\n {}", url, json);
+                } catch (IOException e) {
+                    throw new M2SysBiometricsException(e);
+                }
             }
         }
     }

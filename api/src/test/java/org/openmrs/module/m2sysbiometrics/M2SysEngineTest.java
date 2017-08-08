@@ -14,7 +14,7 @@ import org.openmrs.module.m2sysbiometrics.model.BiometricCaptureType;
 import org.openmrs.module.m2sysbiometrics.model.M2SysRequest;
 import org.openmrs.module.m2sysbiometrics.model.M2SysResponse;
 import org.openmrs.module.m2sysbiometrics.model.ChangeIdRequest;
-import org.openmrs.module.m2sysbiometrics.util.Token;
+import org.openmrs.module.m2sysbiometrics.model.Token;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricEngineStatus;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricSubject;
 import org.openmrs.test.Verifies;
@@ -91,7 +91,7 @@ public class M2SysEngineTest extends M2SysBiometricSensitiveTestBase {
         when(administrationService.getGlobalProperty(M2SysBiometricsConstants.M2SYS_USER)).thenReturn(USERNAME);
         when(administrationService.getGlobalProperty(M2SysBiometricsConstants.M2SYS_PASSWORD)).thenReturn(PASSWORD);
 
-        when(httpClient.getToken(USERNAME, PASSWORD)).thenReturn(token);
+        when(httpClient.getToken(SERVER_URL, USERNAME, PASSWORD)).thenReturn(token);
     }
 
     @Test
