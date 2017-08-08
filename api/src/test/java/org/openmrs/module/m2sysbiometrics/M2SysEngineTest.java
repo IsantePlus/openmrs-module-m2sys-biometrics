@@ -1,5 +1,6 @@
 package org.openmrs.module.m2sysbiometrics;
 
+import com.google.common.collect.Lists;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -11,9 +12,11 @@ import org.mockito.MockitoAnnotations;
 import org.openmrs.api.AdministrationService;
 import org.openmrs.module.m2sysbiometrics.http.M2SysHttpClient;
 import org.openmrs.module.m2sysbiometrics.model.BiometricCaptureType;
+import org.openmrs.module.m2sysbiometrics.model.M2SysMatchingResult;
 import org.openmrs.module.m2sysbiometrics.model.M2SysRequest;
 import org.openmrs.module.m2sysbiometrics.model.M2SysResponse;
 import org.openmrs.module.m2sysbiometrics.model.ChangeIdRequest;
+import org.openmrs.module.m2sysbiometrics.model.M2SysResult;
 import org.openmrs.module.m2sysbiometrics.model.Token;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricEngineStatus;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricSubject;
@@ -22,6 +25,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 
 import java.io.IOException;
+import java.util.Collections;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -67,6 +71,9 @@ public class M2SysEngineTest extends M2SysBiometricSensitiveTestBase {
     private BiometricSubject expectedSubject;
 
     @Mock
+    private M2SysMatchingResult expectedMatchingResult;
+
+    @Mock
     private Token token;
 
     @InjectMocks
@@ -87,6 +94,7 @@ public class M2SysEngineTest extends M2SysBiometricSensitiveTestBase {
                 ACCESS_POINT_ID);
 
         when(response.toBiometricSubject()).thenReturn(expectedSubject);
+        when(response.parseMatchingResult()).thenReturn(expectedMatchingResult);
 
         when(administrationService.getGlobalProperty(M2SysBiometricsConstants.M2SYS_USER)).thenReturn(USERNAME);
         when(administrationService.getGlobalProperty(M2SysBiometricsConstants.M2SYS_PASSWORD)).thenReturn(PASSWORD);
@@ -140,12 +148,16 @@ public class M2SysEngineTest extends M2SysBiometricSensitiveTestBase {
     public void shouldLookupBiometricSubject() throws Exception {
         final String url = SERVER_URL + M2SYS_LOOKUP_ENDPOINT;
 
+        M2SysResult expectedResult = new M2SysResult();
+        expectedResult.setValue("11");
+
         when(httpClient.postRequest(eq(url), any(M2SysRequest.class), eq(token))).thenReturn(response);
+        when(expectedMatchingResult.getResults()).thenReturn(Lists.newArrayList(expectedResult));
 
         BiometricSubject reqSubject = new BiometricSubject("ID1");
         BiometricSubject subject = m2SysEngine.lookup(reqSubject.getSubjectId());
 
-        verifyBiometricSubjectRequest(url, subject);
+        assertEquals(reqSubject.getSubjectId(), subject.getSubjectId());
     }
 
     @Test

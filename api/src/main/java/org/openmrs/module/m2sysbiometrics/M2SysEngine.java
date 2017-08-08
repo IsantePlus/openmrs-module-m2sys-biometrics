@@ -3,8 +3,9 @@ package org.openmrs.module.m2sysbiometrics;
 import org.apache.commons.lang.StringUtils;
 import org.openmrs.api.APIException;
 import org.openmrs.api.AdministrationService;
-git aimport org.openmrs.module.m2sysbiometrics.http.M2SysHttpClient;
+import org.openmrs.module.m2sysbiometrics.http.M2SysHttpClient;
 import org.openmrs.module.m2sysbiometrics.model.BiometricCaptureType;
+import org.openmrs.module.m2sysbiometrics.model.M2SysMatchingResult;
 import org.openmrs.module.m2sysbiometrics.model.M2SysRequest;
 import org.openmrs.module.m2sysbiometrics.model.M2SysResponse;
 import org.openmrs.module.m2sysbiometrics.model.ChangeIdRequest;
@@ -143,7 +144,12 @@ public class M2SysEngine implements BiometricEngine {
         request.setRegistrationId(subjectId);
 
         M2SysResponse response = httpClient.postRequest(url(M2SYS_LOOKUP_ENDPOINT), request, getToken());
-        return response.toBiometricSubject();
+        M2SysMatchingResult m =  response.parseMatchingResult();
+        BiometricSubject biometricSubject = new BiometricSubject();
+        if (checkLookupMatchingResult(m)) {
+            biometricSubject.setSubjectId(subjectId);
+        }
+        return biometricSubject;
     }
 
     /**
@@ -205,5 +211,10 @@ public class M2SysEngine implements BiometricEngine {
             throw new APIException("Property value for '" + propertyName + "' is not set");
         }
         return propertyValue;
+    }
+
+    private boolean checkLookupMatchingResult(M2SysMatchingResult matchingResult) {
+        String value = matchingResult.getResults().get(0).getValue();
+        return !(StringUtils.isBlank(value) || value.length() != 2 || !StringUtils.isNumeric(value));
     }
 }

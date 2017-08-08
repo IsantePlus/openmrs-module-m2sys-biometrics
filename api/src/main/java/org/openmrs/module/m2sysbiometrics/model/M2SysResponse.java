@@ -1,11 +1,16 @@
 package org.openmrs.module.m2sysbiometrics.model;
 
 import org.codehaus.jackson.annotate.JsonProperty;
+import org.openmrs.module.m2sysbiometrics.exception.M2SysBiometricsException;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricMatch;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricSubject;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricTemplateFormat;
 import org.openmrs.module.registrationcore.api.biometrics.model.Fingerprint;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+import java.io.StringReader;
 import java.util.Collections;
 import java.util.List;
 
@@ -287,5 +292,17 @@ public class M2SysResponse extends M2SysData {
     public List<BiometricMatch> toMatchList() {
         // TODO:
         return Collections.emptyList();
+    }
+
+    public M2SysMatchingResult parseMatchingResult() {
+        try {
+            JAXBContext jc = JAXBContext.newInstance(M2SysMatchingResult.class);
+
+            Unmarshaller unmarshaller = jc.createUnmarshaller();
+            StringReader reader = new StringReader(matchingResult);
+            return (M2SysMatchingResult) unmarshaller.unmarshal(reader);
+        } catch (JAXBException e) {
+            throw new M2SysBiometricsException("Matching result parse error", e);
+        }
     }
 }
