@@ -80,7 +80,7 @@ public class M2SysResponseTest {
     }
 
     @Test(expected = M2SysBiometricsException.class)
-    public void shouldThrowExcepionForInvalidEngineResult() throws IOException {
+    public void shouldThrowExceptionForInvalidEngineResult() throws IOException {
         M2SysResponse response = new M2SysResponse();
         response.setMatchingResult(readFile("invalidEngine.xml"));
 
