@@ -5,7 +5,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 
-@XmlAccessorType(XmlAccessType.PROPERTY)
+@XmlAccessorType(XmlAccessType.FIELD)
 public class M2SysResult {
 
     public static final String INVALID_ENGINE = "INVALID_ENGINE";
@@ -17,7 +17,7 @@ public class M2SysResult {
     @XmlAttribute
     private String value;
 
-    @XmlAttribute
+    @XmlAttribute(name = "Instance")
     private int instance;
 
     public int getScore() {
