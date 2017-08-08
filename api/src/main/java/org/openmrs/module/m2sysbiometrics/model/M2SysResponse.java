@@ -13,6 +13,8 @@ import java.io.StringReader;
 import java.util.Collections;
 import java.util.List;
 
+import static org.openmrs.module.registrationcore.api.biometrics.model.BiometricTemplateFormat.ISO;
+
 public class M2SysResponse extends M2SysData {
 
     private static final long serialVersionUID = 5297535433389093052L;
@@ -277,11 +279,11 @@ public class M2SysResponse extends M2SysData {
             subject = new BiometricSubject(registrationId);
 
             subject.addFingerprint(new Fingerprint(
-                    getTemplateData(), "ISO", getLeftTemplate()
+                    getTemplateData(), ISO, getLeftTemplate()
             ));
 
             subject.addFingerprint(new Fingerprint(
-                    getTemplateData2(), "ISO", getRightTemplate()
+                    getTemplateData2(), ISO, getRightTemplate()
             ));
         }
 
