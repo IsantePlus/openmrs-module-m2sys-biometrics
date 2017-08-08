@@ -3,7 +3,6 @@ package org.openmrs.module.m2sysbiometrics.model;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricMatch;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricSubject;
-import org.openmrs.module.registrationcore.api.biometrics.model.BiometricTemplateFormat;
 import org.openmrs.module.registrationcore.api.biometrics.model.Fingerprint;
 
 import java.util.Collections;
@@ -273,11 +272,11 @@ public class M2SysResponse extends M2SysData {
             subject = new BiometricSubject(registrationId);
 
             subject.addFingerprint(new Fingerprint(
-                    getTemplateData(), BiometricTemplateFormat.ISO, getLeftTemplate()
+                    getTemplateData(), "ISO", getLeftTemplate()
             ));
 
             subject.addFingerprint(new Fingerprint(
-                    getTemplateData2(), BiometricTemplateFormat.ISO, getRightTemplate()
+                    getTemplateData2(), "ISO", getRightTemplate()
             ));
         }
 
