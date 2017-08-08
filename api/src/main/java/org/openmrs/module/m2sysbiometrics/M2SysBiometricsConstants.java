@@ -26,9 +26,9 @@ public final class M2SysBiometricsConstants {
 
     public static final String M2SYS_UPDATE_ENDPOINT = "/api/Biometric/Update";
 
-    public static final String M2SYS_DELETE_ID_ENDPOINT = "api/Biometric/DeleteID";
+    public static final String M2SYS_DELETE_ID_ENDPOINT = "/api/Biometric/DeleteID";
 
-    public static final String M2SYS_CHANGE_ID_ENDPOINT = "api/Biometric/ChangeID";
+    public static final String M2SYS_CHANGE_ID_ENDPOINT = "/api/Biometric/ChangeID";
 
     public static final String ERROR_CODE_OF_SUBJECT_NOT_EXIST = "CS004";
 
