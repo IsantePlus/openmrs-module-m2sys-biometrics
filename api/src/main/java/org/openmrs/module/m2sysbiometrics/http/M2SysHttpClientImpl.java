@@ -14,6 +14,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.converter.json.MappingJacksonHttpMessageConverter;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.client.RestTemplate;
@@ -42,6 +43,13 @@ public class M2SysHttpClientImpl implements M2SysHttpClient {
         // don't log customer key
         objectMapper.getSerializationConfig().addMixInAnnotations(M2SysRequest.class, LoggingMixin.class);
         objectMapper.getSerializationConfig().addMixInAnnotations(M2SysResponse.class, LoggingMixin.class);
+
+        MappingJacksonHttpMessageConverter messageConverter = new MappingJacksonHttpMessageConverter();
+        messageConverter.setPrettyPrint(false);
+        messageConverter.setObjectMapper(objectMapper);
+
+        RestTemplate restTemplate = (RestTemplate) restOperations;
+        restTemplate.getMessageConverters().add(messageConverter);
     }
 
     @Override
