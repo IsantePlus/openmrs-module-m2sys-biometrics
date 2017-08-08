@@ -1,5 +1,6 @@
 package org.openmrs.module.m2sysbiometrics.model;
 
+import org.apache.commons.lang3.StringUtils;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.openmrs.module.m2sysbiometrics.exception.M2SysBiometricsException;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricMatch;
@@ -10,10 +11,8 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import java.io.StringReader;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
-
-import static org.openmrs.module.registrationcore.api.biometrics.model.BiometricTemplateFormat.ISO;
 
 public class M2SysResponse extends M2SysData {
 
@@ -279,11 +278,11 @@ public class M2SysResponse extends M2SysData {
             subject = new BiometricSubject(registrationId);
 
             subject.addFingerprint(new Fingerprint(
-                    getTemplateData(), ISO, getLeftTemplate()
+                    getTemplateData(), "ISO", getLeftTemplate()
             ));
 
             subject.addFingerprint(new Fingerprint(
-                    getTemplateData2(), ISO, getRightTemplate()
+                    getTemplateData2(), "ISO", getRightTemplate()
             ));
         }
 
@@ -291,8 +290,24 @@ public class M2SysResponse extends M2SysData {
     }
 
     public List<BiometricMatch> toMatchList() {
-        // TODO:
-        return Collections.emptyList();
+        List<BiometricMatch> matches = new ArrayList<>();
+
+        if (StringUtils.isNotBlank(matchingResult)) {
+            M2SysMatchingResult m2SysMatches = parseMatchingResult();
+
+            for (M2SysResult result : m2SysMatches.getResults()) {
+                if (M2SysResult.INVALID_ENGINE.equals(result.getValue())) {
+                    throw new M2SysBiometricsException("Invalid Engine  - the server is not licensed to"
+                            + " handle the biometric engine");
+                } else if (!M2SysResult.NO_MATCH.equals(result.getValue())) {
+                    BiometricMatch match = new BiometricMatch(result.getValue(),
+                            (double) result.getScore());
+                    matches.add(match);
+                }
+            }
+        }
+
+        return matches;
     }
 
     public M2SysMatchingResult parseMatchingResult() {
