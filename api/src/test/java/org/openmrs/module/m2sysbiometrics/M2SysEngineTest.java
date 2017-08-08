@@ -25,7 +25,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 
 import java.io.IOException;
-import java.util.Collections;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -166,6 +165,10 @@ public class M2SysEngineTest extends M2SysBiometricSensitiveTestBase {
         final String url = SERVER_URL + M2SYS_UPDATE_ENDPOINT;
         final String lookupUrl = SERVER_URL + M2SYS_LOOKUP_ENDPOINT;
 
+        M2SysResult expectedResult = new M2SysResult();
+        expectedResult.setValue("11");
+
+        when(expectedMatchingResult.getResults()).thenReturn(Lists.newArrayList(expectedResult));
         when(httpClient.postRequest(eq(url), any(M2SysRequest.class), eq(token))).thenReturn(response);
         when(httpClient.postRequest(eq(lookupUrl), any(M2SysRequest.class), eq(token))).thenReturn(response);
 

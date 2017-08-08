@@ -144,9 +144,9 @@ public class M2SysEngine implements BiometricEngine {
         request.setRegistrationId(subjectId);
 
         M2SysResponse response = httpClient.postRequest(url(M2SYS_LOOKUP_ENDPOINT), request, getToken());
-        M2SysMatchingResult m =  response.parseMatchingResult();
-        BiometricSubject biometricSubject = new BiometricSubject();
-        if (checkLookupMatchingResult(m)) {
+        BiometricSubject biometricSubject = null;
+        if (checkLookupMatchingResult(response.parseMatchingResult())) {
+            biometricSubject = new BiometricSubject();
             biometricSubject.setSubjectId(subjectId);
         }
         return biometricSubject;
@@ -214,6 +214,9 @@ public class M2SysEngine implements BiometricEngine {
     }
 
     private boolean checkLookupMatchingResult(M2SysMatchingResult matchingResult) {
+        if (matchingResult == null || matchingResult.getResults().isEmpty()) {
+            return false;
+        }
         String value = matchingResult.getResults().get(0).getValue();
         return !(StringUtils.isBlank(value) || value.length() != 2 || !StringUtils.isNumeric(value));
     }
