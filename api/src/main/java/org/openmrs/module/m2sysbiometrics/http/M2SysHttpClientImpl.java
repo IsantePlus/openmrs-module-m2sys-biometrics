@@ -46,7 +46,6 @@ public class M2SysHttpClientImpl implements M2SysHttpClient {
 
         MappingJacksonHttpMessageConverter messageConverter = new MappingJacksonHttpMessageConverter();
         messageConverter.setPrettyPrint(false);
-        messageConverter.setObjectMapper(objectMapper);
 
         RestTemplate restTemplate = (RestTemplate) restOperations;
         restTemplate.getMessageConverters().add(messageConverter);
