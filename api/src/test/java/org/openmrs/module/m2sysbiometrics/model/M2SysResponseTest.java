@@ -1,7 +1,6 @@
 package org.openmrs.module.m2sysbiometrics.model;
 
 import org.apache.commons.io.IOUtils;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.openmrs.module.m2sysbiometrics.exception.M2SysBiometricsException;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricMatch;
@@ -17,7 +16,6 @@ import static org.junit.Assert.assertTrue;
 public class M2SysResponseTest {
 
     @Test
-    @Ignore
     public void shouldParseMatchingResult() throws Exception {
         M2SysResponse response = new M2SysResponse();
         response.setMatchingResult(readFile("sampleMatchingResult.xml"));
