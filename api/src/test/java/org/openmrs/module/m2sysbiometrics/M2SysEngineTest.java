@@ -19,15 +19,20 @@ import org.openmrs.module.m2sysbiometrics.model.ChangeIdRequest;
 import org.openmrs.module.m2sysbiometrics.model.M2SysResult;
 import org.openmrs.module.m2sysbiometrics.model.Token;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricEngineStatus;
+import org.openmrs.module.registrationcore.api.biometrics.model.BiometricMatch;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricSubject;
 import org.openmrs.test.Verifies;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
+import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -39,6 +44,7 @@ import static org.mockito.Mockito.when;
 import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.M2SYS_DELETE_ID_ENDPOINT;
 import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.M2SYS_LOOKUP_ENDPOINT;
 import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.M2SYS_REGISTER_ENDPOINT;
+import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.M2SYS_SEARCH_ENDPOINT;
 import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.M2SYS_UPDATE_ENDPOINT;
 
 public class M2SysEngineTest extends M2SysBiometricSensitiveTestBase {
@@ -215,7 +221,24 @@ public class M2SysEngineTest extends M2SysBiometricSensitiveTestBase {
         M2SysRequest request = requestCaptor.getValue();
         verifyRequestCommonFields(request);
         assertEquals("XXX", request.getRegistrationId());
+    }
 
+    @Test
+    public void shouldSearchForMatches() {
+        final String url = SERVER_URL + M2SYS_SEARCH_ENDPOINT;
+        when(httpClient.postRequest(eq(url), any(M2SysRequest.class), eq(token))).thenReturn(response);
+        List<BiometricMatch> matchList = asList(mock(BiometricMatch.class),
+                mock(BiometricMatch.class));
+        when(response.toMatchList()).thenReturn(matchList);
+
+        List<BiometricMatch> result = m2SysEngine.search(new BiometricSubject());
+
+        assertEquals(matchList, result);
+        verify(httpClient).postRequest(eq(url), requestCaptor.capture(), eq(token));
+
+        M2SysRequest request = requestCaptor.getValue();
+        verifyRequestCommonFields(request);
+        assertNull(request.getRegistrationId());
     }
 
     private void verifyRequestCommonFields(M2SysRequest request) {
