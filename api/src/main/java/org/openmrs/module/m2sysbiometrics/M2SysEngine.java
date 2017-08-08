@@ -3,7 +3,7 @@ package org.openmrs.module.m2sysbiometrics;
 import org.apache.commons.lang.StringUtils;
 import org.openmrs.api.APIException;
 import org.openmrs.api.AdministrationService;
-import org.openmrs.module.m2sysbiometrics.http.M2SysHttpClient;
+git aimport org.openmrs.module.m2sysbiometrics.http.M2SysHttpClient;
 import org.openmrs.module.m2sysbiometrics.model.BiometricCaptureType;
 import org.openmrs.module.m2sysbiometrics.model.M2SysRequest;
 import org.openmrs.module.m2sysbiometrics.model.M2SysResponse;
@@ -25,6 +25,7 @@ import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.M2SYS_
 import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.M2SYS_DELETE_ID_ENDPOINT;
 import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.M2SYS_LOOKUP_ENDPOINT;
 import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.M2SYS_REGISTER_ENDPOINT;
+import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.M2SYS_SEARCH_ENDPOINT;
 import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.M2SYS_SERVER_URL;
 import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.M2SYS_UPDATE_ENDPOINT;
 import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.getErrorMessage;
@@ -55,6 +56,9 @@ public class M2SysEngine implements BiometricEngine {
 
     @Override
     public BiometricSubject enroll(BiometricSubject subject) {
+        if (subject == null) {
+            subject = new BiometricSubject();
+        }
         if (subject.getSubjectId() == null) {
             subject.setSubjectId(UUID.randomUUID().toString());
         }
@@ -121,7 +125,7 @@ public class M2SysEngine implements BiometricEngine {
         addCommonValues(request);
         request.setRegistrationId(subject.getSubjectId());
 
-        M2SysResponse response = httpClient.postRequest(url(M2SYS_LOOKUP_ENDPOINT), request, getToken());
+        M2SysResponse response = httpClient.postRequest(url(M2SYS_SEARCH_ENDPOINT), request, getToken());
 
         return response.toMatchList();
     }

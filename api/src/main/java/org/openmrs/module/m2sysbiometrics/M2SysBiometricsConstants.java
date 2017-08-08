@@ -18,7 +18,9 @@ public final class M2SysBiometricsConstants {
 
     public static final String M2SYS_CAPTURE_TIMEOUT = "m2sys-biometrics.captureTimeout";
 
-    public static final String M2SYS_LOOKUP_ENDPOINT = "/api/Biometric/Identify";
+    public static final String M2SYS_LOOKUP_ENDPOINT = "/api/Biometric/IsRegister";
+
+    public static final String M2SYS_SEARCH_ENDPOINT = "/api/Biometric/Identify";
 
     public static final String M2SYS_REGISTER_ENDPOINT = "/api/Biometric/Register";
 
