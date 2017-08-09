@@ -9,7 +9,10 @@ import javax.xml.bind.annotation.XmlAttribute;
 public class M2SysResult {
 
     public static final String INVALID_ENGINE = "INVALID_ENGINE";
-    public static final String NO_MATCH = "-1";
+    public static final String FAILED = "-1";
+    public static final String SUCCESS = "SUCCESS";
+    public static final String LICENSE_ERROR = "LICENSE_ERROR";
+
 
     @XmlAttribute
     private int score;

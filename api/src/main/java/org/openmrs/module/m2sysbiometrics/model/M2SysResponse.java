@@ -271,19 +271,35 @@ public class M2SysResponse extends M2SysData {
         this.transactionTime = transactionTime;
     }
 
-    public BiometricSubject toBiometricSubject() {
+    public BiometricSubject toBiometricSubject(String subjectId) {
         BiometricSubject subject = null;
 
-        if (success) {
-            subject = new BiometricSubject(registrationId);
+        if (StringUtils.isNotBlank(matchingResult)) {
+            M2SysMatchingResult m2SysMatchingResult = parseMatchingResult();
+            for (M2SysResult result : m2SysMatchingResult.getResults()) {
+                if (M2SysResult.INVALID_ENGINE.equals(result.getValue())) {
+                    throw new M2SysBiometricsException("Invalid Engine  - the server is not licensed to"
+                            + " handle the biometric engine");
+                } else if (M2SysResult.LICENSE_ERROR.equals(result.getValue())) {
+                    throw new M2SysBiometricsException("License error - this enrollment would have"
+                            + "exceeded the current server user license limit");
+                } else if (M2SysResult.FAILED.equals(result.getValue())) {
+                    throw new M2SysBiometricsException("Failed or was cancelled before completion");
+                } else if (M2SysResult.SUCCESS.equals(result.getValue())) {
+                    subject = new BiometricSubject(subjectId);
 
-            subject.addFingerprint(new Fingerprint(
-                    getTemplateData(), "ISO", getLeftTemplate()
-            ));
-
-            subject.addFingerprint(new Fingerprint(
-                    getTemplateData2(), "ISO", getRightTemplate()
-            ));
+                    //TODO we do not have this data
+                    subject.addFingerprint(new Fingerprint(
+                            getTemplateData(), "ISO", getLeftTemplate()
+                    ));
+                    subject.addFingerprint(new Fingerprint(
+                            getTemplateData2(), "ISO", getRightTemplate()
+                    ));
+                } else {
+                    throw new M2SysBiometricsException("Filed - biometric template alredy exists in system."
+                            + " Registration id: " + result.getValue());
+                }
+            }
         }
 
         return subject;
@@ -299,7 +315,7 @@ public class M2SysResponse extends M2SysData {
                 if (M2SysResult.INVALID_ENGINE.equals(result.getValue())) {
                     throw new M2SysBiometricsException("Invalid Engine  - the server is not licensed to"
                             + " handle the biometric engine");
-                } else if (!M2SysResult.NO_MATCH.equals(result.getValue())) {
+                } else if (!M2SysResult.FAILED.equals(result.getValue())) {
                     BiometricMatch match = new BiometricMatch(result.getValue(),
                             (double) result.getScore());
                     matches.add(match);

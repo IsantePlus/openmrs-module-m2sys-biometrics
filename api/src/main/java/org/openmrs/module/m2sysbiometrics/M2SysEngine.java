@@ -70,7 +70,7 @@ public class M2SysEngine implements BiometricEngine {
 
         M2SysResponse response = httpClient.postRequest(url(M2SYS_REGISTER_ENDPOINT), request, getToken());
 
-        return response.toBiometricSubject();
+        return response.toBiometricSubject(subject.getSubjectId());
     }
 
     /**
@@ -92,7 +92,7 @@ public class M2SysEngine implements BiometricEngine {
 
         M2SysResponse response = httpClient.postRequest(url(M2SYS_UPDATE_ENDPOINT), request, getToken());
 
-        return response.toBiometricSubject();
+        return response.toBiometricSubject(subject.getSubjectId());
     }
 
     /**
@@ -110,8 +110,8 @@ public class M2SysEngine implements BiometricEngine {
         request.setNewRegistrationId(newId);
 
         M2SysResponse response = httpClient.postRequest(url(M2SYS_CHANGE_ID_ENDPOINT), request, getToken());
-
-        return response.toBiometricSubject();
+        //TODO create another method
+        return response.toBiometricSubject(newId);
     }
 
     /**
