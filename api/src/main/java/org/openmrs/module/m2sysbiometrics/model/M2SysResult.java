@@ -10,6 +10,8 @@ public class M2SysResult {
 
     public static final String INVALID_ENGINE = "INVALID_ENGINE";
     public static final String NO_MATCH = "-1";
+    public static final String UPDATE_SUBJECT_ID_SUCCESS = "CS";
+    public static final String UPDATE_SUBJECT_ID_FAILURE = "CF";
 
     @XmlAttribute
     private int score;

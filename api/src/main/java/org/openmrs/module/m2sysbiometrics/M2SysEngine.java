@@ -3,6 +3,7 @@ package org.openmrs.module.m2sysbiometrics;
 import org.apache.commons.lang.StringUtils;
 import org.openmrs.api.APIException;
 import org.openmrs.api.AdministrationService;
+import org.openmrs.module.m2sysbiometrics.exception.M2SysBiometricsException;
 import org.openmrs.module.m2sysbiometrics.http.M2SysHttpClient;
 import org.openmrs.module.m2sysbiometrics.model.BiometricCaptureType;
 import org.openmrs.module.m2sysbiometrics.model.M2SysMatchingResult;
@@ -30,6 +31,7 @@ import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.M2SYS_
 import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.M2SYS_SERVER_URL;
 import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.M2SYS_UPDATE_ENDPOINT;
 import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.getErrorMessage;
+import static org.openmrs.module.m2sysbiometrics.model.M2SysResult.UPDATE_SUBJECT_ID_SUCCESS;
 
 @Component("m2sysbiometrics.M2SysEngine")
 public class M2SysEngine implements BiometricEngine {
@@ -111,6 +113,9 @@ public class M2SysEngine implements BiometricEngine {
 
         M2SysResponse response = httpClient.postRequest(url(M2SYS_CHANGE_ID_ENDPOINT), request, getToken());
 
+        if (!checkUpdateSubjectIdMatchingResult(response.parseMatchingResult())) {
+            throw new M2SysBiometricsException("Changing subject id failed. Probably the old id doesn't exist");
+        }
         return response.toBiometricSubject();
     }
 
@@ -219,5 +224,13 @@ public class M2SysEngine implements BiometricEngine {
         }
         String value = matchingResult.getResults().get(0).getValue();
         return !(StringUtils.isBlank(value) || value.length() != 2 || !StringUtils.isNumeric(value));
+    }
+
+    private boolean checkUpdateSubjectIdMatchingResult(M2SysMatchingResult matchingResult) {
+        if (matchingResult == null || matchingResult.getResults().isEmpty()) {
+            return false;
+        }
+        String value = matchingResult.getResults().get(0).getValue();
+        return !StringUtils.isBlank(value) && value.equals(UPDATE_SUBJECT_ID_SUCCESS);
     }
 }

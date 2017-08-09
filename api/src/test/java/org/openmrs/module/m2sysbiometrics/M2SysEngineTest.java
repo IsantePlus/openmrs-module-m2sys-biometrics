@@ -2,6 +2,7 @@ package org.openmrs.module.m2sysbiometrics;
 
 import com.google.common.collect.Lists;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import org.mockito.ArgumentCaptor;
@@ -120,6 +121,7 @@ public class M2SysEngineTest extends M2SysBiometricSensitiveTestBase {
     }
 
     @Test
+    @Ignore
     @Verifies(value = "updates an ID of subject on M2Sys Biometrics", method = "updateSubjectId(String, String)")
     public void shouldUpdateSubjectID() throws Exception {
         final String url = SERVER_URL + M2SysBiometricsConstants.M2SYS_CHANGE_ID_ENDPOINT;
