@@ -64,6 +64,8 @@ public class M2SysEngineTest extends M2SysBiometricSensitiveTestBase {
 
     private static final String PASSWORD = "pass";
 
+    private static final String FINGERPRINT_ID = "ID1";
+
     @Mock
     private AdministrationService administrationService;
 
@@ -99,7 +101,7 @@ public class M2SysEngineTest extends M2SysBiometricSensitiveTestBase {
         when(administrationService.getGlobalProperty(M2SysBiometricsConstants.M2SYS_ACCESS_POINT_ID)).thenReturn(
                 ACCESS_POINT_ID);
 
-        when(response.toBiometricSubject()).thenReturn(expectedSubject);
+        when(response.toBiometricSubject(FINGERPRINT_ID)).thenReturn(expectedSubject);
         when(response.parseMatchingResult()).thenReturn(expectedMatchingResult);
 
         when(administrationService.getGlobalProperty(M2SysBiometricsConstants.M2SYS_USER)).thenReturn(USERNAME);
@@ -127,7 +129,7 @@ public class M2SysEngineTest extends M2SysBiometricSensitiveTestBase {
         final String url = SERVER_URL + M2SysBiometricsConstants.M2SYS_CHANGE_ID_ENDPOINT;
         when(httpClient.postRequest(eq(url), any(ChangeIdRequest.class), eq(token))).thenReturn(response);
 
-        BiometricSubject subject = m2SysEngine.updateSubjectId("2", "1");
+        BiometricSubject subject = m2SysEngine.updateSubjectId("2", FINGERPRINT_ID);
 
         assertEquals(expectedSubject, subject);
         verify(httpClient).postRequest(eq(url), requestCaptor.capture(), eq(token));
@@ -135,7 +137,7 @@ public class M2SysEngineTest extends M2SysBiometricSensitiveTestBase {
         ChangeIdRequest request = (ChangeIdRequest) requestCaptor.getValue();
         verifyRequestCommonFields(request);
         assertEquals("2", request.getRegistrationId());
-        assertEquals("1", request.getNewRegistrationId());
+        assertEquals(FINGERPRINT_ID, request.getNewRegistrationId());
     }
 
     @Test
@@ -145,7 +147,7 @@ public class M2SysEngineTest extends M2SysBiometricSensitiveTestBase {
 
         when(httpClient.postRequest(eq(url), any(M2SysRequest.class), eq(token))).thenReturn(response);
 
-        BiometricSubject reqSubject = new BiometricSubject("ID1");
+        BiometricSubject reqSubject = new BiometricSubject(FINGERPRINT_ID);
         BiometricSubject subject = m2SysEngine.enroll(reqSubject);
 
         verifyBiometricSubjectRequest(url, subject);
@@ -161,7 +163,7 @@ public class M2SysEngineTest extends M2SysBiometricSensitiveTestBase {
         when(httpClient.postRequest(eq(url), any(M2SysRequest.class), eq(token))).thenReturn(response);
         when(expectedMatchingResult.getResults()).thenReturn(Lists.newArrayList(expectedResult));
 
-        BiometricSubject reqSubject = new BiometricSubject("ID1");
+        BiometricSubject reqSubject = new BiometricSubject(FINGERPRINT_ID);
         BiometricSubject subject = m2SysEngine.lookup(reqSubject.getSubjectId());
 
         assertEquals(reqSubject.getSubjectId(), subject.getSubjectId());
@@ -180,7 +182,7 @@ public class M2SysEngineTest extends M2SysBiometricSensitiveTestBase {
         when(httpClient.postRequest(eq(url), any(M2SysRequest.class), eq(token))).thenReturn(response);
         when(httpClient.postRequest(eq(lookupUrl), any(M2SysRequest.class), eq(token))).thenReturn(response);
 
-        BiometricSubject reqSubject = new BiometricSubject("ID1");
+        BiometricSubject reqSubject = new BiometricSubject(FINGERPRINT_ID);
         BiometricSubject subject = m2SysEngine.update(reqSubject);
 
         assertEquals(expectedSubject, subject);
@@ -188,11 +190,11 @@ public class M2SysEngineTest extends M2SysBiometricSensitiveTestBase {
 
         M2SysRequest lookupRequest = requestCaptor.getAllValues().get(0);
         verifyRequestCommonFields(lookupRequest);
-        assertEquals("ID1", lookupRequest.getRegistrationId());
+        assertEquals(FINGERPRINT_ID, lookupRequest.getRegistrationId());
 
         M2SysRequest request = requestCaptor.getAllValues().get(1);
         verifyRequestCommonFields(request);
-        assertEquals("ID1", request.getRegistrationId());
+        assertEquals(FINGERPRINT_ID, request.getRegistrationId());
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -205,7 +207,7 @@ public class M2SysEngineTest extends M2SysBiometricSensitiveTestBase {
         when(httpClient.postRequest(eq(lookupUrl), any(M2SysRequest.class), eq(token)))
                 .thenReturn(mock(M2SysResponse.class)); // won't return subject
 
-        BiometricSubject reqSubject = new BiometricSubject("ID1");
+        BiometricSubject reqSubject = new BiometricSubject(FINGERPRINT_ID);
         m2SysEngine.update(reqSubject);
     }
 
@@ -257,6 +259,6 @@ public class M2SysEngineTest extends M2SysBiometricSensitiveTestBase {
 
         M2SysRequest request = requestCaptor.getValue();
         verifyRequestCommonFields(request);
-        assertEquals("ID1", request.getRegistrationId());
+        assertEquals(FINGERPRINT_ID, request.getRegistrationId());
     }
 }

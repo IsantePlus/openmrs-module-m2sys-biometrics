@@ -72,7 +72,7 @@ public class M2SysEngine implements BiometricEngine {
 
         M2SysResponse response = httpClient.postRequest(url(M2SYS_REGISTER_ENDPOINT), request, getToken());
 
-        return response.toBiometricSubject();
+        return response.toBiometricSubject(subject.getSubjectId());
     }
 
     /**
@@ -94,7 +94,7 @@ public class M2SysEngine implements BiometricEngine {
 
         M2SysResponse response = httpClient.postRequest(url(M2SYS_UPDATE_ENDPOINT), request, getToken());
 
-        return response.toBiometricSubject();
+        return response.toBiometricSubject(subject.getSubjectId());
     }
 
     /**
@@ -116,7 +116,8 @@ public class M2SysEngine implements BiometricEngine {
         if (!checkUpdateSubjectIdMatchingResult(response.parseMatchingResult())) {
             throw new M2SysBiometricsException("Changing subject id failed. Probably the old id doesn't exist");
         }
-        return response.toBiometricSubject();
+        //TODO create another method
+        return response.toBiometricSubject(newId);
     }
 
     /**
