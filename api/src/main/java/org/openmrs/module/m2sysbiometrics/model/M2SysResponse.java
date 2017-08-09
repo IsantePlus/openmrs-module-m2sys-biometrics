@@ -296,7 +296,7 @@ public class M2SysResponse extends M2SysData {
                             getTemplateData2(), "ISO", getRightTemplate()
                     ));
                 } else {
-                    throw new M2SysBiometricsException("Filed - biometric template alredy exists in system."
+                    throw new M2SysBiometricsException("Filed - biometric template already exists in system."
                             + " Registration id: " + result.getValue());
                 }
             }
