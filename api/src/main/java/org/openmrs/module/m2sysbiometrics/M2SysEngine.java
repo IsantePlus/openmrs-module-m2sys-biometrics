@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.ResourceAccessException;
 
 import java.util.List;
 import java.util.UUID;
@@ -51,7 +52,13 @@ public class M2SysEngine implements BiometricEngine {
     public BiometricEngineStatus getStatus() {
         BiometricEngineStatus result = new BiometricEngineStatus();
 
-        ResponseEntity<String> responseEntity = httpClient.getServerStatus(getServerUrl(), getToken());
+        ResponseEntity<String> responseEntity;
+        try {
+            responseEntity = httpClient.getServerStatus(getServerUrl(), getToken());
+        } catch (ResourceAccessException e) {
+            responseEntity = new ResponseEntity<>(HttpStatus.SERVICE_UNAVAILABLE);
+        }
+
         if (null != responseEntity) {
             result.setStatusMessage(responseEntity.getStatusCode() + " " + responseEntity.getStatusCode().getReasonPhrase());
             result.setDescription(getServerStatusDescription(responseEntity.getStatusCode().value()));
