@@ -130,7 +130,6 @@ public class M2SysEngine implements BiometricEngine {
     public List<BiometricMatch> search(BiometricSubject subject) {
         M2SysRequest request = new M2SysRequest();
         addCommonValues(request);
-        request.setRegistrationId(subject.getSubjectId());
 
         M2SysResponse response = httpClient.postRequest(url(M2SYS_SEARCH_ENDPOINT), request, getToken());
 

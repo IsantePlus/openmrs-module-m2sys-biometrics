@@ -5,7 +5,6 @@ import org.codehaus.jackson.annotate.JsonProperty;
 import org.openmrs.module.m2sysbiometrics.exception.M2SysBiometricsException;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricMatch;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricSubject;
-import org.openmrs.module.registrationcore.api.biometrics.model.Fingerprint;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -287,16 +286,8 @@ public class M2SysResponse extends M2SysData {
                     throw new M2SysBiometricsException("Failed or was cancelled before completion");
                 } else if (M2SysResult.SUCCESS.equals(result.getValue())) {
                     subject = new BiometricSubject(subjectId);
-
-                    //TODO we do not have this data
-                    subject.addFingerprint(new Fingerprint(
-                            getTemplateData(), "ISO", getLeftTemplate()
-                    ));
-                    subject.addFingerprint(new Fingerprint(
-                            getTemplateData2(), "ISO", getRightTemplate()
-                    ));
                 } else {
-                    throw new M2SysBiometricsException("Filed - biometric template alredy exists in system."
+                    throw new M2SysBiometricsException("Filed - biometric template already exists in system."
                             + " Registration id: " + result.getValue());
                 }
             }
