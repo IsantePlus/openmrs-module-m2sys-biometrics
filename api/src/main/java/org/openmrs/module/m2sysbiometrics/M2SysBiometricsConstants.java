@@ -1,5 +1,6 @@
 package org.openmrs.module.m2sysbiometrics;
 
+import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 public final class M2SysBiometricsConstants {
@@ -34,5 +35,13 @@ public final class M2SysBiometricsConstants {
 
     public static String getErrorMessage(String errorCode) {
         return ResourceBundle.getBundle("MessageBundle").getString("m2sys.response.error." + errorCode);
+    }
+
+    public static String getServerStatusDescription(int responseCode) {
+        try {
+            return ResourceBundle.getBundle("MessageBundle").getString("m2sys.getStatus.decription." + responseCode);
+        } catch (MissingResourceException ex) {
+            return ResourceBundle.getBundle("MessageBundle").getString("m2sys.getStatus.decription.default");
+        }
     }
 }

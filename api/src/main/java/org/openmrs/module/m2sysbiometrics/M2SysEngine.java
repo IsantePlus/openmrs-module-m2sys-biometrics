@@ -16,6 +16,7 @@ import org.openmrs.module.registrationcore.api.biometrics.model.BiometricEngineS
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricMatch;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricSubject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
@@ -31,6 +32,7 @@ import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.M2SYS_
 import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.M2SYS_SERVER_URL;
 import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.M2SYS_UPDATE_ENDPOINT;
 import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.getErrorMessage;
+import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.getServerStatusDescription;
 import static org.openmrs.module.m2sysbiometrics.model.M2SysResult.UPDATE_SUBJECT_ID_SUCCESS;
 
 @Component("m2sysbiometrics.M2SysEngine")
@@ -52,6 +54,8 @@ public class M2SysEngine implements BiometricEngine {
         ResponseEntity<String> responseEntity = httpClient.getServerStatus(getServerUrl(), getToken());
         if (null != responseEntity) {
             result.setStatusMessage(responseEntity.getStatusCode() + " " + responseEntity.getStatusCode().getReasonPhrase());
+            result.setDescription(getServerStatusDescription(responseEntity.getStatusCode().value()));
+            result.setEnabled(isSuccessfulStatus(responseEntity.getStatusCode()));
         }
 
         return result;
@@ -232,5 +236,9 @@ public class M2SysEngine implements BiometricEngine {
         }
         String value = matchingResult.getResults().get(0).getValue();
         return !StringUtils.isBlank(value) && value.equals(UPDATE_SUBJECT_ID_SUCCESS);
+    }
+
+    private boolean isSuccessfulStatus(HttpStatus httpStatus) {
+        return httpStatus.equals(HttpStatus.OK);
     }
 }
