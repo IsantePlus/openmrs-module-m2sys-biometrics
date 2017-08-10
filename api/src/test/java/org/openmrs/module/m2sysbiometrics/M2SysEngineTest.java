@@ -123,10 +123,14 @@ public class M2SysEngineTest extends M2SysBiometricSensitiveTestBase {
     }
 
     @Test
-    @Ignore
     @Verifies(value = "updates an ID of subject on M2Sys Biometrics", method = "updateSubjectId(String, String)")
     public void shouldUpdateSubjectID() throws Exception {
         final String url = SERVER_URL + M2SysBiometricsConstants.M2SYS_CHANGE_ID_ENDPOINT;
+
+        M2SysResult expectedResult = new M2SysResult();
+        expectedResult.setValue(M2SysResult.UPDATE_SUBJECT_ID_SUCCESS);
+
+        when(expectedMatchingResult.getResults()).thenReturn(Lists.newArrayList(expectedResult));
         when(httpClient.postRequest(eq(url), any(ChangeIdRequest.class), eq(token))).thenReturn(response);
 
         BiometricSubject subject = m2SysEngine.updateSubjectId("2", FINGERPRINT_ID);
