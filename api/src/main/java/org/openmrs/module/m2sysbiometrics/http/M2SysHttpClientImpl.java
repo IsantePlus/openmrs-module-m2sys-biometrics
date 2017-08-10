@@ -25,6 +25,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collections;
 
+import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.getErrorMessage;
+
 /**
  * Serves as a base for all implementation of the resource interfaces. Provides method for basic
  * REST operations with the M2Sys servers.
@@ -109,7 +111,8 @@ public class M2SysHttpClientImpl implements M2SysHttpClient {
 
     private void checkResponse(M2SysResponse response) {
         if (BooleanUtils.isNotTrue(response.getSuccess())) {
-            throw new M2SysBiometricsException("Failure response: " + response.getResponseCode());
+            String errorCode = response.getResponseCode();
+            throw new M2SysBiometricsException("Failure response: " + errorCode + " - " + getErrorMessage(errorCode));
         }
     }
 
