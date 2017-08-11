@@ -91,11 +91,16 @@ public class M2SysEngine implements BiometricEngine {
         addCommonValues(request);
         request.setRegistrationId(subject.getSubjectId());
 
-        M2SysResponse response = httpClient.postRequest(url(M2SYS_REGISTER_ENDPOINT), request, getToken());
-        BiometricSubject biometricSubject = response.toBiometricSubject(subject.getSubjectId());
-        LOGGER.debug(String.format("A new BiometricsSubject with %s subjectId has been enrolled",
-                biometricSubject.getSubjectId()));
-        return biometricSubject;
+        try {
+            M2SysResponse response = httpClient.postRequest(url(M2SYS_REGISTER_ENDPOINT), request, getToken());
+            BiometricSubject biometricSubject = response.toBiometricSubject(subject.getSubjectId());
+            LOGGER.debug(String.format("A new BiometricsSubject with %s subjectId has been enrolled",
+                    biometricSubject.getSubjectId()));
+            return biometricSubject;
+        } catch (Exception ex) {
+            LOGGER.error(String.format("Updating BiometricSubject with %s id failed", subject.getSubjectId()));
+            throw ex;
+        }
     }
 
     /**
@@ -172,9 +177,14 @@ public class M2SysEngine implements BiometricEngine {
 
         M2SysResponse response = httpClient.postRequest(url(M2SYS_SEARCH_ENDPOINT), request, getToken());
 
-        List<BiometricMatch> biometricMatches = response.toMatchList();
-        LOGGER.debug(String.format("There are %d results of search method", biometricMatches.size()));
-        return biometricMatches;
+        try {
+            List<BiometricMatch> biometricMatches = response.toMatchList();
+            LOGGER.debug(String.format("There are %d results of search method", biometricMatches.size()));
+            return biometricMatches;
+        } catch (Exception ex) {
+            LOGGER.error("Error during search method");
+            throw ex;
+        }
     }
 
     /**

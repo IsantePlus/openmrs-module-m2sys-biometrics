@@ -9,10 +9,12 @@ public abstract class LoggingMixin {
     @JsonProperty("CustomerKey")
     private String customerKey;
 
+    @JsonIgnore
     public String getCustomerKey() {
         return customerKey;
     }
 
+    @JsonIgnore
     public void setCustomerKey(String customerKey) {
         this.customerKey = customerKey;
     }
