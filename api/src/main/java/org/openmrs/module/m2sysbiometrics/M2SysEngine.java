@@ -122,9 +122,8 @@ public class M2SysEngine implements BiometricEngine {
         addCommonValues(request);
         request.setRegistrationId(subject.getSubjectId());
 
-        M2SysResponse response = httpClient.postRequest(url(M2SYS_UPDATE_ENDPOINT), request, getToken());
-
         try {
+            M2SysResponse response = httpClient.postRequest(url(M2SYS_UPDATE_ENDPOINT), request, getToken());
             BiometricSubject biometricSubject = response.toBiometricSubject(subject.getSubjectId());
             LOGGER.debug(String.format("BiometricsSubject with %s subjectId has been updated",
                     biometricSubject.getSubjectId()));
@@ -150,9 +149,8 @@ public class M2SysEngine implements BiometricEngine {
         request.setRegistrationId(oldId);
         request.setNewRegistrationId(newId);
 
-        M2SysResponse response = httpClient.postRequest(url(M2SYS_CHANGE_ID_ENDPOINT), request, getToken());
-
         try {
+            M2SysResponse response = httpClient.postRequest(url(M2SYS_CHANGE_ID_ENDPOINT), request, getToken());
             checkUpdateSubjectIdResponse(response);
             BiometricSubject biometricSubject = new BiometricSubject(newId);
             LOGGER.debug(String.format("subjectId of BiometricsSubject has been changed from %s to %s value", oldId, newId));
@@ -175,9 +173,8 @@ public class M2SysEngine implements BiometricEngine {
         M2SysRequest request = new M2SysRequest();
         addCommonValues(request);
 
-        M2SysResponse response = httpClient.postRequest(url(M2SYS_SEARCH_ENDPOINT), request, getToken());
-
         try {
+            M2SysResponse response = httpClient.postRequest(url(M2SYS_SEARCH_ENDPOINT), request, getToken());
             List<BiometricMatch> biometricMatches = response.toMatchList();
             LOGGER.debug(String.format("There are %d results of search method", biometricMatches.size()));
             return biometricMatches;
@@ -200,16 +197,19 @@ public class M2SysEngine implements BiometricEngine {
         addCommonValues(request);
         request.setRegistrationId(subjectId);
 
-        M2SysResponse response = httpClient.postRequest(url(M2SYS_LOOKUP_ENDPOINT), request, getToken());
-        BiometricSubject biometricSubject = null;
-        if (checkLookupMatchingResult(response.parseMatchingResult())) {
-            biometricSubject = new BiometricSubject();
-            biometricSubject.setSubjectId(subjectId);
+        try {
+            BiometricSubject biometricSubject = null;
+            M2SysResponse response = httpClient.postRequest(url(M2SYS_LOOKUP_ENDPOINT), request, getToken());
+            if (checkLookupResponse(response)) {
+                biometricSubject = new BiometricSubject();
+                biometricSubject.setSubjectId(subjectId);
+            }
             LOGGER.debug(String.format("BiometricSubject with %s subjectId exists", subjectId));
-        } else {
+            return biometricSubject;
+        } catch (Exception ex) {
             LOGGER.debug(String.format("BiometricSubject with %s subjectId doesn't exist", subjectId));
+            throw ex;
         }
-        return biometricSubject;
     }
 
     /**
@@ -223,9 +223,9 @@ public class M2SysEngine implements BiometricEngine {
         M2SysRequest request = new M2SysRequest();
         addCommonValues(request);
         request.setRegistrationId(subjectId);
-        M2SysResponse response = httpClient.postRequest(url(M2SYS_DELETE_ID_ENDPOINT), request, getToken());
 
         try {
+            M2SysResponse response = httpClient.postRequest(url(M2SYS_DELETE_ID_ENDPOINT), request, getToken());
             checkDeleteResponse(response);
             LOGGER.debug(String.format("BiometricsSubject with %s subjectId has been deleted", subjectId));
         } catch (Exception ex) {
@@ -284,11 +284,15 @@ public class M2SysEngine implements BiometricEngine {
         return propertyValue;
     }
 
-    private boolean checkLookupMatchingResult(M2SysMatchingResult matchingResult) {
+    private boolean checkLookupResponse(M2SysResponse response) {
+        M2SysMatchingResult matchingResult = response.parseMatchingResult();
         checkIfMatchingResultIsNotEmptyList(matchingResult);
 
-        String value = matchingResult.getResults().get(0).getValue();
-        return !(StringUtils.isBlank(value) || value.length() != 2 || !StringUtils.isNumeric(value));
+        M2SysResult result = matchingResult.getResults().get(0);
+        result.checkCommonErrorValues();
+        String value = result.getValue();
+        return !(M2SysResult.FAILED.equals(value)
+            || (StringUtils.isBlank(value) || value.length() != 2 || !StringUtils.isNumeric(value)));
     }
 
     private void checkUpdateSubjectIdResponse(M2SysResponse response) {
