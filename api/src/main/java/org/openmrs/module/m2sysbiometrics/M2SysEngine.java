@@ -3,14 +3,11 @@ package org.openmrs.module.m2sysbiometrics;
 import org.apache.commons.lang.StringUtils;
 import org.openmrs.api.APIException;
 import org.openmrs.api.AdministrationService;
-import org.openmrs.module.m2sysbiometrics.exception.M2SysBiometricsException;
 import org.openmrs.module.m2sysbiometrics.http.M2SysHttpClient;
 import org.openmrs.module.m2sysbiometrics.model.BiometricCaptureType;
-import org.openmrs.module.m2sysbiometrics.model.M2SysMatchingResult;
+import org.openmrs.module.m2sysbiometrics.model.ChangeIdRequest;
 import org.openmrs.module.m2sysbiometrics.model.M2SysRequest;
 import org.openmrs.module.m2sysbiometrics.model.M2SysResponse;
-import org.openmrs.module.m2sysbiometrics.model.ChangeIdRequest;
-import org.openmrs.module.m2sysbiometrics.model.M2SysResult;
 import org.openmrs.module.m2sysbiometrics.model.Token;
 import org.openmrs.module.registrationcore.api.biometrics.BiometricEngine;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricEngineStatus;
@@ -37,8 +34,10 @@ import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.M2SYS_
 import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.M2SYS_UPDATE_ENDPOINT;
 import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.getErrorMessage;
 import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.getServerStatusDescription;
+import static org.openmrs.module.m2sysbiometrics.util.M2SysResponseUtil.checkDeleteResponse;
+import static org.openmrs.module.m2sysbiometrics.util.M2SysResponseUtil.checkLookupResponse;
+import static org.openmrs.module.m2sysbiometrics.util.M2SysResponseUtil.checkUpdateSubjectIdResponse;
 
-@SuppressWarnings("PMD.TooManyMethods")
 @Component("m2sysbiometrics.M2SysEngine")
 public class M2SysEngine implements BiometricEngine {
 
@@ -282,49 +281,6 @@ public class M2SysEngine implements BiometricEngine {
             throw new APIException("Property value for '" + propertyName + "' is not set");
         }
         return propertyValue;
-    }
-
-    private boolean checkLookupResponse(M2SysResponse response) {
-        M2SysMatchingResult matchingResult = response.parseMatchingResult();
-        checkIfMatchingResultIsNotEmptyList(matchingResult);
-
-        M2SysResult result = matchingResult.getResults().get(0);
-        result.checkCommonErrorValues();
-        String value = result.getValue();
-        return !(M2SysResult.FAILED.equals(value)
-            || (StringUtils.isBlank(value) || value.length() != 2 || !StringUtils.isNumeric(value)));
-    }
-
-    private void checkUpdateSubjectIdResponse(M2SysResponse response) {
-        M2SysMatchingResult matchingResult = (response.parseMatchingResult());
-        checkIfMatchingResultIsNotEmptyList(matchingResult);
-
-        M2SysResult result = matchingResult.getResults().get(0);
-        result.checkCommonErrorValues();
-        if (M2SysResult.UPDATE_SUBJECT_ID_FAILURE.equals(result.getValue())) {
-            throw new IllegalArgumentException("Changing subject id failed. Probably the old id doesn't exist");
-        } else if (!M2SysResult.UPDATE_SUBJECT_ID_SUCCESS.equals(result.getValue())) {
-            throw new M2SysBiometricsException("Unknown updating subjectId result");
-        }
-    }
-
-    private void checkDeleteResponse(M2SysResponse response) {
-        M2SysMatchingResult matchingResult = (response.parseMatchingResult());
-        checkIfMatchingResultIsNotEmptyList(matchingResult);
-
-        M2SysResult result = matchingResult.getResults().get(0);
-        result.checkCommonErrorValues();
-        if (M2SysResult.DELETE_FAILURE.equals(result.getValue())) {
-            throw new IllegalArgumentException("Deleting subject failed. Probably the subject doesn't exist");
-        } else if (!M2SysResult.DELETE_SUCCESS.equals(result.getValue())) {
-            throw new M2SysBiometricsException("Unknown deleting result");
-        }
-    }
-
-    private void checkIfMatchingResultIsNotEmptyList(M2SysMatchingResult matchingResult) {
-        if (matchingResult == null || matchingResult.getResults().isEmpty()) {
-            throw new M2SysBiometricsException("Unknown m2Sys result");
-        }
     }
 
     private boolean isSuccessfulStatus(HttpStatus httpStatus) {
