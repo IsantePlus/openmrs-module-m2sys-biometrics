@@ -10,6 +10,7 @@ import org.openmrs.module.m2sysbiometrics.model.M2SysMatchingResult;
 import org.openmrs.module.m2sysbiometrics.model.M2SysRequest;
 import org.openmrs.module.m2sysbiometrics.model.M2SysResponse;
 import org.openmrs.module.m2sysbiometrics.model.ChangeIdRequest;
+import org.openmrs.module.m2sysbiometrics.model.M2SysResult;
 import org.openmrs.module.m2sysbiometrics.model.Token;
 import org.openmrs.module.registrationcore.api.biometrics.BiometricEngine;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricEngineStatus;
@@ -36,7 +37,6 @@ import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.M2SYS_
 import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.M2SYS_UPDATE_ENDPOINT;
 import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.getErrorMessage;
 import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.getServerStatusDescription;
-import static org.openmrs.module.m2sysbiometrics.model.M2SysResult.UPDATE_SUBJECT_ID_SUCCESS;
 
 @Component("m2sysbiometrics.M2SysEngine")
 public class M2SysEngine implements BiometricEngine {
@@ -118,9 +118,15 @@ public class M2SysEngine implements BiometricEngine {
 
         M2SysResponse response = httpClient.postRequest(url(M2SYS_UPDATE_ENDPOINT), request, getToken());
 
-        BiometricSubject biometricSubject = response.toBiometricSubject(subject.getSubjectId());
-        LOGGER.debug(String.format("BiometricsSubject with %s subjectId has been updated", biometricSubject.getSubjectId()));
-        return biometricSubject;
+        try {
+            BiometricSubject biometricSubject = response.toBiometricSubject(subject.getSubjectId());
+            LOGGER.debug(String.format("BiometricsSubject with %s subjectId has been updated",
+                    biometricSubject.getSubjectId()));
+            return biometricSubject;
+        } catch (Exception ex) {
+            LOGGER.error(String.format("Updating BiometricSubject with %s id failed", subject.getSubjectId()));
+            throw ex;
+        }
     }
 
     /**
@@ -140,15 +146,15 @@ public class M2SysEngine implements BiometricEngine {
 
         M2SysResponse response = httpClient.postRequest(url(M2SYS_CHANGE_ID_ENDPOINT), request, getToken());
 
-        if (!checkUpdateSubjectIdMatchingResult(response.parseMatchingResult())) {
+        try {
+            checkUpdateSubjectIdMatchingResult(response.parseMatchingResult());
+            BiometricSubject biometricSubject = new BiometricSubject(newId);
+            LOGGER.debug(String.format("subjectId of BiometricsSubject has been changed from %s to %s value", oldId, newId));
+            return biometricSubject;
+        } catch (Exception ex) {
             LOGGER.error(String.format("Changing subject id from %s to %s value failed", oldId, newId));
-            throw new M2SysBiometricsException("Changing subject id failed. Probably the old id doesn't exist");
+            throw ex;
         }
-
-        //TODO create another method
-        BiometricSubject biometricSubject = response.toBiometricSubject(newId);
-        LOGGER.debug(String.format("subjectId of BiometricsSubject has been changed from %s to %s value", oldId, newId));
-        return biometricSubject;
     }
 
     /**
@@ -179,7 +185,6 @@ public class M2SysEngine implements BiometricEngine {
     @Override
     public BiometricSubject lookup(String subjectId) {
         LOGGER.info("Called lookup method");
-        LOGGER.debug(String.format("with param %s", subjectId));
         M2SysRequest request = new M2SysRequest();
         addCommonValues(request);
         request.setRegistrationId(subjectId);
@@ -265,12 +270,17 @@ public class M2SysEngine implements BiometricEngine {
         return !(StringUtils.isBlank(value) || value.length() != 2 || !StringUtils.isNumeric(value));
     }
 
-    private boolean checkUpdateSubjectIdMatchingResult(M2SysMatchingResult matchingResult) {
+    private void checkUpdateSubjectIdMatchingResult(M2SysMatchingResult matchingResult) {
         if (matchingResult == null || matchingResult.getResults().isEmpty()) {
-            return false;
+            throw new M2SysBiometricsException("Unknown m2Sys result");
         }
-        String value = matchingResult.getResults().get(0).getValue();
-        return !StringUtils.isBlank(value) && value.equals(UPDATE_SUBJECT_ID_SUCCESS);
+        M2SysResult result = matchingResult.getResults().get(0);
+        result.checkCommonErrorValues();
+        if (M2SysResult.UPDATE_SUBJECT_ID_FAILURE.equals(result.getValue())) {
+            throw new M2SysBiometricsException("Changing subject id failed. Probably the old id doesn't exist");
+        } else if (!M2SysResult.UPDATE_SUBJECT_ID_SUCCESS.equals(result.getValue())) {
+            throw new M2SysBiometricsException("Unknown m2Sys result");
+        }
     }
 
     private boolean isSuccessfulStatus(HttpStatus httpStatus) {

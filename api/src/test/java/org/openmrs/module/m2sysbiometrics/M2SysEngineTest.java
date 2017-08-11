@@ -131,11 +131,12 @@ public class M2SysEngineTest extends M2SysBiometricSensitiveTestBase {
         expectedResult.setValue(M2SysResult.UPDATE_SUBJECT_ID_SUCCESS);
 
         when(expectedMatchingResult.getResults()).thenReturn(Lists.newArrayList(expectedResult));
+        when(expectedSubject.getSubjectId()).thenReturn(FINGERPRINT_ID);
         when(httpClient.postRequest(eq(url), any(ChangeIdRequest.class), eq(token))).thenReturn(response);
 
         BiometricSubject subject = m2SysEngine.updateSubjectId("2", FINGERPRINT_ID);
 
-        assertEquals(expectedSubject, subject);
+        assertEquals(expectedSubject.getSubjectId(), subject.getSubjectId());
         verify(httpClient).postRequest(eq(url), requestCaptor.capture(), eq(token));
 
         ChangeIdRequest request = (ChangeIdRequest) requestCaptor.getValue();

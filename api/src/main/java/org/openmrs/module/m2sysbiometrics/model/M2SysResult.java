@@ -1,6 +1,8 @@
 package org.openmrs.module.m2sysbiometrics.model;
 
 
+import org.openmrs.module.m2sysbiometrics.exception.M2SysBiometricsException;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -46,5 +48,15 @@ public class M2SysResult {
 
     public void setInstance(int instance) {
         this.instance = instance;
+    }
+
+    public void checkCommonErrorValues() {
+        if (M2SysResult.INVALID_ENGINE.equals(value)) {
+            throw new M2SysBiometricsException("Invalid Engine  - the server is not licensed to"
+                    + " handle the biometric engine");
+        } else if (M2SysResult.LICENSE_ERROR.equals(value)) {
+            throw new M2SysBiometricsException("License error - this enrollment would have"
+                    + "exceeded the current server user license limit");
+        }
     }
 }

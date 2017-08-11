@@ -275,14 +275,10 @@ public class M2SysResponse extends M2SysData {
 
         if (StringUtils.isNotBlank(matchingResult)) {
             M2SysMatchingResult m2SysMatchingResult = parseMatchingResult();
+
             for (M2SysResult result : m2SysMatchingResult.getResults()) {
-                if (M2SysResult.INVALID_ENGINE.equals(result.getValue())) {
-                    throw new M2SysBiometricsException("Invalid Engine  - the server is not licensed to"
-                            + " handle the biometric engine");
-                } else if (M2SysResult.LICENSE_ERROR.equals(result.getValue())) {
-                    throw new M2SysBiometricsException("License error - this enrollment would have"
-                            + "exceeded the current server user license limit");
-                } else if (M2SysResult.FAILED.equals(result.getValue())) {
+                result.checkCommonErrorValues();
+                if (M2SysResult.FAILED.equals(result.getValue())) {
                     throw new M2SysBiometricsException("Failed or was cancelled before completion");
                 } else if (M2SysResult.SUCCESS.equals(result.getValue())) {
                     subject = new BiometricSubject(subjectId);
@@ -303,10 +299,8 @@ public class M2SysResponse extends M2SysData {
             M2SysMatchingResult m2SysMatches = parseMatchingResult();
 
             for (M2SysResult result : m2SysMatches.getResults()) {
-                if (M2SysResult.INVALID_ENGINE.equals(result.getValue())) {
-                    throw new M2SysBiometricsException("Invalid Engine  - the server is not licensed to"
-                            + " handle the biometric engine");
-                } else if (!M2SysResult.FAILED.equals(result.getValue())) {
+                result.checkCommonErrorValues();
+                if (!M2SysResult.FAILED.equals(result.getValue())) {
                     BiometricMatch match = new BiometricMatch(result.getValue(),
                             (double) result.getScore());
                     matches.add(match);
