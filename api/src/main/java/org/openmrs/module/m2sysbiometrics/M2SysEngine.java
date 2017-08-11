@@ -38,6 +38,7 @@ import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.M2SYS_
 import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.getErrorMessage;
 import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.getServerStatusDescription;
 
+@SuppressWarnings("PMD.TooManyMethods")
 @Component("m2sysbiometrics.M2SysEngine")
 public class M2SysEngine implements BiometricEngine {
 
@@ -108,7 +109,7 @@ public class M2SysEngine implements BiometricEngine {
         LOGGER.info("Called update method");
         BiometricSubject existingSubject = lookup(subject.getSubjectId());
         if (existingSubject == null) {
-            LOGGER.debug(String.format("BiometricSubject with %s subjectId doesn't exist", subject.getSubjectId()));
+            LOGGER.error(String.format("BiometricSubject with %s subjectId doesn't exist", subject.getSubjectId()));
             throw new IllegalArgumentException(getErrorMessage(ERROR_CODE_OF_SUBJECT_NOT_EXIST));
         }
 
@@ -147,7 +148,7 @@ public class M2SysEngine implements BiometricEngine {
         M2SysResponse response = httpClient.postRequest(url(M2SYS_CHANGE_ID_ENDPOINT), request, getToken());
 
         try {
-            checkUpdateSubjectIdMatchingResult(response.parseMatchingResult());
+            checkUpdateSubjectIdResponse(response);
             BiometricSubject biometricSubject = new BiometricSubject(newId);
             LOGGER.debug(String.format("subjectId of BiometricsSubject has been changed from %s to %s value", oldId, newId));
             return biometricSubject;
@@ -194,6 +195,8 @@ public class M2SysEngine implements BiometricEngine {
         if (checkLookupMatchingResult(response.parseMatchingResult())) {
             biometricSubject = new BiometricSubject();
             biometricSubject.setSubjectId(subjectId);
+            LOGGER.debug(String.format("BiometricSubject with %s subjectId exists", subjectId));
+        } else {
             LOGGER.debug(String.format("BiometricSubject with %s subjectId doesn't exist", subjectId));
         }
         return biometricSubject;
@@ -210,8 +213,17 @@ public class M2SysEngine implements BiometricEngine {
         M2SysRequest request = new M2SysRequest();
         addCommonValues(request);
         request.setRegistrationId(subjectId);
-        httpClient.postRequest(url(M2SYS_DELETE_ID_ENDPOINT), request, getToken());
-        LOGGER.debug(String.format("BiometricsSubject with %s subjectId has been deleted", subjectId));
+        M2SysResponse response = httpClient.postRequest(url(M2SYS_DELETE_ID_ENDPOINT), request, getToken());
+
+        try {
+            checkDeleteResponse(response);
+            LOGGER.debug(String.format("BiometricsSubject with %s subjectId has been deleted", subjectId));
+        } catch (Exception ex) {
+            LOGGER.error(String.format(
+                    "BiometricsSubject with %s subjectId hasn't been deleted. Probably the subject doesn't exist",
+                    subjectId));
+            throw ex;
+        }
     }
 
     private void addCommonValues(M2SysRequest request) {
@@ -263,22 +275,40 @@ public class M2SysEngine implements BiometricEngine {
     }
 
     private boolean checkLookupMatchingResult(M2SysMatchingResult matchingResult) {
-        if (matchingResult == null || matchingResult.getResults().isEmpty()) {
-            return false;
-        }
+        checkIfMatchingResultIsNotEmptyList(matchingResult);
+
         String value = matchingResult.getResults().get(0).getValue();
         return !(StringUtils.isBlank(value) || value.length() != 2 || !StringUtils.isNumeric(value));
     }
 
-    private void checkUpdateSubjectIdMatchingResult(M2SysMatchingResult matchingResult) {
-        if (matchingResult == null || matchingResult.getResults().isEmpty()) {
-            throw new M2SysBiometricsException("Unknown m2Sys result");
-        }
+    private void checkUpdateSubjectIdResponse(M2SysResponse response) {
+        M2SysMatchingResult matchingResult = (response.parseMatchingResult());
+        checkIfMatchingResultIsNotEmptyList(matchingResult);
+
         M2SysResult result = matchingResult.getResults().get(0);
         result.checkCommonErrorValues();
         if (M2SysResult.UPDATE_SUBJECT_ID_FAILURE.equals(result.getValue())) {
-            throw new M2SysBiometricsException("Changing subject id failed. Probably the old id doesn't exist");
+            throw new IllegalArgumentException("Changing subject id failed. Probably the old id doesn't exist");
         } else if (!M2SysResult.UPDATE_SUBJECT_ID_SUCCESS.equals(result.getValue())) {
+            throw new M2SysBiometricsException("Unknown updating subjectId result");
+        }
+    }
+
+    private void checkDeleteResponse(M2SysResponse response) {
+        M2SysMatchingResult matchingResult = (response.parseMatchingResult());
+        checkIfMatchingResultIsNotEmptyList(matchingResult);
+
+        M2SysResult result = matchingResult.getResults().get(0);
+        result.checkCommonErrorValues();
+        if (M2SysResult.DELETE_FAILURE.equals(result.getValue())) {
+            throw new IllegalArgumentException("Deleting subject failed. Probably the subject doesn't exist");
+        } else if (!M2SysResult.DELETE_SUCCESS.equals(result.getValue())) {
+            throw new M2SysBiometricsException("Unknown deleting result");
+        }
+    }
+
+    private void checkIfMatchingResultIsNotEmptyList(M2SysMatchingResult matchingResult) {
+        if (matchingResult == null || matchingResult.getResults().isEmpty()) {
             throw new M2SysBiometricsException("Unknown m2Sys result");
         }
     }

@@ -11,6 +11,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.openmrs.api.AdministrationService;
+import org.openmrs.module.m2sysbiometrics.exception.M2SysBiometricsException;
 import org.openmrs.module.m2sysbiometrics.http.M2SysHttpClient;
 import org.openmrs.module.m2sysbiometrics.model.BiometricCaptureType;
 import org.openmrs.module.m2sysbiometrics.model.M2SysMatchingResult;
@@ -208,9 +209,17 @@ public class M2SysEngineTest extends M2SysBiometricSensitiveTestBase {
         final String url = SERVER_URL + M2SYS_UPDATE_ENDPOINT;
         final String lookupUrl = SERVER_URL + M2SYS_LOOKUP_ENDPOINT;
 
+        M2SysResponse lookupResponse = mock(M2SysResponse.class);
+        M2SysMatchingResult lookupMatchingResult = mock(M2SysMatchingResult.class);
+        M2SysResult expectedResult = new M2SysResult();
+        expectedResult.setValue(M2SysResult.FAILED);
+
+        when(lookupResponse.parseMatchingResult()).thenReturn(lookupMatchingResult);
+        when(lookupMatchingResult.getResults()).thenReturn(Lists.newArrayList(expectedResult));
+
         when(httpClient.postRequest(eq(url), any(M2SysRequest.class), eq(token))).thenReturn(response);
         when(httpClient.postRequest(eq(lookupUrl), any(M2SysRequest.class), eq(token)))
-                .thenReturn(mock(M2SysResponse.class)); // won't return subject
+                .thenReturn(lookupResponse); // won't return subject
 
         BiometricSubject reqSubject = new BiometricSubject(FINGERPRINT_ID);
         m2SysEngine.update(reqSubject);
@@ -221,6 +230,29 @@ public class M2SysEngineTest extends M2SysBiometricSensitiveTestBase {
     public void shouldDeleteSubject() throws IOException {
         final String url = SERVER_URL + M2SYS_DELETE_ID_ENDPOINT;
 
+        M2SysResult expectedResult = new M2SysResult();
+        expectedResult.setValue(M2SysResult.DELETE_SUCCESS);
+
+        when(expectedMatchingResult.getResults()).thenReturn(Lists.newArrayList(expectedResult));
+        when(httpClient.postRequest(eq(url), any(M2SysRequest.class), eq(token))).thenReturn(response);
+
+        m2SysEngine.delete("XXX");
+
+        verify(httpClient).postRequest(eq(url), requestCaptor.capture(), eq(token));
+
+        M2SysRequest request = requestCaptor.getValue();
+        verifyRequestCommonFields(request);
+        assertEquals("XXX", request.getRegistrationId());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void shouldNotDeleteSubjectIfItDoesNotExist() throws IOException {
+        final String url = SERVER_URL + M2SYS_DELETE_ID_ENDPOINT;
+
+        M2SysResult expectedResult = new M2SysResult();
+        expectedResult.setValue(M2SysResult.DELETE_FAILURE);
+
+        when(expectedMatchingResult.getResults()).thenReturn(Lists.newArrayList(expectedResult));
         when(httpClient.postRequest(eq(url), any(M2SysRequest.class), eq(token))).thenReturn(response);
 
         m2SysEngine.delete("XXX");
