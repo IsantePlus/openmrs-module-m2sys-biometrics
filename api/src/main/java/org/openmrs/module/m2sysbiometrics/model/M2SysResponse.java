@@ -283,7 +283,7 @@ public class M2SysResponse extends M2SysData {
                 } else if (M2SysResult.SUCCESS.equals(result.getValue())) {
                     subject = new BiometricSubject(subjectId);
                 } else {
-                    throw new M2SysBiometricsException("Filed - biometric template already exists in system."
+                    throw new M2SysBiometricsException("Failed - biometric template already exists in system."
                             + " Registration id: " + result.getValue());
                 }
             }
