@@ -12,7 +12,7 @@ To set up this module, so it works properly there are three things needed:
 
 This module is using REST to communicate with CloudScanner API and send requests.
 
-## Worklflow:
+## Worklflow
 
 1. M2Sys module for iSantePlus sends requests to CloudScanner Standalone Api using REST
 2. CloudScanner Standalone Api uses RabbitMQ to communicate with CloudScanner Client
@@ -21,4 +21,4 @@ This module is using REST to communicate with CloudScanner API and send requests
 5. CloudScanner Standalone Api sends SOAP request to BioPlugin server
 6. CloudScanner Standalone Api gets response from BioPlugin server and sends it back to M2Sys module
 
-## Configuration variables:
+## Configuration variables
