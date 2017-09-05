@@ -1,5 +1,7 @@
 
-# iSantePlus m2Sys Biometrics Module
+# iSantePlus m2Sys Biometrics Module [![Build Status](https://travis-ci.org/IsantePlus/openmrs-module-m2sys-biometrics.svg?branch=master)](https://travis-ci.org/IsantePlus/openmrs-module-m2sys-biometrics)
+
+This an implementation of the Biometrics interfaces from the registration core module that use the m2sys Biometrics server. The module uses the CloudScanner API by m2sys in order to communicate with the server and invoke the fingerprint reader.
 
 To set up this module, so it works properly there are three things needed:
 - BioPlugin server 8
@@ -17,4 +19,4 @@ Worklflow:
 5. CloudScanner Standalone Api sends SOAP request to BioPlugin server
 6. CloudScanner Standalone Api gets response from BioPlugin server and sends it back to M2Sys module
 
-[![Build Status](https://travis-ci.org/IsantePlus/openmrs-module-m2sys-biometrics.svg?branch=master)](https://travis-ci.org/IsantePlus/openmrs-module-m2sys-biometrics)
+Configuration variables:
