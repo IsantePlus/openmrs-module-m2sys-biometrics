@@ -22,3 +22,11 @@ This module is using REST to communicate with CloudScanner API and send requests
 6. CloudScanner Standalone Api gets response from BioPlugin server and sends it back to M2Sys module
 
 ## Configuration variables
+
+m2sys-biometrics.accessPointID - The m2sys server AccessPointID
+m2sys-biometrics.captureTimeout - The m2sys server CaptureTimeout
+m2sys-biometrics.customKey - The m2sys server CustomKey
+m2sys-biometrics.locationID - The m2sys server location ID
+m2sys-biometrics.server.password - The m2sys server password
+m2sys-biometrics.server.url - The m2sys server url
+m2sys-biometrics.server.user - The m2sys server username
