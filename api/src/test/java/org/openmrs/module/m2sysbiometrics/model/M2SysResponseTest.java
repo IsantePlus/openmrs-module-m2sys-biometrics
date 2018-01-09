@@ -79,6 +79,19 @@ public class M2SysResponseTest {
         assertTrue(matches.isEmpty());
     }
 
+    @Test
+    public void shouldParseInvalidResultXmlWithEmpty() throws IOException {
+        M2SysResponse response = new M2SysResponse();
+        response.setMatchingResult(readFile("invalidResultXml.xml"));
+
+        List<BiometricMatch> matches = response.toMatchList();
+
+        assertNotNull(matches);
+        assertEquals(1, matches.size());
+        assertEquals(75.0, matches.get(0).getMatchScore(), 0.0);
+        assertEquals("test", matches.get(0).getSubjectId());
+    }
+
     @Test(expected = M2SysBiometricsException.class)
     public void shouldThrowExceptionForInvalidEngineResult() throws IOException {
         M2SysResponse response = new M2SysResponse();

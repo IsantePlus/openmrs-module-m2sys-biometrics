@@ -3,12 +3,18 @@ package org.openmrs.module.m2sysbiometrics.model;
 import org.apache.commons.lang3.StringUtils;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.openmrs.module.m2sysbiometrics.exception.M2SysBiometricsException;
+import org.openmrs.module.m2sysbiometrics.xml.M2SysXmlErrorHandler;
+import org.openmrs.module.m2sysbiometrics.xml.ResultContentHandler;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricMatch;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricSubject;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.XMLReader;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
@@ -313,12 +319,25 @@ public class M2SysResponse extends M2SysData {
 
     public M2SysMatchingResult parseMatchingResult() {
         try {
-            JAXBContext jc = JAXBContext.newInstance(M2SysMatchingResult.class);
 
-            Unmarshaller unmarshaller = jc.createUnmarshaller();
-            StringReader reader = new StringReader(matchingResult);
-            return (M2SysMatchingResult) unmarshaller.unmarshal(reader);
-        } catch (JAXBException e) {
+            SAXParserFactory factory = SAXParserFactory.newInstance();
+            SAXParser saxParser = factory.newSAXParser();
+
+            XMLReader xmlReader = saxParser.getXMLReader();
+
+            xmlReader.setFeature(
+                    "http://apache.org/xml/features/continue-after-fatal-error",
+                    true);
+            xmlReader.setErrorHandler(new M2SysXmlErrorHandler());
+
+            final M2SysMatchingResult results = new M2SysMatchingResult();
+            xmlReader.setContentHandler(new ResultContentHandler(results));
+
+            InputSource inputSource = new InputSource(new StringReader(matchingResult));
+            xmlReader.parse(inputSource);
+
+            return results;
+        } catch (SAXException | IOException | ParserConfigurationException e) {
             throw new M2SysBiometricsException("Matching result parse error", e);
         }
     }

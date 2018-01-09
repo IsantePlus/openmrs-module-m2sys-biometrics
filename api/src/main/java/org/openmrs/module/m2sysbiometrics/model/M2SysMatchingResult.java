@@ -4,6 +4,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.util.ArrayList;
 import java.util.List;
 
 @XmlRootElement(name = "Results")
@@ -11,7 +12,7 @@ import java.util.List;
 public class M2SysMatchingResult {
 
     @XmlElement(name = "result")
-    private List<M2SysResult> results;
+    private List<M2SysResult> results = new ArrayList<>();
 
     public List<M2SysResult> getResults() {
         return results;
@@ -19,5 +20,9 @@ public class M2SysMatchingResult {
 
     public void setResults(List<M2SysResult> results) {
         this.results = results;
+    }
+
+    public void addResult(M2SysResult result) {
+        results.add(result);
     }
 }

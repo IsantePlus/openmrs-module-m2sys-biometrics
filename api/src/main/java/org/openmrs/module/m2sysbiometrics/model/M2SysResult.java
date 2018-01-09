@@ -10,6 +10,8 @@ import javax.xml.bind.annotation.XmlAttribute;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class M2SysResult {
 
+    public static final String EMPTY = "empty";
+
     public static final String INVALID_ENGINE = "INVALID_ENGINE";
     public static final String UPDATE_SUBJECT_ID_SUCCESS = "CS";
     public static final String UPDATE_SUBJECT_ID_FAILURE = "CF";
@@ -60,5 +62,9 @@ public class M2SysResult {
             throw new M2SysBiometricsException("License error - this enrollment would have"
                     + "exceeded the current server user license limit");
         }
+    }
+
+    public boolean isEmpty() {
+        return EMPTY.equalsIgnoreCase(value);
     }
 }
