@@ -19,7 +19,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpStatusCodeException;
-import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.client.RestTemplate;
 
@@ -87,8 +86,8 @@ public class M2SysHttpClientImpl implements M2SysHttpClient {
             checkResponse(response);
             return response;
         } catch (HttpStatusCodeException e) {
-            throw new M2SysBiometricsException("Error response, status: " + e.getStatusCode() + "" +
-                    " " + e.getStatusText() + ". Body: " + e.getResponseBodyAsString(), e);
+            throw new M2SysBiometricsException("Error response, status: " + e.getStatusCode() + ""
+                    + " " + e.getStatusText() + ". Body: " + e.getResponseBodyAsString(), e);
         } catch (Exception e) {
             throw new M2SysBiometricsException(e);
         }
