@@ -16,6 +16,10 @@ import org.springframework.http.MediaType;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.converter.json.MappingJacksonHttpMessageConverter;
 import org.springframework.stereotype.Component;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.HttpStatusCodeException;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.client.RestTemplate;
 
@@ -82,6 +86,9 @@ public class M2SysHttpClientImpl implements M2SysHttpClient {
             M2SysResponse response = responseEntity.getBody();
             checkResponse(response);
             return response;
+        } catch (HttpStatusCodeException e) {
+            throw new M2SysBiometricsException("Error response, status: " + e.getStatusCode() + "" +
+                    " " + e.getStatusText() + ". Body: " + e.getResponseBodyAsString(), e);
         } catch (Exception e) {
             throw new M2SysBiometricsException(e);
         }
@@ -100,13 +107,20 @@ public class M2SysHttpClientImpl implements M2SysHttpClient {
     }
 
     @Override
-    public Token getToken(String host, String username, String password) {
+    public Token getToken(String host, String username, String password, String customerKey) {
         HttpHeaders headers = new HttpHeaders();
-        headers.add("Content-Type", "application/x-www-form-urlencoded");
-        String body = "grant_type=password&username=" + username + "&Password=" + password;
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
-        return restOperations.exchange(host + "/cstoken", HttpMethod.POST,
-                new HttpEntity<Object>(body, headers), Token.class).getBody();
+        MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
+        body.add("grant_type", "password");
+        body.add("username", username);
+        body.add("Password", password);
+        body.add("scope", customerKey);
+
+        HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(body, headers);
+
+        return restOperations.exchange(host + "/cstoken", HttpMethod.POST, entity, Token.class)
+                .getBody();
     }
 
     private void checkResponse(M2SysResponse response) {

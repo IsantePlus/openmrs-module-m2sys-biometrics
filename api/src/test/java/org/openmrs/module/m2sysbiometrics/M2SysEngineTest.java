@@ -108,7 +108,7 @@ public class M2SysEngineTest extends M2SysBiometricSensitiveTestBase {
         when(administrationService.getGlobalProperty(M2SysBiometricsConstants.M2SYS_USER)).thenReturn(USERNAME);
         when(administrationService.getGlobalProperty(M2SysBiometricsConstants.M2SYS_PASSWORD)).thenReturn(PASSWORD);
 
-        when(httpClient.getToken(SERVER_URL, USERNAME, PASSWORD)).thenReturn(token);
+        when(httpClient.getToken(SERVER_URL, USERNAME, PASSWORD, CUSTOMER_KEY)).thenReturn(token);
     }
 
     @Test

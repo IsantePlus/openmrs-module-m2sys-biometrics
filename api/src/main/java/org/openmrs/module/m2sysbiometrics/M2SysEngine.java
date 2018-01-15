@@ -272,7 +272,8 @@ public class M2SysEngine implements BiometricEngine {
     private Token getToken() {
         String username = getProperty(M2SysBiometricsConstants.M2SYS_USER);
         String password = getProperty(M2SysBiometricsConstants.M2SYS_PASSWORD);
-        return httpClient.getToken(getServerUrl(), username, password);
+        String customerKey = getProperty(M2SysBiometricsConstants.M2SYS_CUSTOMER_KEY);
+        return httpClient.getToken(getServerUrl(), username, password, customerKey);
     }
 
     private String getProperty(String propertyName) {

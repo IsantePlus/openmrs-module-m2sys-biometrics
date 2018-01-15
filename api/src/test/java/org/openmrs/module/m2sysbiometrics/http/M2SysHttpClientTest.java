@@ -93,13 +93,13 @@ public class M2SysHttpClientTest {
     public void shouldGetToken() throws IOException {
         stubFor(post("/cstoken")
             .withHeader("Content-Type", equalTo("application/x-www-form-urlencoded"))
-            .withRequestBody(equalTo("grant_type=password&username=username&Password=password"))
+            .withRequestBody(equalTo("grant_type=password&username=username&Password=password&scope=custKey"))
             .willReturn(
                     aResponse().withStatus(HttpStatus.SC_OK)
                         .withHeader("Content-Type", "application/json;charset=UTF-8")
                         .withBody(readFile("token.json"))));
 
-        Token token = httpClient.getToken(SERVER_URL,"username", "password");
+        Token token = httpClient.getToken(SERVER_URL,"username", "password", "custKey");
 
         assertNotNull(token);
         assertEquals("This is a token", token.getAccessToken());

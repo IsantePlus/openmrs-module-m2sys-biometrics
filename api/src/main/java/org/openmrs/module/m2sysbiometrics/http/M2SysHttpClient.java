@@ -11,5 +11,5 @@ public interface M2SysHttpClient {
 
     M2SysResponse postRequest(String url, M2SysRequest request, Token token);
 
-    Token getToken(String host, String username, String password);
+    Token getToken(String host, String username, String password, String customerKey);
 }
