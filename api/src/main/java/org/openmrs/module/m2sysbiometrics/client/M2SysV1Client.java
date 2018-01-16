@@ -1,21 +1,13 @@
 package org.openmrs.module.m2sysbiometrics.client;
 
-import org.apache.commons.lang.StringUtils;
-import org.openmrs.api.APIException;
-import org.openmrs.api.AdministrationService;
-import org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants;
-import org.openmrs.module.m2sysbiometrics.http.M2SysHttpClient;
-import org.openmrs.module.m2sysbiometrics.model.BiometricCaptureType;
 import org.openmrs.module.m2sysbiometrics.model.ChangeIdRequest;
 import org.openmrs.module.m2sysbiometrics.model.M2SysRequest;
 import org.openmrs.module.m2sysbiometrics.model.M2SysResponse;
-import org.openmrs.module.m2sysbiometrics.model.Token;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricEngineStatus;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricMatch;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricSubject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -30,7 +22,6 @@ import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.M2SYS_
 import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.M2SYS_LOOKUP_ENDPOINT;
 import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.M2SYS_REGISTER_ENDPOINT;
 import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.M2SYS_SEARCH_ENDPOINT;
-import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.M2SYS_SERVER_URL;
 import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.M2SYS_UPDATE_ENDPOINT;
 import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.getErrorMessage;
 import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.getServerStatusDescription;
@@ -39,13 +30,7 @@ import static org.openmrs.module.m2sysbiometrics.util.M2SysResponseUtil.checkLoo
 import static org.openmrs.module.m2sysbiometrics.util.M2SysResponseUtil.checkUpdateSubjectIdResponse;
 
 @Component("m2sysbiometrics.M2SysV1Client")
-public class M2SysV1Client implements M2SysClient {
-
-    @Autowired
-    private AdministrationService adminService;
-
-    @Autowired
-    private M2SysHttpClient httpClient;
+public class M2SysV1Client extends AbstractM2SysClient {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(M2SysV1Client.class);
 
@@ -59,7 +44,7 @@ public class M2SysV1Client implements M2SysClient {
 
         ResponseEntity<String> responseEntity;
         try {
-            responseEntity = httpClient.getServerStatus(getServerUrl(), getToken());
+            responseEntity = getHttpClient().getServerStatus(getServerUrl(), getToken());
         } catch (ResourceAccessException e) {
             LOGGER.error(e.getMessage());
             responseEntity = new ResponseEntity<>(HttpStatus.SERVICE_UNAVAILABLE);
@@ -91,7 +76,7 @@ public class M2SysV1Client implements M2SysClient {
         request.setRegistrationId(subject.getSubjectId());
 
         try {
-            M2SysResponse response = httpClient.postRequest(url(M2SYS_REGISTER_ENDPOINT), request, getToken());
+            M2SysResponse response = getHttpClient().postRequest(url(M2SYS_REGISTER_ENDPOINT), request, getToken());
             BiometricSubject biometricSubject = response.toBiometricSubject(subject.getSubjectId());
             LOGGER.debug(String.format("A new BiometricsSubject with %s subjectId has been enrolled",
                     biometricSubject.getSubjectId()));
@@ -122,7 +107,7 @@ public class M2SysV1Client implements M2SysClient {
         request.setRegistrationId(subject.getSubjectId());
 
         try {
-            M2SysResponse response = httpClient.postRequest(url(M2SYS_UPDATE_ENDPOINT), request, getToken());
+            M2SysResponse response = getHttpClient().postRequest(url(M2SYS_UPDATE_ENDPOINT), request, getToken());
             BiometricSubject biometricSubject = response.toBiometricSubject(subject.getSubjectId());
             LOGGER.debug(String.format("BiometricsSubject with %s subjectId has been updated",
                     biometricSubject.getSubjectId()));
@@ -149,7 +134,7 @@ public class M2SysV1Client implements M2SysClient {
         request.setNewRegistrationId(newId);
 
         try {
-            M2SysResponse response = httpClient.postRequest(url(M2SYS_CHANGE_ID_ENDPOINT), request, getToken());
+            M2SysResponse response = getHttpClient().postRequest(url(M2SYS_CHANGE_ID_ENDPOINT), request, getToken());
             checkUpdateSubjectIdResponse(response);
             BiometricSubject biometricSubject = new BiometricSubject(newId);
             LOGGER.debug(String.format("subjectId of BiometricsSubject has been changed from %s to %s value", oldId, newId));
@@ -173,7 +158,7 @@ public class M2SysV1Client implements M2SysClient {
         addCommonValues(request);
 
         try {
-            M2SysResponse response = httpClient.postRequest(url(M2SYS_SEARCH_ENDPOINT), request, getToken());
+            M2SysResponse response = getHttpClient().postRequest(url(M2SYS_SEARCH_ENDPOINT), request, getToken());
             List<BiometricMatch> biometricMatches = response.toMatchList();
             LOGGER.debug(String.format("There are %d results of search method", biometricMatches.size()));
             return biometricMatches;
@@ -198,7 +183,7 @@ public class M2SysV1Client implements M2SysClient {
 
         try {
             BiometricSubject biometricSubject = null;
-            M2SysResponse response = httpClient.postRequest(url(M2SYS_LOOKUP_ENDPOINT), request, getToken());
+            M2SysResponse response = getHttpClient().postRequest(url(M2SYS_LOOKUP_ENDPOINT), request, getToken());
             if (checkLookupResponse(response)) {
                 biometricSubject = new BiometricSubject();
                 biometricSubject.setSubjectId(subjectId);
@@ -224,7 +209,7 @@ public class M2SysV1Client implements M2SysClient {
         request.setRegistrationId(subjectId);
 
         try {
-            M2SysResponse response = httpClient.postRequest(url(M2SYS_DELETE_ID_ENDPOINT), request, getToken());
+            M2SysResponse response = getHttpClient().postRequest(url(M2SYS_DELETE_ID_ENDPOINT), request, getToken());
             checkDeleteResponse(response);
             LOGGER.debug(String.format("BiometricsSubject with %s subjectId has been deleted", subjectId));
         } catch (Exception ex) {
@@ -233,58 +218,5 @@ public class M2SysV1Client implements M2SysClient {
                     subjectId));
             throw ex;
         }
-    }
-
-    private void addCommonValues(M2SysRequest request) {
-        request.setAccessPointId(getAccessPointID());
-        request.setCaptureTimeout(getCaptureTimeOut());
-        request.setCustomerKey(getCustomerKey());
-
-        request.setLocationId(getLocationID());
-
-        request.setBiometricWith(BiometricCaptureType.None); // TODO; why none?
-    }
-
-    private String url(String path) {
-        return getServerUrl() + path;
-    }
-
-    private String getServerUrl() {
-        return getProperty(M2SYS_SERVER_URL);
-    }
-
-    private String getCustomerKey() {
-        return getProperty(M2SysBiometricsConstants.M2SYS_CUSTOMER_KEY);
-    }
-
-    private String getAccessPointID() {
-        return getProperty(M2SysBiometricsConstants.M2SYS_ACCESS_POINT_ID);
-    }
-
-    private float getCaptureTimeOut() {
-        return Float.parseFloat(getProperty(M2SysBiometricsConstants.M2SYS_CAPTURE_TIMEOUT));
-    }
-
-    private int getLocationID() {
-        return Integer.parseInt(getProperty(M2SysBiometricsConstants.M2SYS_LOCATION_ID));
-    }
-
-    private Token getToken() {
-        String username = getProperty(M2SysBiometricsConstants.M2SYS_USER);
-        String password = getProperty(M2SysBiometricsConstants.M2SYS_PASSWORD);
-        String customerKey = getProperty(M2SysBiometricsConstants.M2SYS_CUSTOMER_KEY);
-        return httpClient.getToken(getServerUrl(), username, password, customerKey);
-    }
-
-    private String getProperty(String propertyName) {
-        String propertyValue = adminService.getGlobalProperty(propertyName);
-        if (StringUtils.isBlank(propertyValue)) {
-            throw new APIException("Property value for '" + propertyName + "' is not set");
-        }
-        return propertyValue;
-    }
-
-    private boolean isSuccessfulStatus(HttpStatus httpStatus) {
-        return httpStatus.equals(HttpStatus.OK);
     }
 }
