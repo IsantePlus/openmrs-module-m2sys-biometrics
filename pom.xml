@@ -111,6 +111,11 @@
                 <version>${springWebVersion}</version>
                 <scope>provided</scope>
             </dependency>
+            <dependency>
+                <groupId>org.springframework.ws</groupId>
+                <artifactId>spring-ws-core</artifactId>
+                <version>3.0.0.RELEASE</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 

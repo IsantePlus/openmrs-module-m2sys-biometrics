@@ -3,7 +3,9 @@ package org.openmrs.module.m2sysbiometrics.http;
 import org.apache.commons.lang.BooleanUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.openmrs.module.m2sysbiometrics.exception.M2SysBiometricsException;
+import org.openmrs.module.m2sysbiometrics.model.AbstractM2SysResponse;
 import org.openmrs.module.m2sysbiometrics.model.LoggingMixin;
+import org.openmrs.module.m2sysbiometrics.model.M2SysData;
 import org.openmrs.module.m2sysbiometrics.model.M2SysRequest;
 import org.openmrs.module.m2sysbiometrics.model.M2SysResponse;
 import org.openmrs.module.m2sysbiometrics.model.Token;
@@ -65,6 +67,11 @@ public class M2SysHttpClientImpl implements M2SysHttpClient {
         }
     }
 
+    @Override
+    public M2SysResponse postRequest(String url, M2SysData request, Token token) {
+        return postRequest(url, request, token, M2SysResponse.class);
+    }
+
     /**
      * Sends a post request to the M2Sys server.
      *
@@ -72,7 +79,8 @@ public class M2SysHttpClientImpl implements M2SysHttpClient {
      * @return the response json
      */
     @Override
-    public M2SysResponse postRequest(String url, M2SysRequest request, Token token) {
+    public <T extends AbstractM2SysResponse> T postRequest(String url, M2SysData request, Token token,
+                                                           Class<T> responseClass) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setAccept(Collections.singletonList(MediaType.ALL));
@@ -80,9 +88,9 @@ public class M2SysHttpClientImpl implements M2SysHttpClient {
         debugRequest(url, request);
 
         try {
-            ResponseEntity<M2SysResponse> responseEntity = exchange(new URI(url), HttpMethod.POST, request, headers,
-                    M2SysResponse.class, token);
-            M2SysResponse response = responseEntity.getBody();
+            ResponseEntity<T> responseEntity = exchange(new URI(url), HttpMethod.POST, request, headers,
+                    responseClass, token);
+            T response = responseEntity.getBody();
             checkResponse(response);
             return response;
         } catch (HttpStatusCodeException e) {
@@ -122,7 +130,7 @@ public class M2SysHttpClientImpl implements M2SysHttpClient {
                 .getBody();
     }
 
-    private void checkResponse(M2SysResponse response) {
+    private void checkResponse(AbstractM2SysResponse response) {
         if (BooleanUtils.isNotTrue(response.getSuccess())) {
             String errorCode = response.getResponseCode();
             throw new M2SysBiometricsException("Failure response: " + errorCode + " - " + getErrorMessage(errorCode));

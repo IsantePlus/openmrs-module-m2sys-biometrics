@@ -19,7 +19,7 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
-public class M2SysResponse extends M2SysData {
+public class M2SysResponse extends AbstractM2SysResponse {
 
     private static final long serialVersionUID = 5297535433389093052L;
 
@@ -31,15 +31,6 @@ public class M2SysResponse extends M2SysData {
 
     @JsonProperty("ClientVersion")
     private String clientVersion;
-
-    @JsonProperty("Success")
-    private Boolean success;
-
-    @JsonProperty("Message")
-    private String message;
-
-    @JsonProperty("ResponseCode")
-    private String responseCode;
 
     @JsonProperty("RegistrationID")
     private String registrationId;
@@ -114,30 +105,6 @@ public class M2SysResponse extends M2SysData {
 
     public void setClientVersion(String clientVersion) {
         this.clientVersion = clientVersion;
-    }
-
-    public Boolean getSuccess() {
-        return success;
-    }
-
-    public void setSuccess(Boolean success) {
-        this.success = success;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    public String getResponseCode() {
-        return responseCode;
-    }
-
-    public void setResponseCode(String responseCode) {
-        this.responseCode = responseCode;
     }
 
     public String getRegistrationId() {

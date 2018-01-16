@@ -74,7 +74,7 @@ public class M2SysIT {
         assertNotNull(token);*/
         BiometricSubject subject = new BiometricSubject("MIT");
 
-        subject = engine.enroll(subject);
+        //subject = engine.enroll(subject);
         //List<BiometricMatch> matches = engine.search(subject);
 
         assertNotNull(subject);

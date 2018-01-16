@@ -1,8 +1,7 @@
-package org.openmrs.module.m2sysbiometrics;
+package org.openmrs.module.m2sysbiometrics.client;
 
 import com.google.common.collect.Lists;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import org.mockito.ArgumentCaptor;
@@ -11,7 +10,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.openmrs.api.AdministrationService;
-import org.openmrs.module.m2sysbiometrics.exception.M2SysBiometricsException;
+import org.openmrs.module.m2sysbiometrics.M2SysBiometricSensitiveTestBase;
+import org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants;
+import org.openmrs.module.m2sysbiometrics.M2SysEngine;
 import org.openmrs.module.m2sysbiometrics.http.M2SysHttpClient;
 import org.openmrs.module.m2sysbiometrics.model.BiometricCaptureType;
 import org.openmrs.module.m2sysbiometrics.model.M2SysMatchingResult;
@@ -28,7 +29,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 
 import static java.util.Arrays.asList;
@@ -49,7 +49,7 @@ import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.M2SYS_
 import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.M2SYS_SEARCH_ENDPOINT;
 import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.M2SYS_UPDATE_ENDPOINT;
 
-public class M2SysEngineTest extends M2SysBiometricSensitiveTestBase {
+public class M2SysV1ClientTest extends M2SysBiometricSensitiveTestBase {
 
     private static final String SERVER_URL = "http://testServerAPI/";
 
@@ -86,7 +86,7 @@ public class M2SysEngineTest extends M2SysBiometricSensitiveTestBase {
     private Token token;
 
     @InjectMocks
-    private M2SysEngine m2SysEngine;
+    private M2SysV1Client m2SysV1Client;
 
     @Captor
     private ArgumentCaptor<M2SysRequest> requestCaptor;
@@ -117,7 +117,7 @@ public class M2SysEngineTest extends M2SysBiometricSensitiveTestBase {
 
         doReturn(new ResponseEntity<String>(HttpStatus.OK)).when(httpClient).getServerStatus(SERVER_URL, token);
 
-        BiometricEngineStatus status = m2SysEngine.getStatus();
+        BiometricEngineStatus status = m2SysV1Client.getStatus();
 
         assertNotNull(status);
         assertEquals("200 OK", status.getStatusMessage());
@@ -135,7 +135,7 @@ public class M2SysEngineTest extends M2SysBiometricSensitiveTestBase {
         when(expectedSubject.getSubjectId()).thenReturn(FINGERPRINT_ID);
         when(httpClient.postRequest(eq(url), any(ChangeIdRequest.class), eq(token))).thenReturn(response);
 
-        BiometricSubject subject = m2SysEngine.updateSubjectId("2", FINGERPRINT_ID);
+        BiometricSubject subject = m2SysV1Client.updateSubjectId("2", FINGERPRINT_ID);
 
         assertEquals(expectedSubject.getSubjectId(), subject.getSubjectId());
         verify(httpClient).postRequest(eq(url), requestCaptor.capture(), eq(token));
@@ -154,7 +154,7 @@ public class M2SysEngineTest extends M2SysBiometricSensitiveTestBase {
         when(httpClient.postRequest(eq(url), any(M2SysRequest.class), eq(token))).thenReturn(response);
 
         BiometricSubject reqSubject = new BiometricSubject(FINGERPRINT_ID);
-        BiometricSubject subject = m2SysEngine.enroll(reqSubject);
+        BiometricSubject subject = m2SysV1Client.enroll(reqSubject);
 
         verifyBiometricSubjectRequest(url, subject);
     }
@@ -170,7 +170,7 @@ public class M2SysEngineTest extends M2SysBiometricSensitiveTestBase {
         when(expectedMatchingResult.getResults()).thenReturn(Lists.newArrayList(expectedResult));
 
         BiometricSubject reqSubject = new BiometricSubject(FINGERPRINT_ID);
-        BiometricSubject subject = m2SysEngine.lookup(reqSubject.getSubjectId());
+        BiometricSubject subject = m2SysV1Client.lookup(reqSubject.getSubjectId());
 
         assertEquals(reqSubject.getSubjectId(), subject.getSubjectId());
     }
@@ -189,7 +189,7 @@ public class M2SysEngineTest extends M2SysBiometricSensitiveTestBase {
         when(httpClient.postRequest(eq(lookupUrl), any(M2SysRequest.class), eq(token))).thenReturn(response);
 
         BiometricSubject reqSubject = new BiometricSubject(FINGERPRINT_ID);
-        BiometricSubject subject = m2SysEngine.update(reqSubject);
+        BiometricSubject subject = m2SysV1Client.update(reqSubject);
 
         assertEquals(expectedSubject, subject);
         verify(httpClient, times(2)).postRequest(anyString(), requestCaptor.capture(), eq(token));
@@ -222,7 +222,7 @@ public class M2SysEngineTest extends M2SysBiometricSensitiveTestBase {
                 .thenReturn(lookupResponse); // won't return subject
 
         BiometricSubject reqSubject = new BiometricSubject(FINGERPRINT_ID);
-        m2SysEngine.update(reqSubject);
+        m2SysV1Client.update(reqSubject);
     }
 
     @Test
@@ -236,7 +236,7 @@ public class M2SysEngineTest extends M2SysBiometricSensitiveTestBase {
         when(expectedMatchingResult.getResults()).thenReturn(Lists.newArrayList(expectedResult));
         when(httpClient.postRequest(eq(url), any(M2SysRequest.class), eq(token))).thenReturn(response);
 
-        m2SysEngine.delete("XXX");
+        m2SysV1Client.delete("XXX");
 
         verify(httpClient).postRequest(eq(url), requestCaptor.capture(), eq(token));
 
@@ -255,7 +255,7 @@ public class M2SysEngineTest extends M2SysBiometricSensitiveTestBase {
         when(expectedMatchingResult.getResults()).thenReturn(Lists.newArrayList(expectedResult));
         when(httpClient.postRequest(eq(url), any(M2SysRequest.class), eq(token))).thenReturn(response);
 
-        m2SysEngine.delete("XXX");
+        m2SysV1Client.delete("XXX");
 
         verify(httpClient).postRequest(eq(url), requestCaptor.capture(), eq(token));
 
@@ -272,7 +272,7 @@ public class M2SysEngineTest extends M2SysBiometricSensitiveTestBase {
                 mock(BiometricMatch.class));
         when(response.toMatchList()).thenReturn(matchList);
 
-        List<BiometricMatch> result = m2SysEngine.search(new BiometricSubject());
+        List<BiometricMatch> result = m2SysV1Client.search(new BiometricSubject());
 
         assertEquals(matchList, result);
         verify(httpClient).postRequest(eq(url), requestCaptor.capture(), eq(token));
