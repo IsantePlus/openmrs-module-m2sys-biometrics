@@ -1,6 +1,6 @@
 package org.openmrs.module.m2sysbiometrics;
 
-import org.openmrs.module.m2sysbiometrics.client.M2SysV1Client;
+import org.openmrs.module.m2sysbiometrics.client.M2SysClient;
 import org.openmrs.module.registrationcore.api.biometrics.BiometricEngine;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricEngineStatus;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricMatch;
@@ -14,19 +14,19 @@ import java.util.List;
 public class M2SysEngine implements BiometricEngine {
 
     @Autowired
-    private M2SysV1Client v1Client;
+    private M2SysClient client;
 
     /**
      * Gets a status of biometric server.
      */
     @Override
     public BiometricEngineStatus getStatus() {
-        return v1Client.getStatus();
+        return client.getStatus();
     }
 
     @Override
     public BiometricSubject enroll(BiometricSubject subject) {
-        return v1Client.enroll(subject);
+        return client.enroll(subject);
     }
 
     /**
@@ -37,7 +37,7 @@ public class M2SysEngine implements BiometricEngine {
      */
     @Override
     public BiometricSubject update(BiometricSubject subject) {
-        return v1Client.update(subject);
+        return client.update(subject);
     }
 
     /**
@@ -49,7 +49,7 @@ public class M2SysEngine implements BiometricEngine {
      */
     @Override
     public BiometricSubject updateSubjectId(String oldId, String newId) {
-        return v1Client.updateSubjectId(oldId, newId);
+        return client.updateSubjectId(oldId, newId);
     }
 
     /**
@@ -60,7 +60,7 @@ public class M2SysEngine implements BiometricEngine {
      */
     @Override
     public List<BiometricMatch> search(BiometricSubject subject) {
-        return v1Client.search(subject);
+        return client.search(subject);
     }
 
     /**
@@ -71,7 +71,7 @@ public class M2SysEngine implements BiometricEngine {
      */
     @Override
     public BiometricSubject lookup(String subjectId) {
-        return v1Client.lookup(subjectId);
+        return client.lookup(subjectId);
     }
 
     /**
@@ -81,6 +81,6 @@ public class M2SysEngine implements BiometricEngine {
      */
     @Override
     public void delete(String subjectId) {
-        v1Client.delete(subjectId);
+        client.delete(subjectId);
     }
 }

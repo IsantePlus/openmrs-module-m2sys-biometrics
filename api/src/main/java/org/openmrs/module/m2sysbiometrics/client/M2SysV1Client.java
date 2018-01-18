@@ -22,7 +22,6 @@ import static org.openmrs.module.m2sysbiometrics.util.M2SysResponseUtil.checkDel
 import static org.openmrs.module.m2sysbiometrics.util.M2SysResponseUtil.checkLookupResponse;
 import static org.openmrs.module.m2sysbiometrics.util.M2SysResponseUtil.checkUpdateSubjectIdResponse;
 
-@Component("m2sysbiometrics.M2SysV1Client")
 public class M2SysV1Client extends AbstractM2SysClient {
 
     @Override
