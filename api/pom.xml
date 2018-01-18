@@ -99,7 +99,7 @@
                     <generatePackage>org.openmrs.module.m2sysbiometrics.bioplugin</generatePackage>
                     <schemas>
                         <schema>
-                            <url>${wsUrl}</url>
+                            <url>${biopluginWsdlUrl}</url>
                         </schema>
                     </schemas>
                 </configuration>
