@@ -82,7 +82,29 @@ public class BioServerClient extends WebServiceGatewaySupport {
         return response.identifyResult;
     }
 
-    public void delete(String subjectId) {
+    public void delete(String serviceUrl, String subjectId) {
+        DeleteID deleteID = new DeleteID();
+        deleteID.setID(subjectId);
 
+        DeleteIDResponse response = (DeleteIDResponse) getWebServiceTemplate()
+                .marshalSendAndReceive(serviceUrl, deleteID);
+
+        if (response == null) {
+            throw new M2SysBiometricsException("Unable to delete subject: " + subjectId);
+        }
+    }
+
+    public String isRegistered(String serviceUrl, String subjectId) {
+        IsRegistered isRegistered = new IsRegistered();
+        isRegistered.setID(subjectId);
+
+        IsRegisteredResponse response = (IsRegisteredResponse) getWebServiceTemplate()
+                .marshalSendAndReceive(serviceUrl, isRegistered);
+
+        if (response == null) {
+            throw new M2SysBiometricsException("Unable to lookup subject: " + subjectId);
+        }
+
+        return response.getIsRegisteredResult();
     }
 }

@@ -63,12 +63,14 @@ public class M2SysV105Client extends AbstractM2SysClient {
 
     @Override
     public BiometricSubject lookup(String subjectId) {
-        throw new UnsupportedOperationException();
+        bioServerClient.isRegistered(getLocalBioServerUrl(), subjectId);
+        // TODO:
+        return null;
     }
 
     @Override
     public void delete(String subjectId) {
-        throw new UnsupportedOperationException();
+        bioServerClient.delete(getLocalBioServerUrl(), subjectId);
     }
 
     private Fingers scanDoubleFingers() {
