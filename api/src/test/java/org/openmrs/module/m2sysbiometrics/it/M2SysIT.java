@@ -9,18 +9,15 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.openmrs.api.AdministrationService;
 import org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants;
-import org.openmrs.module.m2sysbiometrics.M2SysEngine;
+import org.openmrs.module.m2sysbiometrics.client.M2SysV105Client;
 import org.openmrs.module.m2sysbiometrics.http.M2SysHttpClient;
 import org.openmrs.module.m2sysbiometrics.http.M2SysHttpClientImpl;
-import org.openmrs.module.m2sysbiometrics.model.Token;
-import org.openmrs.module.registrationcore.api.biometrics.model.BiometricMatch;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricSubject;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJacksonHttpMessageConverter;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.List;
 
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.when;
@@ -32,7 +29,7 @@ public class M2SysIT {
     private static final int LOCATION_ID = 1;
 
     private M2SysHttpClient m2SysHttpClient = new M2SysHttpClientImpl();
-    private M2SysEngine engine = new M2SysEngine();
+    private M2SysV105Client client = new M2SysV105Client();
     private ObjectMapper objectMapper = new ObjectMapper();
 
     @Mock
@@ -63,8 +60,8 @@ public class M2SysIT {
 
         replaceJacksonMessageConverter();
 
-        ReflectionTestUtils.setField(engine, "adminService", adminService);
-        ReflectionTestUtils.setField(engine, "httpClient", m2SysHttpClient);
+        ReflectionTestUtils.setField(client, "adminService", adminService);
+        ReflectionTestUtils.setField(client, "httpClient", m2SysHttpClient);
     }
 
     @Test
@@ -76,6 +73,8 @@ public class M2SysIT {
 
         //subject = engine.enroll(subject);
         //List<BiometricMatch> matches = engine.search(subject);
+
+        client.enroll(subject);
 
         assertNotNull(subject);
         //assertNotNull(matches);

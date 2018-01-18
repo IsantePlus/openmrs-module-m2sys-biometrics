@@ -7,6 +7,8 @@ public final class M2SysBiometricsConstants {
 
     public static final String M2SYS_SERVER_URL = "m2sys-biometrics.server.url";
 
+    public static final String M2SYS_LOCAL_SERVICE_URL = "m2sys-biometrics.local-service.url";
+
     public static final String M2SYS_USER = "m2sys-biometrics.server.user";
 
     public static final String M2SYS_PASSWORD = "m2sys-biometrics.server.password";
@@ -30,6 +32,8 @@ public final class M2SysBiometricsConstants {
     public static final String M2SYS_DELETE_ID_ENDPOINT = "/api/Biometric/DeleteID";
 
     public static final String M2SYS_CHANGE_ID_ENDPOINT = "/api/Biometric/ChangeID";
+
+    public static final String M2SYS_CAPTURE_ENDPOINT = "/api/CloudScanr/Capture";
 
     public static final String ERROR_CODE_OF_SUBJECT_NOT_EXIST = "CS004";
 

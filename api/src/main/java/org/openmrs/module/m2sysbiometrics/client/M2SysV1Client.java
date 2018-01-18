@@ -3,15 +3,9 @@ package org.openmrs.module.m2sysbiometrics.client;
 import org.openmrs.module.m2sysbiometrics.model.ChangeIdRequest;
 import org.openmrs.module.m2sysbiometrics.model.M2SysRequest;
 import org.openmrs.module.m2sysbiometrics.model.M2SysResponse;
-import org.openmrs.module.registrationcore.api.biometrics.model.BiometricEngineStatus;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricMatch;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricSubject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.ResourceAccessException;
 
 import java.util.List;
 import java.util.UUID;
@@ -24,7 +18,6 @@ import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.M2SYS_
 import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.M2SYS_SEARCH_ENDPOINT;
 import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.M2SYS_UPDATE_ENDPOINT;
 import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.getErrorMessage;
-import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.getServerStatusDescription;
 import static org.openmrs.module.m2sysbiometrics.util.M2SysResponseUtil.checkDeleteResponse;
 import static org.openmrs.module.m2sysbiometrics.util.M2SysResponseUtil.checkLookupResponse;
 import static org.openmrs.module.m2sysbiometrics.util.M2SysResponseUtil.checkUpdateSubjectIdResponse;
@@ -32,43 +25,15 @@ import static org.openmrs.module.m2sysbiometrics.util.M2SysResponseUtil.checkUpd
 @Component("m2sysbiometrics.M2SysV1Client")
 public class M2SysV1Client extends AbstractM2SysClient {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(M2SysV1Client.class);
-
-    /**
-     * Gets a status of biometric server.
-     */
-    @Override
-    public BiometricEngineStatus getStatus() {
-        LOGGER.info("Called getStatus method");
-        BiometricEngineStatus result = new BiometricEngineStatus();
-
-        ResponseEntity<String> responseEntity;
-        try {
-            responseEntity = getHttpClient().getServerStatus(getServerUrl(), getToken());
-        } catch (ResourceAccessException e) {
-            LOGGER.error(e.getMessage());
-            responseEntity = new ResponseEntity<>(HttpStatus.SERVICE_UNAVAILABLE);
-        }
-
-        if (null != responseEntity) {
-            result.setStatusMessage(responseEntity.getStatusCode() + " " + responseEntity.getStatusCode().getReasonPhrase());
-            result.setDescription(getServerStatusDescription(responseEntity.getStatusCode().value()));
-            result.setEnabled(isSuccessfulStatus(responseEntity.getStatusCode()));
-        }
-
-        LOGGER.debug(String.format("M2SysServer status: %s", result.getDescription()));
-        return result;
-    }
-
     @Override
     public BiometricSubject enroll(BiometricSubject subject) {
-        LOGGER.info("Called getStatus enroll");
+        getLogger().info("Called getStatus enroll");
         if (subject == null) {
             subject = new BiometricSubject();
         }
         if (subject.getSubjectId() == null) {
             subject.setSubjectId(UUID.randomUUID().toString());
-            LOGGER.debug(String.format("Generated a new SubjectId: %s", subject.getSubjectId()));
+            getLogger().debug(String.format("Generated a new SubjectId: %s", subject.getSubjectId()));
         }
 
         M2SysRequest request = new M2SysRequest();
@@ -78,11 +43,11 @@ public class M2SysV1Client extends AbstractM2SysClient {
         try {
             M2SysResponse response = getHttpClient().postRequest(url(M2SYS_REGISTER_ENDPOINT), request, getToken());
             BiometricSubject biometricSubject = response.toBiometricSubject(subject.getSubjectId());
-            LOGGER.debug(String.format("A new BiometricsSubject with %s subjectId has been enrolled",
+            getLogger().debug(String.format("A new BiometricsSubject with %s subjectId has been enrolled",
                     biometricSubject.getSubjectId()));
             return biometricSubject;
         } catch (Exception ex) {
-            LOGGER.error(String.format("Updating BiometricSubject with %s id failed", subject.getSubjectId()));
+            getLogger().error(String.format("Updating BiometricSubject with %s id failed", subject.getSubjectId()));
             throw ex;
         }
     }
@@ -95,10 +60,10 @@ public class M2SysV1Client extends AbstractM2SysClient {
      */
     @Override
     public BiometricSubject update(BiometricSubject subject) {
-        LOGGER.info("Called update method");
+        getLogger().info("Called update method");
         BiometricSubject existingSubject = lookup(subject.getSubjectId());
         if (existingSubject == null) {
-            LOGGER.error(String.format("BiometricSubject with %s subjectId doesn't exist", subject.getSubjectId()));
+            getLogger().error(String.format("BiometricSubject with %s subjectId doesn't exist", subject.getSubjectId()));
             throw new IllegalArgumentException(getErrorMessage(ERROR_CODE_OF_SUBJECT_NOT_EXIST));
         }
 
@@ -109,11 +74,11 @@ public class M2SysV1Client extends AbstractM2SysClient {
         try {
             M2SysResponse response = getHttpClient().postRequest(url(M2SYS_UPDATE_ENDPOINT), request, getToken());
             BiometricSubject biometricSubject = response.toBiometricSubject(subject.getSubjectId());
-            LOGGER.debug(String.format("BiometricsSubject with %s subjectId has been updated",
+            getLogger().debug(String.format("BiometricsSubject with %s subjectId has been updated",
                     biometricSubject.getSubjectId()));
             return biometricSubject;
         } catch (Exception ex) {
-            LOGGER.error(String.format("Updating BiometricSubject with %s id failed", subject.getSubjectId()));
+            getLogger().error(String.format("Updating BiometricSubject with %s id failed", subject.getSubjectId()));
             throw ex;
         }
     }
@@ -127,7 +92,7 @@ public class M2SysV1Client extends AbstractM2SysClient {
      */
     @Override
     public BiometricSubject updateSubjectId(String oldId, String newId) {
-        LOGGER.info("Called updateSubjectId method");
+        getLogger().info("Called updateSubjectId method");
         ChangeIdRequest request = new ChangeIdRequest();
         addCommonValues(request);
         request.setRegistrationId(oldId);
@@ -137,10 +102,11 @@ public class M2SysV1Client extends AbstractM2SysClient {
             M2SysResponse response = getHttpClient().postRequest(url(M2SYS_CHANGE_ID_ENDPOINT), request, getToken());
             checkUpdateSubjectIdResponse(response);
             BiometricSubject biometricSubject = new BiometricSubject(newId);
-            LOGGER.debug(String.format("subjectId of BiometricsSubject has been changed from %s to %s value", oldId, newId));
+            getLogger().debug(String.format("subjectId of BiometricsSubject has been changed from %s to %s value",
+                    oldId, newId));
             return biometricSubject;
         } catch (Exception ex) {
-            LOGGER.error(String.format("Changing subject id from %s to %s value failed", oldId, newId));
+            getLogger().error(String.format("Changing subject id from %s to %s value failed", oldId, newId));
             throw ex;
         }
     }
@@ -153,17 +119,17 @@ public class M2SysV1Client extends AbstractM2SysClient {
      */
     @Override
     public List<BiometricMatch> search(BiometricSubject subject) {
-        LOGGER.info("Called search method");
+        getLogger().info("Called search method");
         M2SysRequest request = new M2SysRequest();
         addCommonValues(request);
 
         try {
             M2SysResponse response = getHttpClient().postRequest(url(M2SYS_SEARCH_ENDPOINT), request, getToken());
             List<BiometricMatch> biometricMatches = response.toMatchList();
-            LOGGER.debug(String.format("There are %d results of search method", biometricMatches.size()));
+            getLogger().debug(String.format("There are %d results of search method", biometricMatches.size()));
             return biometricMatches;
         } catch (Exception ex) {
-            LOGGER.error("Error during search method");
+            getLogger().error("Error during search method");
             throw ex;
         }
     }
@@ -176,7 +142,7 @@ public class M2SysV1Client extends AbstractM2SysClient {
      */
     @Override
     public BiometricSubject lookup(String subjectId) {
-        LOGGER.info("Called lookup method");
+        getLogger().info("Called lookup method");
         M2SysRequest request = new M2SysRequest();
         addCommonValues(request);
         request.setRegistrationId(subjectId);
@@ -188,10 +154,10 @@ public class M2SysV1Client extends AbstractM2SysClient {
                 biometricSubject = new BiometricSubject();
                 biometricSubject.setSubjectId(subjectId);
             }
-            LOGGER.debug(String.format("BiometricSubject with %s subjectId exists", subjectId));
+            getLogger().debug(String.format("BiometricSubject with %s subjectId exists", subjectId));
             return biometricSubject;
         } catch (Exception ex) {
-            LOGGER.debug(String.format("BiometricSubject with %s subjectId doesn't exist", subjectId));
+            getLogger().debug(String.format("BiometricSubject with %s subjectId doesn't exist", subjectId));
             throw ex;
         }
     }
@@ -203,7 +169,7 @@ public class M2SysV1Client extends AbstractM2SysClient {
      */
     @Override
     public void delete(String subjectId) {
-        LOGGER.info("Called delete method");
+        getLogger().info("Called delete method");
         M2SysRequest request = new M2SysRequest();
         addCommonValues(request);
         request.setRegistrationId(subjectId);
@@ -211,9 +177,9 @@ public class M2SysV1Client extends AbstractM2SysClient {
         try {
             M2SysResponse response = getHttpClient().postRequest(url(M2SYS_DELETE_ID_ENDPOINT), request, getToken());
             checkDeleteResponse(response);
-            LOGGER.debug(String.format("BiometricsSubject with %s subjectId has been deleted", subjectId));
+            getLogger().debug(String.format("BiometricsSubject with %s subjectId has been deleted", subjectId));
         } catch (Exception ex) {
-            LOGGER.error(String.format(
+            getLogger().error(String.format(
                     "BiometricsSubject with %s subjectId hasn't been deleted. Probably the subject doesn't exist",
                     subjectId));
             throw ex;
