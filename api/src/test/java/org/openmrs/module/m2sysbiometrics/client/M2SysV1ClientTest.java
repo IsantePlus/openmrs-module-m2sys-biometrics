@@ -12,10 +12,9 @@ import org.mockito.MockitoAnnotations;
 import org.openmrs.api.AdministrationService;
 import org.openmrs.module.m2sysbiometrics.M2SysBiometricSensitiveTestBase;
 import org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants;
-import org.openmrs.module.m2sysbiometrics.M2SysEngine;
 import org.openmrs.module.m2sysbiometrics.http.M2SysHttpClient;
 import org.openmrs.module.m2sysbiometrics.model.BiometricCaptureType;
-import org.openmrs.module.m2sysbiometrics.model.M2SysMatchingResult;
+import org.openmrs.module.m2sysbiometrics.model.M2SysResults;
 import org.openmrs.module.m2sysbiometrics.model.M2SysRequest;
 import org.openmrs.module.m2sysbiometrics.model.M2SysResponse;
 import org.openmrs.module.m2sysbiometrics.model.ChangeIdRequest;
@@ -80,7 +79,7 @@ public class M2SysV1ClientTest extends M2SysBiometricSensitiveTestBase {
     private BiometricSubject expectedSubject;
 
     @Mock
-    private M2SysMatchingResult expectedMatchingResult;
+    private M2SysResults expectedMatchingResult;
 
     @Mock
     private Token token;
@@ -210,7 +209,7 @@ public class M2SysV1ClientTest extends M2SysBiometricSensitiveTestBase {
         final String lookupUrl = SERVER_URL + M2SYS_LOOKUP_ENDPOINT;
 
         M2SysResponse lookupResponse = mock(M2SysResponse.class);
-        M2SysMatchingResult lookupMatchingResult = mock(M2SysMatchingResult.class);
+        M2SysResults lookupMatchingResult = mock(M2SysResults.class);
         M2SysResult expectedResult = new M2SysResult();
         expectedResult.setValue(M2SysResult.FAILED);
 

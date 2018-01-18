@@ -20,7 +20,7 @@ public class M2SysResponseTest {
         M2SysResponse response = new M2SysResponse();
         response.setMatchingResult(readFile("sampleMatchingResult.xml"));
 
-        M2SysMatchingResult matchingResult = response.parseMatchingResult();
+        M2SysResults matchingResult = response.parseMatchingResult();
         M2SysResult result = matchingResult.getResults().get(0);
 
         assertNotNull(matchingResult);

@@ -247,9 +247,9 @@ public class M2SysResponse extends AbstractM2SysResponse {
         BiometricSubject subject = null;
 
         if (StringUtils.isNotBlank(matchingResult)) {
-            M2SysMatchingResult m2SysMatchingResult = parseMatchingResult();
+            M2SysResults m2SysResults = parseMatchingResult();
 
-            for (M2SysResult result : m2SysMatchingResult.getResults()) {
+            for (M2SysResult result : m2SysResults.getResults()) {
                 result.checkCommonErrorValues();
                 if (M2SysResult.FAILED.equals(result.getValue())) {
                     throw new M2SysBiometricsException("Failed or was cancelled before completion");
@@ -269,7 +269,7 @@ public class M2SysResponse extends AbstractM2SysResponse {
         List<BiometricMatch> matches = new ArrayList<>();
 
         if (StringUtils.isNotBlank(matchingResult)) {
-            M2SysMatchingResult m2SysMatches = parseMatchingResult();
+            M2SysResults m2SysMatches = parseMatchingResult();
 
             for (M2SysResult result : m2SysMatches.getResults()) {
                 result.checkCommonErrorValues();
@@ -284,7 +284,7 @@ public class M2SysResponse extends AbstractM2SysResponse {
         return matches;
     }
 
-    public M2SysMatchingResult parseMatchingResult() {
+    public M2SysResults parseMatchingResult() {
         try {
 
             SAXParserFactory factory = SAXParserFactory.newInstance();
@@ -297,7 +297,7 @@ public class M2SysResponse extends AbstractM2SysResponse {
                     true);
             xmlReader.setErrorHandler(new M2SysXmlErrorHandler());
 
-            final M2SysMatchingResult results = new M2SysMatchingResult();
+            final M2SysResults results = new M2SysResults();
             xmlReader.setContentHandler(new ResultContentHandler(results));
 
             InputSource inputSource = new InputSource(new StringReader(matchingResult));

@@ -4,36 +4,40 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
 import org.openmrs.api.AdministrationService;
+import org.openmrs.module.m2sysbiometrics.M2SysBiometricSensitiveTestBase;
 import org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants;
-import org.openmrs.module.m2sysbiometrics.client.M2SysV105Client;
+import org.openmrs.module.m2sysbiometrics.M2SysEngine;
 import org.openmrs.module.m2sysbiometrics.http.M2SysHttpClient;
-import org.openmrs.module.m2sysbiometrics.http.M2SysHttpClientImpl;
+import org.openmrs.module.registrationcore.api.biometrics.model.BiometricMatch;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricSubject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJacksonHttpMessageConverter;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.RestTemplate;
 
 
-import static org.junit.Assert.assertNotNull;
-import static org.mockito.Mockito.when;
+import java.util.List;
 
-@RunWith(MockitoJUnitRunner.class)
-public class M2SysIT {
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
+public class M2SysIT extends M2SysBiometricSensitiveTestBase {
 
     private static final int CAPTURE_TIMEOUT = 120;
     private static final int LOCATION_ID = 1;
 
-    private M2SysHttpClient m2SysHttpClient = new M2SysHttpClientImpl();
-    private M2SysV105Client client = new M2SysV105Client();
-    private ObjectMapper objectMapper = new ObjectMapper();
+    @Autowired
+    private M2SysHttpClient m2SysHttpClient;
 
-    @Mock
+    @Autowired
+    private M2SysEngine engine;
+
+    @Autowired
     private AdministrationService adminService;
+
+    private ObjectMapper objectMapper = new ObjectMapper();
 
     @Before
     public void setUp() {
@@ -42,42 +46,34 @@ public class M2SysIT {
         String username = System.getenv("m2sys-biometrics.server.user");
         String apiUrl = System.getenv("m2sys-biometrics.server.url");
         String accessPointId = System.getenv("m2sys-biometrics.accessPointID");
+        String localServiceUrl = System.getenv("m2sys-biometrics.local-service.url");
 
-        when(adminService.getGlobalProperty(M2SysBiometricsConstants.M2SYS_CUSTOMER_KEY))
-                .thenReturn(custKey);
-        when(adminService.getGlobalProperty(M2SysBiometricsConstants.M2SYS_PASSWORD))
-                .thenReturn(password);
-        when(adminService.getGlobalProperty(M2SysBiometricsConstants.M2SYS_USER))
-                .thenReturn(username);
-        when(adminService.getGlobalProperty(M2SysBiometricsConstants.M2SYS_SERVER_URL))
-                .thenReturn(apiUrl);
-        when(adminService.getGlobalProperty(M2SysBiometricsConstants.M2SYS_ACCESS_POINT_ID))
-                .thenReturn(accessPointId);
-        when(adminService.getGlobalProperty(M2SysBiometricsConstants.M2SYS_CAPTURE_TIMEOUT))
-                .thenReturn(String.valueOf(CAPTURE_TIMEOUT));
-        when(adminService.getGlobalProperty(M2SysBiometricsConstants.M2SYS_LOCATION_ID))
-                .thenReturn(String.valueOf(LOCATION_ID));
+        adminService.setGlobalProperty(M2SysBiometricsConstants.M2SYS_CUSTOMER_KEY, custKey);
+        adminService.setGlobalProperty(M2SysBiometricsConstants.M2SYS_PASSWORD, password);
+        adminService.setGlobalProperty(M2SysBiometricsConstants.M2SYS_USER, username);
+        adminService.setGlobalProperty(M2SysBiometricsConstants.M2SYS_SERVER_URL, apiUrl);
+        adminService.setGlobalProperty(M2SysBiometricsConstants.M2SYS_ACCESS_POINT_ID, accessPointId);
+        adminService.setGlobalProperty(M2SysBiometricsConstants.M2SYS_CAPTURE_TIMEOUT,
+                String.valueOf(CAPTURE_TIMEOUT));
+        adminService.setGlobalProperty(M2SysBiometricsConstants.M2SYS_LOCATION_ID,
+                String.valueOf(LOCATION_ID));
+        adminService.setGlobalProperty(M2SysBiometricsConstants.M2SYS_LOCAL_SERVICE_URL,
+                localServiceUrl);
 
         replaceJacksonMessageConverter();
-
-        ReflectionTestUtils.setField(client, "adminService", adminService);
-        ReflectionTestUtils.setField(client, "httpClient", m2SysHttpClient);
     }
 
     @Test
     @Ignore
     public void test() {
-/*        Token token = m2SysHttpClient.getToken(apiUrl, username, password, custKey);
-        assertNotNull(token);*/
-        BiometricSubject subject = new BiometricSubject("MIT");
+        BiometricSubject subject = new BiometricSubject("SEARCH_TEST");
+        //engine.enroll(subject);
 
-        //subject = engine.enroll(subject);
-        //List<BiometricMatch> matches = engine.search(subject);
+/*        subject = engine.enroll(subject);
+        subject = engine.update(subject);*/
 
-        client.enroll(subject);
-
-        assertNotNull(subject);
-        //assertNotNull(matches);
+        List<BiometricMatch> matches = engine.search(subject);
+        assertNotNull(matches);
     }
 
     private void replaceJacksonMessageConverter() {

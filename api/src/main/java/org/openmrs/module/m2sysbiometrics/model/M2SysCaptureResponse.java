@@ -19,7 +19,7 @@ public class M2SysCaptureResponse extends AbstractM2SysResponse {
     @JsonProperty("BioImageData")
     private String bioImageData;
 
-    @JsonProperty("TemplateData")
+    @JsonProperty("FaceImageData")
     private String faceImageData;
 
     public String getTemplateData() {
@@ -47,9 +47,8 @@ public class M2SysCaptureResponse extends AbstractM2SysResponse {
     }
 
     @JsonIgnore
-    public Fingers getFingerData() {
+    public Fingers getFingerData(JAXBContext jaxbContext) {
         try {
-            JAXBContext jaxbContext = JAXBContext.newInstance(Fingers.class, Finger.class);
             Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
 
             InputSource inputSource = new InputSource(new StringReader(templateData));

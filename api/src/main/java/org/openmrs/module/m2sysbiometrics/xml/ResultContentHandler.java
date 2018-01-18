@@ -1,7 +1,7 @@
 package org.openmrs.module.m2sysbiometrics.xml;
 
 import org.apache.commons.lang3.StringUtils;
-import org.openmrs.module.m2sysbiometrics.model.M2SysMatchingResult;
+import org.openmrs.module.m2sysbiometrics.model.M2SysResults;
 import org.openmrs.module.m2sysbiometrics.model.M2SysResult;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -9,9 +9,9 @@ import org.xml.sax.helpers.DefaultHandler;
 
 public class ResultContentHandler extends DefaultHandler {
 
-    private final M2SysMatchingResult results;
+    private final M2SysResults results;
 
-    public ResultContentHandler(M2SysMatchingResult results) {
+    public ResultContentHandler(M2SysResults results) {
         this.results = results;
     }
 

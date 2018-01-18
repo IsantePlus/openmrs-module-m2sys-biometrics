@@ -119,4 +119,8 @@ public abstract class AbstractM2SysClient implements M2SysClient {
     protected boolean isSuccessfulStatus(HttpStatus httpStatus) {
         return httpStatus.equals(HttpStatus.OK);
     }
+
+    protected String getLocalBioServerUrl() {
+        return getProperty(M2SysBiometricsConstants.M2SYS_LOCAL_SERVICE_URL);
+    }
 }
