@@ -1,6 +1,7 @@
 package org.openmrs.module.m2sysbiometrics.bioplugin;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 import org.springframework.stereotype.Component;
 import org.springframework.ws.WebServiceMessageFactory;
@@ -12,6 +13,7 @@ import javax.annotation.PostConstruct;
 public class BioServerClient extends WebServiceGatewaySupport {
 
     @Autowired
+    @Qualifier("m2sysbiometrics.jax2b")
     private Jaxb2Marshaller marshaller;
 
     @Autowired

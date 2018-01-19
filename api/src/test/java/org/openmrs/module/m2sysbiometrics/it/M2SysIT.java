@@ -64,7 +64,7 @@ public class M2SysIT extends M2SysBiometricSensitiveTestBase {
     }
 
     @Test
-    @Ignore
+    //@Ignore
     public void test() {
         BiometricSubject subject = new BiometricSubject("SEARCH_TEST");
         //engine.enroll(subject);
