@@ -121,6 +121,14 @@
             The m2sys server CaptureTimeout.
         </description>
     </globalProperty>
+
+    <globalProperty>
+        <property>${project.parent.artifactId}.local-service.url</property>
+        <defaultValue></defaultValue>
+        <description>
+            The URL to the SOAP service of the local (local to the clinic) M2Sys BioPlugin Server.
+        </description>
+    </globalProperty>
     <!-- /Required Global Properties -->
 
     <!--
