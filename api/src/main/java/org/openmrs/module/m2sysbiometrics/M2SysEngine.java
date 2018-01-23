@@ -5,13 +5,18 @@ import org.openmrs.module.registrationcore.api.biometrics.BiometricEngine;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricEngineStatus;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricMatch;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricSubject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.UUID;
 
 @Component("m2sysbiometrics.M2SysEngine")
 public class M2SysEngine implements BiometricEngine {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(M2SysEngine.class);
 
     @Autowired
     private M2SysClient client;
@@ -26,6 +31,15 @@ public class M2SysEngine implements BiometricEngine {
 
     @Override
     public BiometricSubject enroll(BiometricSubject subject) {
+        LOGGER.info("Called getStatus enroll");
+        if (subject == null) {
+            subject = new BiometricSubject();
+        }
+        if (subject.getSubjectId() == null) {
+            subject.setSubjectId(UUID.randomUUID().toString());
+            LOGGER.debug(String.format("Generated a new SubjectId: %s", subject.getSubjectId()));
+        }
+
         return client.enroll(subject);
     }
 

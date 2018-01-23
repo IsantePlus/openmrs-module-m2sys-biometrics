@@ -7,7 +7,6 @@ import org.openmrs.module.registrationcore.api.biometrics.model.BiometricMatch;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricSubject;
 
 import java.util.List;
-import java.util.UUID;
 
 import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.ERROR_CODE_OF_SUBJECT_NOT_EXIST;
 import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.M2SYS_CHANGE_ID_ENDPOINT;
@@ -25,15 +24,6 @@ public class M2SysV1Client extends AbstractM2SysClient {
 
     @Override
     public BiometricSubject enroll(BiometricSubject subject) {
-        getLogger().info("Called getStatus enroll");
-        if (subject == null) {
-            subject = new BiometricSubject();
-        }
-        if (subject.getSubjectId() == null) {
-            subject.setSubjectId(UUID.randomUUID().toString());
-            getLogger().debug(String.format("Generated a new SubjectId: %s", subject.getSubjectId()));
-        }
-
         M2SysRequest request = new M2SysRequest();
         addCommonValues(request);
         request.setRegistrationId(subject.getSubjectId());
