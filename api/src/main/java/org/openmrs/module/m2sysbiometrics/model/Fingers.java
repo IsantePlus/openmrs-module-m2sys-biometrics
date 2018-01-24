@@ -45,4 +45,9 @@ public class Fingers {
         return new ArrayList<>(Arrays.asList(leftFinger.toOpenMRSFingerprint(),
                 rightFinger.toOpenMRSFingerprint()));
     }
+
+    public void trimData() {
+        fingers.get(0).setTemplateData(fingers.get(0).getTemplateData().trim());
+        fingers.get(1).setTemplateData(fingers.get(1).getTemplateData().trim());
+    }
 }

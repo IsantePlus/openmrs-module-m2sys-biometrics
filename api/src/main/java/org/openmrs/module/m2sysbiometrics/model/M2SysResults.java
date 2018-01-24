@@ -8,6 +8,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @XmlRootElement(name = "Results")
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -48,13 +49,16 @@ public class M2SysResults {
         return firstValueEqualsIgnoreCase(M2SysResult.UPDATE_SUBJECT_ID_SUCCESS);
     }
 
-    public boolean firstValueEqualsIgnoreCase(String value) {
+    public String firstValue() {
         if (results.isEmpty()) {
-            return false;
+            return null;
         } else {
-            M2SysResult firstResult = results.get(0);
-            return firstResult.getValue().equalsIgnoreCase(value);
+            return results.get(0).getValue();
         }
+    }
+
+    public boolean firstValueEqualsIgnoreCase(String value) {
+        return Objects.equals(firstValue(), value);
     }
 
     public List<BiometricMatch> toOpenMrsMatchList() {

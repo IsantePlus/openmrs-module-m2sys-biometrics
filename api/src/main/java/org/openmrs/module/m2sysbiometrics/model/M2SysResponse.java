@@ -5,6 +5,7 @@ import org.codehaus.jackson.annotate.JsonProperty;
 import org.openmrs.module.m2sysbiometrics.exception.M2SysBiometricsException;
 import org.openmrs.module.m2sysbiometrics.xml.M2SysXmlErrorHandler;
 import org.openmrs.module.m2sysbiometrics.xml.ResultContentHandler;
+import org.openmrs.module.m2sysbiometrics.xml.XmlResultUtil;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricMatch;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricSubject;
 import org.xml.sax.InputSource;
@@ -285,27 +286,6 @@ public class M2SysResponse extends AbstractM2SysResponse {
     }
 
     public M2SysResults parseMatchingResult() {
-        try {
-
-            SAXParserFactory factory = SAXParserFactory.newInstance();
-            SAXParser saxParser = factory.newSAXParser();
-
-            XMLReader xmlReader = saxParser.getXMLReader();
-
-            xmlReader.setFeature(
-                    "http://apache.org/xml/features/continue-after-fatal-error",
-                    true);
-            xmlReader.setErrorHandler(new M2SysXmlErrorHandler());
-
-            final M2SysResults results = new M2SysResults();
-            xmlReader.setContentHandler(new ResultContentHandler(results));
-
-            InputSource inputSource = new InputSource(new StringReader(matchingResult));
-            xmlReader.parse(inputSource);
-
-            return results;
-        } catch (SAXException | IOException | ParserConfigurationException e) {
-            throw new M2SysBiometricsException("Matching result parse error", e);
-        }
+        return XmlResultUtil.parse(matchingResult);
     }
 }

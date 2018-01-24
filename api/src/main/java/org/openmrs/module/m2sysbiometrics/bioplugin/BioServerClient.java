@@ -27,15 +27,12 @@ public class BioServerClient extends WebServiceGatewaySupport {
     }
 
     public String enroll(String serviceUrl, String subjectId, int locationId,
-                       String leftTemplate, String rightTemplate) {
+                       String biometricXml) {
         Register register = new Register();
         register.setLocationID(locationId);
         register.setID(subjectId);
 
-        register.setLeftEnrollTemplate(leftTemplate);
-        register.setLeftFingerType(0);
-        register.setRightEnrollTemplate(rightTemplate);
-        register.setRightFingerType(0);
+        register.setBiometricXml(biometricXml);
 
         RegisterResponse response = (RegisterResponse) getWebServiceTemplate()
                 .marshalSendAndReceive(serviceUrl, register);
@@ -44,15 +41,12 @@ public class BioServerClient extends WebServiceGatewaySupport {
     }
 
     public String update(String serviceUrl, String subjectId, int locationId,
-                       String leftTemplate, String rightTemplate) {
+                       String biometricXml) {
         Update update = new Update();
         update.setLocationID(locationId);
         update.setID(subjectId);
 
-        update.setLeftUpdateTemplate(leftTemplate);
-        update.setLeftFingerType(0);
-        update.setRightUpdateTemplate(rightTemplate);
-        update.setRightFingerType(0);
+        update.setBiometricXml(biometricXml);
 
         UpdateResponse response = (UpdateResponse) getWebServiceTemplate()
                 .marshalSendAndReceive(serviceUrl, update);
@@ -60,7 +54,7 @@ public class BioServerClient extends WebServiceGatewaySupport {
         return response.getUpdateResult();
     }
 
-    public String getInfo(String serviceUrl, String subjectId) {
+    public String getInfo(String serviceUrl) {
         GetInfo getInfo = new GetInfo();
 
         GetInfoResponse response = (GetInfoResponse) getWebServiceTemplate()
@@ -81,11 +75,10 @@ public class BioServerClient extends WebServiceGatewaySupport {
     }
 
     public String identify(String serviceUrl, int locationId,
-                         String leftTemplate, String rightTemplate) {
+                         String biometricXml) {
         Identify identify = new Identify();
 
-        identify.setLeftCaptureTemplate(leftTemplate);
-        identify.setRightCaptureTemplate(rightTemplate);
+        identify.setBiometricXml(biometricXml);
         identify.setLocationID(locationId);
 
         IdentifyResponse response = (IdentifyResponse) getWebServiceTemplate()

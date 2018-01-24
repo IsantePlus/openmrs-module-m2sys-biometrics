@@ -67,13 +67,17 @@ public class M2SysIT extends M2SysBiometricSensitiveTestBase {
     //@Ignore
     public void test() {
         BiometricSubject subject = new BiometricSubject("SEARCH_TEST");
+        //engine.delete(subject.getSubjectId());
         //engine.enroll(subject);
 
 /*        subject = engine.enroll(subject);
         subject = engine.update(subject);*/
-
         List<BiometricMatch> matches = engine.search(subject);
-        assertNotNull(matches);
+
+        //engine.enroll(subject);
+
+        //List<BiometricMatch> matches = engine.search(subject);
+        //assertNotNull(matches);
     }
 
     private void replaceJacksonMessageConverter() {

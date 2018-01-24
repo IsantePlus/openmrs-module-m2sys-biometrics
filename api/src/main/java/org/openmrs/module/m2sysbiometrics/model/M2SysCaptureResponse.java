@@ -53,7 +53,11 @@ public class M2SysCaptureResponse extends AbstractM2SysResponse {
 
             InputSource inputSource = new InputSource(new StringReader(templateData));
 
-            return (Fingers) unmarshaller.unmarshal(inputSource);
+            Fingers fingers =  (Fingers) unmarshaller.unmarshal(inputSource);
+
+            fingers.trimData();
+
+            return fingers;
         } catch (JAXBException e) {
             throw new M2SysBiometricsException("Unable to parse template data in capture response: "
                 + templateData, e);
