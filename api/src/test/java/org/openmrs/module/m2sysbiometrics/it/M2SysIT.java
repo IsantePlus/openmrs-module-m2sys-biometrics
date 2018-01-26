@@ -8,6 +8,8 @@ import org.openmrs.api.AdministrationService;
 import org.openmrs.module.m2sysbiometrics.M2SysBiometricSensitiveTestBase;
 import org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants;
 import org.openmrs.module.m2sysbiometrics.M2SysEngine;
+import org.openmrs.module.m2sysbiometrics.bioplugin.BioServerClient;
+import org.openmrs.module.m2sysbiometrics.client.M2SysV105Client;
 import org.openmrs.module.m2sysbiometrics.http.M2SysHttpClient;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricMatch;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricSubject;
@@ -37,16 +39,22 @@ public class M2SysIT extends M2SysBiometricSensitiveTestBase {
     @Autowired
     private AdministrationService adminService;
 
+    @Autowired
+    private BioServerClient bioServerClient;
+
     private ObjectMapper objectMapper = new ObjectMapper();
+
+    private String localServiceUrl;
 
     @Before
     public void setUp() {
         String custKey = System.getenv("m2sys-biometrics.customKey");
         String password = System.getenv("m2sys-biometrics.server.password");
         String username = System.getenv("m2sys-biometrics.server.user");
-        String apiUrl = System.getenv("m2sys-biometrics.server.url");
         String accessPointId = System.getenv("m2sys-biometrics.accessPointID");
-        String localServiceUrl = System.getenv("m2sys-biometrics.local-service.url");
+        String apiUrl = System.getenv("m2sys-biometrics.server.url");
+
+        localServiceUrl = System.getenv("m2sys-biometrics.local-service.url");
 
         adminService.setGlobalProperty(M2SysBiometricsConstants.M2SYS_CUSTOMER_KEY, custKey);
         adminService.setGlobalProperty(M2SysBiometricsConstants.M2SYS_PASSWORD, password);
@@ -70,9 +78,16 @@ public class M2SysIT extends M2SysBiometricSensitiveTestBase {
         //engine.delete(subject.getSubjectId());
         //engine.enroll(subject);
 
+        engine.delete(subject.getSubjectId());
+        engine.enroll(subject);
+
+        List<BiometricMatch> matches = engine.search(subject);
+
+        bioServerClient.isRegistered(localServiceUrl, subject.getSubjectId());
+
 /*        subject = engine.enroll(subject);
         subject = engine.update(subject);*/
-        List<BiometricMatch> matches = engine.search(subject);
+        //List<BiometricMatch> matches = engine.search(subject);
 
         //engine.enroll(subject);
 
