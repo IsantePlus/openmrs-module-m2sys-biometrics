@@ -1,5 +1,11 @@
 package org.openmrs.module.m2sysbiometrics.client;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.openmrs.Patient;
+import org.openmrs.PatientIdentifierType;
+import org.openmrs.api.AdministrationService;
+import org.openmrs.api.PatientService;
 import org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants;
 import org.openmrs.module.m2sysbiometrics.bioplugin.BioServerClient;
 import org.openmrs.module.m2sysbiometrics.exception.M2SysBiometricsException;
@@ -11,21 +17,33 @@ import org.openmrs.module.m2sysbiometrics.model.M2SysResult;
 import org.openmrs.module.m2sysbiometrics.model.M2SysResults;
 import org.openmrs.module.m2sysbiometrics.model.Token;
 import org.openmrs.module.m2sysbiometrics.xml.XmlResultUtil;
+import org.openmrs.module.registrationcore.RegistrationCoreConstants;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricMatch;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricSubject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
+import java.util.Collections;
 import java.util.List;
 
 @Component("m2sysbiometrics.M2SysV1Client")
 public class M2SysV105Client extends AbstractM2SysClient {
 
+    private static final Logger LOG = LoggerFactory.getLogger(M2SysV105Client.class);
+
     @Autowired
     private BioServerClient bioServerClient;
+
+    @Autowired
+    private PatientService patientService;
+
+    @Autowired
+    private AdministrationService adminService;
 
     private JAXBContext jaxbContext;
 
@@ -44,8 +62,37 @@ public class M2SysV105Client extends AbstractM2SysClient {
         M2SysResults results = XmlResultUtil.parse(response);
 
         if (!results.isRegisterSuccess()) {
-            throw new M2SysBiometricsException("No success during fingerprint registration:"
-                    + results.firstValue());
+            String responseValue = results.firstValue();
+
+            LOG.info("Got error response from M2Sys: {}. Checking if tied to patient.", responseValue);
+
+            Patient patient = checkIfPatientExists(responseValue);
+            if (patient == null) {
+                LOG.info("No patient matching fingerprint ID: {}", responseValue);
+
+                String isRegisterResponse = bioServerClient.isRegistered(getLocalBioServerUrl(),
+                        results.firstValue());
+                M2SysResults isRegisterResults = XmlResultUtil.parse(isRegisterResponse);
+
+                if (isRegisterResults.isLookupNotFound()) {
+                    throw new M2SysBiometricsException("No success during fingerprint registration: "
+                            + responseValue);
+                } else {
+                    LOG.info("Fingerprints are registered with ID {} but do not match any patient, fixing.",
+                            responseValue);
+                    if (!StringUtils.equals(subject.getSubjectId(), responseValue)) {
+                        LOG.info("Changing existing fingerprint ID {} to {}",
+                                responseValue, subject.getSubjectId());
+
+                        bioServerClient.changeId(getLocalBioServerUrl(), responseValue, subject.getSubjectId());
+                    } else {
+                        LOG.info("User already has the same fingerprints registered under his fingerprint ID");
+                    }
+                }
+            } else {
+                throw new M2SysBiometricsException("Fingerprints already match patient: "
+                        + patient.getPersonName().getFullName());
+            }
         }
 
         Fingers fingers = capture.getFingerData(jaxbContext);
@@ -126,5 +173,21 @@ public class M2SysV105Client extends AbstractM2SysClient {
         return getHttpClient().postRequest(
                 getServerUrl() + M2SysBiometricsConstants.M2SYS_CAPTURE_ENDPOINT,
                 request, token, M2SysCaptureResponse.class);
+    }
+
+    private Patient checkIfPatientExists(String fingerprintId) {
+        String identifierUuid = adminService.getGlobalProperty(
+                RegistrationCoreConstants.GP_BIOMETRICS_PERSON_IDENTIFIER_TYPE_UUID, null);
+
+        if (StringUtils.isNotBlank(identifierUuid)) {
+            PatientIdentifierType idType = patientService.getPatientIdentifierTypeByUuid(identifierUuid);
+            if (idType != null) {
+                List<Patient> patients = patientService.getPatients(null, fingerprintId,
+                        Collections.singletonList(idType), true);
+                return CollectionUtils.isEmpty(patients) ? null : patients.get(0);
+            }
+        }
+
+        return null;
     }
 }
