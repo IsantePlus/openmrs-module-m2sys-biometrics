@@ -3,20 +3,10 @@ package org.openmrs.module.m2sysbiometrics.model;
 import org.apache.commons.lang3.StringUtils;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.openmrs.module.m2sysbiometrics.exception.M2SysBiometricsException;
-import org.openmrs.module.m2sysbiometrics.xml.M2SysXmlErrorHandler;
-import org.openmrs.module.m2sysbiometrics.xml.ResultContentHandler;
 import org.openmrs.module.m2sysbiometrics.xml.XmlResultUtil;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricMatch;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricSubject;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-import org.xml.sax.XMLReader;
 
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-import java.io.IOException;
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
