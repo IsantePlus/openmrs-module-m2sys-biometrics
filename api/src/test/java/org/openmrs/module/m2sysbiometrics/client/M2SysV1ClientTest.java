@@ -20,6 +20,7 @@ import org.openmrs.module.m2sysbiometrics.model.M2SysResponse;
 import org.openmrs.module.m2sysbiometrics.model.ChangeIdRequest;
 import org.openmrs.module.m2sysbiometrics.model.M2SysResult;
 import org.openmrs.module.m2sysbiometrics.model.Token;
+import org.openmrs.module.m2sysbiometrics.util.AccessPointIdResolver;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricEngineStatus;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricMatch;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricSubject;
@@ -84,6 +85,9 @@ public class M2SysV1ClientTest extends M2SysBiometricSensitiveTestBase {
     @Mock
     private Token token;
 
+    @Mock
+    private AccessPointIdResolver apIdResolver;
+
     @InjectMocks
     private M2SysV1Client m2SysV1Client;
 
@@ -98,8 +102,7 @@ public class M2SysV1ClientTest extends M2SysBiometricSensitiveTestBase {
         when(administrationService.getGlobalProperty(M2SysBiometricsConstants.M2SYS_CUSTOMER_KEY)).thenReturn(CUSTOMER_KEY);
         when(administrationService.getGlobalProperty(M2SysBiometricsConstants.M2SYS_CAPTURE_TIMEOUT)).thenReturn(
                 CAPTURE_TIMEOUT);
-        when(administrationService.getGlobalProperty(M2SysBiometricsConstants.M2SYS_ACCESS_POINT_ID)).thenReturn(
-                ACCESS_POINT_ID);
+        when(apIdResolver.getAccessPointId()).thenReturn(ACCESS_POINT_ID);
 
         when(response.toBiometricSubject(FINGERPRINT_ID)).thenReturn(expectedSubject);
         when(response.parseMatchingResult()).thenReturn(expectedMatchingResult);

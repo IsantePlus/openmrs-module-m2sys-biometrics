@@ -19,6 +19,8 @@ public final class M2SysBiometricsConstants {
 
     public static final String M2SYS_ACCESS_POINT_ID = "m2sys-biometrics.accessPointID";
 
+    public static final String M2SYS_ACCESS_POINT_MAP = "m2sys-biometrics.accessPointMap";
+
     public static final String M2SYS_CAPTURE_TIMEOUT = "m2sys-biometrics.captureTimeout";
 
     public static final String M2SYS_LOOKUP_ENDPOINT = "/api/Biometric/IsRegister";

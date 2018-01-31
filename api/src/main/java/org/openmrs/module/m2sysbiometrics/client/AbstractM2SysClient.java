@@ -9,6 +9,7 @@ import org.openmrs.module.m2sysbiometrics.model.AbstractM2SysRequest;
 import org.openmrs.module.m2sysbiometrics.model.BiometricCaptureType;
 import org.openmrs.module.m2sysbiometrics.model.M2SysRequest;
 import org.openmrs.module.m2sysbiometrics.model.Token;
+import org.openmrs.module.m2sysbiometrics.util.AccessPointIdResolver;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricEngineStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +30,9 @@ public abstract class AbstractM2SysClient implements M2SysClient {
 
     @Autowired
     private AdministrationService adminService;
+
+    @Autowired
+    private AccessPointIdResolver apIdResolver;
 
     /**
      * Gets a status of biometric server.
@@ -90,7 +94,7 @@ public abstract class AbstractM2SysClient implements M2SysClient {
     }
 
     protected String getAccessPointId() {
-        return getProperty(M2SysBiometricsConstants.M2SYS_ACCESS_POINT_ID);
+        return apIdResolver.getAccessPointId();
     }
 
     protected float getCaptureTimeOut() {

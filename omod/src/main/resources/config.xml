@@ -110,7 +110,8 @@
         <property>${project.parent.artifactId}.accessPointID</property>
         <defaultValue></defaultValue>
         <description>
-            The m2sys server AccessPointID.
+            The m2sys server AccessPointID. This is used by default unless a mapping that matches the callers IP
+            is found in the accessPointMap property.
         </description>
     </globalProperty>
 
@@ -129,6 +130,17 @@
             The URL to the SOAP service of the local (local to the clinic) M2Sys BioPlugin Server.
         </description>
     </globalProperty>
+
+    <globalProperty>
+        <property>${project.parent.artifactId}.accessPointMap</property>
+        <defaultValue></defaultValue>
+        <description>
+            A map of IP addresses to Access Point IDs. Has format of IP1:AccessPointID1;IP2:AccessPointID2;...
+            For example 127.0.0.1:APID1;8.8.8.8:APID2... The IPs must match the IPs of the clients calling the
+            server.
+        </description>
+    </globalProperty>
+
     <!-- /Required Global Properties -->
 
     <!--
