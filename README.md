@@ -40,7 +40,7 @@ as it is the same version that wil be used.
 
 m2sys-biometrics.accessPointID - The m2sys server AccessPointID<br/>
 m2sys-biometrics.accessPointMap - A map of IP addresses to Access Point IDs. Has format of IP1:AccessPointID1;IP2:AccessPointID2;...
-For example 127.0.0.1:APID1;8.8.8.8:APID2... The IPs must match the IPs of the clients calling the server.
+For example 127.0.0.1:APID1;8.8.8.8:APID2... The IPs must match the IPs of the clients calling the server.<br/>
 m2sys-biometrics.captureTimeout - The m2sys server CaptureTimeout<br/>
 m2sys-biometrics.customKey - The m2sys server CustomKey<br/>
 m2sys-biometrics.locationID - The m2sys server location ID<br/>
