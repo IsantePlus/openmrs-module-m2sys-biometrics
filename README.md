@@ -32,16 +32,19 @@ as it is the same version that wil be used.
 1. M2Sys module for iSantePlus sends requests to CloudScanner Standalone Api using REST
 2. CloudScanner Standalone Api uses RabbitMQ to communicate with CloudScanner Client
 3. CloudScanner Client gets fingerprints from fingerprint reader
-4. CloudScanner Client sends this data back to CloudScanner Standalone Api
-5. CloudScanner Standalone Api sends SOAP request to BioPlugin server
-6. CloudScanner Standalone Api gets response from BioPlugin server and sends it back to M2Sys module
+4. CloudScanner Client sends the fingerprint data back to this module
+5. This module sends a SOAP request to the local BioPlugin server
+6. This module gets the response from the BioPlugin server and interprets it.
 
 ## Configuration variables
 
 m2sys-biometrics.accessPointID - The m2sys server AccessPointID<br/>
+m2sys-biometrics.accessPointMap - A map of IP addresses to Access Point IDs. Has format of IP1:AccessPointID1;IP2:AccessPointID2;...
+For example 127.0.0.1:APID1;8.8.8.8:APID2... The IPs must match the IPs of the clients calling the server.
 m2sys-biometrics.captureTimeout - The m2sys server CaptureTimeout<br/>
 m2sys-biometrics.customKey - The m2sys server CustomKey<br/>
 m2sys-biometrics.locationID - The m2sys server location ID<br/>
 m2sys-biometrics.server.password - The m2sys server password<br/>
 m2sys-biometrics.server.url - The m2sys server url<br/>
 m2sys-biometrics.server.user - The m2sys server username<br/>
+m2sys-biometrics.local-service.url - The URL to the SOAP service of the local (local to the clinic) M2Sys BioPlugin Server.
