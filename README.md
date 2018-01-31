@@ -12,6 +12,21 @@ To set up this module, so it works properly there are three things needed:
 
 This module is using REST to communicate with CloudScanner API and send requests.
 
+## Building the module
+
+In order to build the module you must pass the location of the BioPlugin Web Service WSDL
+using the property **biopluginWsdlUrl**. You can pass it to Maven like this:
+
+```bash
+mvn clean install -DbiopluginWsdlUrl=https://<HOST>/M2Sys.BioPluginWeb/BioPluginServiceV8.asmx?wsdl
+``` 
+
+Make sure to replace `<HOST>` with either the IP or the domain of the server. Also make
+sure to use the **V8** version of the service, like in te example above.
+
+Note: it is not important which instance of the M2Sys server is using during building as long
+as it is the same version that wil be used.
+
 ## Worklflow
 
 1. M2Sys module for iSantePlus sends requests to CloudScanner Standalone Api using REST
