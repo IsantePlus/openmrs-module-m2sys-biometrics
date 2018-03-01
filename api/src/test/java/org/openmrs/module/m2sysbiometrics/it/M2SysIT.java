@@ -67,23 +67,21 @@ public class M2SysIT extends M2SysBiometricSensitiveTestBase {
                 String.valueOf(LOCATION_ID));
         adminService.setGlobalProperty(M2SysBiometricsConstants.M2SYS_LOCAL_SERVICE_URL,
                 localServiceUrl);
-
-        replaceJacksonMessageConverter();
     }
 
     @Test
     //@Ignore
     public void test() {
-        BiometricSubject subject = new BiometricSubject("SEARCH_TEST");
+        BiometricSubject subject = new BiometricSubject("SEARCH_TEST2");
         //engine.delete(subject.getSubjectId());
         //engine.enroll(subject);
 
-        engine.delete(subject.getSubjectId());
+        //engine.delete(subject.getSubjectId());
         engine.enroll(subject);
 
-        List<BiometricMatch> matches = engine.search(subject);
+       // List<BiometricMatch> matches = engine.search(subject);
 
-        bioServerClient.isRegistered(localServiceUrl, subject.getSubjectId());
+        //bioServerClient.isRegistered(localServiceUrl, subject.getSubjectId());
 
 /*        subject = engine.enroll(subject);
         subject = engine.update(subject);*/
@@ -93,18 +91,5 @@ public class M2SysIT extends M2SysBiometricSensitiveTestBase {
 
         //List<BiometricMatch> matches = engine.search(subject);
         //assertNotNull(matches);
-    }
-
-    private void replaceJacksonMessageConverter() {
-        MappingJacksonHttpMessageConverter messageConverter = new MappingJacksonHttpMessageConverter();
-        messageConverter.setPrettyPrint(false);
-        messageConverter.setObjectMapper(objectMapper);
-
-        RestTemplate restTemplate = (RestTemplate) ReflectionTestUtils.getField(m2SysHttpClient,
-                "restOperations");
-
-        restTemplate.getMessageConverters().removeIf(m -> m.getClass().getName().equals(
-                MappingJackson2HttpMessageConverter.class.getName()));
-        restTemplate.getMessageConverters().add(messageConverter);
     }
 }

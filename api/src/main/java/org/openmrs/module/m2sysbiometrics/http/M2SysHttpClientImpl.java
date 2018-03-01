@@ -16,6 +16,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJacksonHttpMessageConverter;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
@@ -51,11 +52,7 @@ public class M2SysHttpClientImpl implements M2SysHttpClient {
         objectMapper.getSerializationConfig().addMixInAnnotations(M2SysRequest.class, LoggingMixin.class);
         objectMapper.getSerializationConfig().addMixInAnnotations(M2SysResponse.class, LoggingMixin.class);
 
-        MappingJacksonHttpMessageConverter messageConverter = new MappingJacksonHttpMessageConverter();
-        messageConverter.setPrettyPrint(false);
-
-        RestTemplate restTemplate = (RestTemplate) restOperations;
-        restTemplate.getMessageConverters().add(messageConverter);
+        configureJackson((RestTemplate) restOperations);
     }
 
     @Override
@@ -151,5 +148,14 @@ public class M2SysHttpClientImpl implements M2SysHttpClient {
                 }
             }
         }
+    }
+
+    private void configureJackson(RestTemplate restTemplate) {
+        MappingJacksonHttpMessageConverter messageConverter = new MappingJacksonHttpMessageConverter();
+        messageConverter.setPrettyPrint(false);
+
+        restTemplate.getMessageConverters().removeIf(m -> m.getClass().getName().equals(
+                MappingJackson2HttpMessageConverter.class.getName()));
+        restTemplate.getMessageConverters().add(messageConverter);
     }
 }
