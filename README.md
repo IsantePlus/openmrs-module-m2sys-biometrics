@@ -18,7 +18,7 @@ In order to build the module you must pass the location of the BioPlugin Web Ser
 using the property **biopluginWsdlUrl**. You can pass it to Maven like this:
 
 ```bash
-mvn clean install -DbiopluginWsdlUrl=https://<HOST>/M2Sys.BioPluginWeb/BioPluginServiceV8.asmx?wsdl
+mvn clean install -DbiopluginWsdlUrl=http://<HOST>/M2Sys.BioPluginWeb/BioPluginServiceV8.asmx?wsdl
 ``` 
 
 Make sure to replace `<HOST>` with either the IP or the domain of the server. Also make
