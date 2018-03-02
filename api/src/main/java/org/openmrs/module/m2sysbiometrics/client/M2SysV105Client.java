@@ -57,7 +57,7 @@ public class M2SysV105Client extends AbstractM2SysClient {
     public BiometricSubject enroll(BiometricSubject subject) {
         M2SysCaptureResponse capture = scanDoubleFingers();
 
-        String response = localBioServerClient.enroll(this, subject.getSubjectId(), capture.getTemplateData());
+        String response = localBioServerClient.enroll(subject.getSubjectId(), capture.getTemplateData());
         M2SysResults results = XmlResultUtil.parse(response);
 
         if (!results.isRegisterSuccess()) {
@@ -69,8 +69,7 @@ public class M2SysV105Client extends AbstractM2SysClient {
             if (patient == null) {
                 LOG.info("No patient matching fingerprint ID: {}", responseValue);
 
-                String isRegisterResponse = localBioServerClient.isRegistered(this,
-                        results.firstValue());
+                String isRegisterResponse = localBioServerClient.isRegistered(results.firstValue());
                 M2SysResults isRegisterResults = XmlResultUtil.parse(isRegisterResponse);
 
                 if (isRegisterResults.isLookupNotFound()) {
@@ -83,7 +82,7 @@ public class M2SysV105Client extends AbstractM2SysClient {
                         LOG.info("Changing existing fingerprint ID {} to {}",
                                 responseValue, subject.getSubjectId());
 
-                        localBioServerClient.changeId(this, responseValue, subject.getSubjectId());
+                        localBioServerClient.changeId(responseValue, subject.getSubjectId());
                     } else {
                         LOG.info("User already has the same fingerprints registered under his fingerprint ID");
                     }
@@ -105,7 +104,7 @@ public class M2SysV105Client extends AbstractM2SysClient {
     public BiometricSubject update(BiometricSubject subject) {
         M2SysCaptureResponse capture = scanDoubleFingers();
 
-        String response = localBioServerClient.update(this, subject.getSubjectId(), capture.getTemplateData());
+        String response = localBioServerClient.update(subject.getSubjectId(), capture.getTemplateData());
         M2SysResults results = XmlResultUtil.parse(response);
 
         if (!results.isUpdateSuccess()) {
@@ -121,7 +120,7 @@ public class M2SysV105Client extends AbstractM2SysClient {
 
     @Override
     public BiometricSubject updateSubjectId(String oldId, String newId) {
-        String response = localBioServerClient.changeId(this, oldId, newId);
+        String response = localBioServerClient.changeId(oldId, newId);
         M2SysResults results = XmlResultUtil.parse(response);
 
         if (!results.isChangeIdSuccess()) {
@@ -136,7 +135,7 @@ public class M2SysV105Client extends AbstractM2SysClient {
     public List<BiometricMatch> search(BiometricSubject subject) {
         M2SysCaptureResponse capture = scanDoubleFingers();
 
-        String response = localBioServerClient.identify(this, capture.getTemplateData());
+        String response = localBioServerClient.identify(capture.getTemplateData());
         M2SysResults results = XmlResultUtil.parse(response);
 
         return results.toOpenMrsMatchList();
@@ -144,7 +143,7 @@ public class M2SysV105Client extends AbstractM2SysClient {
 
     @Override
     public BiometricSubject lookup(String subjectId) {
-        String response = localBioServerClient.isRegistered(this, subjectId);
+        String response = localBioServerClient.isRegistered(subjectId);
         M2SysResults results = XmlResultUtil.parse(response);
 
         return results.isLookupNotFound() ? null : new BiometricSubject(subjectId);
@@ -152,7 +151,7 @@ public class M2SysV105Client extends AbstractM2SysClient {
 
     @Override
     public void delete(String subjectId) {
-        String response = localBioServerClient.delete(this, subjectId);
+        String response = localBioServerClient.delete(subjectId);
         M2SysResults results = XmlResultUtil.parse(response);
 
         if (!results.isDeleteSuccess()) {

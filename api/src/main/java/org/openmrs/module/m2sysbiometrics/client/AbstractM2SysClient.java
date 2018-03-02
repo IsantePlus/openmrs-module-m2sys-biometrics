@@ -60,15 +60,6 @@ public abstract class AbstractM2SysClient implements M2SysClient {
         return result;
     }
 
-    @Override
-    public String getProperty(String propertyName) {
-        String propertyValue = adminService.getGlobalProperty(propertyName);
-        if (StringUtils.isBlank(propertyValue)) {
-            throw new APIException("Property value for '" + propertyName + "' is not set");
-        }
-        return propertyValue;
-    }
-
     protected M2SysHttpClient getHttpClient() {
         return httpClient;
     }
@@ -119,6 +110,14 @@ public abstract class AbstractM2SysClient implements M2SysClient {
         String password = getProperty(M2SysBiometricsConstants.M2SYS_CLOUD_SCANR_PASSWORD);
         String customerKey = getProperty(M2SysBiometricsConstants.M2SYS_CUSTOMER_KEY);
         return httpClient.getToken(getCloudScanrUrl(), username, password, customerKey);
+    }
+
+    protected String getProperty(String propertyName) {
+        String propertyValue = adminService.getGlobalProperty(propertyName);
+        if (StringUtils.isBlank(propertyValue)) {
+            throw new APIException("Property value for '" + propertyName + "' is not set");
+        }
+        return propertyValue;
     }
 
     protected boolean isSuccessfulStatus(HttpStatus httpStatus) {

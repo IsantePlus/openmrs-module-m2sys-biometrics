@@ -1,7 +1,9 @@
 package org.openmrs.module.m2sysbiometrics.bioplugin;
 
+import org.apache.commons.lang.StringUtils;
+import org.openmrs.api.APIException;
+import org.openmrs.api.AdministrationService;
 import org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants;
-import org.openmrs.module.m2sysbiometrics.client.M2SysClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
@@ -19,6 +21,9 @@ public abstract class AbstractBioServerClient extends WebServiceGatewaySupport i
     private Jaxb2Marshaller marshaller;
 
     @Autowired
+    private AdministrationService adminService;
+
+    @Autowired
     private WebServiceMessageFactory messageFactory;
 
     @PostConstruct
@@ -29,81 +34,89 @@ public abstract class AbstractBioServerClient extends WebServiceGatewaySupport i
     }
 
     @Override
-    public String enroll(M2SysClient client, String subjectId, String biometricXml) {
+    public String enroll(String subjectId, String biometricXml) {
         Register register = new Register();
-        register.setLocationID(getLocationId(client));
+        register.setLocationID(getLocationId());
         register.setID(subjectId);
 
         register.setBiometricXml(biometricXml);
 
         RegisterResponse response = (RegisterResponse) getWebServiceTemplate()
-                .marshalSendAndReceive(getServiceUrl(client), register);
+                .marshalSendAndReceive(getServiceUrl(), register);
 
         return response.getRegisterResult();
     }
 
     @Override
-    public String isRegistered(M2SysClient client, String subjectId) {
+    public String isRegistered(String subjectId) {
         IsRegistered isRegistered = new IsRegistered();
         isRegistered.setID(subjectId);
 
         IsRegisteredResponse response = (IsRegisteredResponse) getWebServiceTemplate()
-                .marshalSendAndReceive(getServiceUrl(client), isRegistered);
+                .marshalSendAndReceive(getServiceUrl(), isRegistered);
 
         return response.getIsRegisteredResult();
     }
 
     @Override
-    public String changeId(M2SysClient client, String oldId, String newId) {
+    public String changeId(String oldId, String newId) {
         ChangeID changeID = new ChangeID();
         changeID.setNewID(newId);
         changeID.setOldID(oldId);
 
         ChangeIDResponse response = (ChangeIDResponse) getWebServiceTemplate()
-                .marshalSendAndReceive(getServiceUrl(client), changeID);
+                .marshalSendAndReceive(getServiceUrl(), changeID);
 
         return response.getChangeIDResult();
     }
 
     @Override
-    public String update(M2SysClient client, String subjectId, String biometricXml) {
+    public String update(String subjectId, String biometricXml) {
         Update update = new Update();
-        update.setLocationID(getLocationId(client));
+        update.setLocationID(getLocationId());
         update.setID(subjectId);
 
         update.setBiometricXml(biometricXml);
 
         UpdateResponse response = (UpdateResponse) getWebServiceTemplate()
-                .marshalSendAndReceive(getServiceUrl(client), update);
+                .marshalSendAndReceive(getServiceUrl(), update);
 
         return response.getUpdateResult();
     }
 
     @Override
-    public String identify(M2SysClient client, String biometricXml) {
+    public String identify(String biometricXml) {
         Identify identify = new Identify();
 
         identify.setBiometricXml(biometricXml);
-        identify.setLocationID(getLocationId(client));
+        identify.setLocationID(getLocationId());
 
         IdentifyResponse response = (IdentifyResponse) getWebServiceTemplate()
-                .marshalSendAndReceive(getServiceUrl(client), identify);
+                .marshalSendAndReceive(getServiceUrl(), identify);
 
         return response.identifyResult;
     }
 
     @Override
-    public String delete(M2SysClient client, String subjectId) {
+    public String delete(String subjectId) {
         DeleteID deleteID = new DeleteID();
         deleteID.setID(subjectId);
 
         DeleteIDResponse response = (DeleteIDResponse) getWebServiceTemplate()
-                .marshalSendAndReceive(getServiceUrl(client), deleteID);
+                .marshalSendAndReceive(getServiceUrl(), deleteID);
 
         return response.getDeleteIDResult();
     }
 
-    private int getLocationId(M2SysClient client) {
-        return Integer.parseInt(client.getProperty(LOCATION_ID_PROPERTY));
+    private int getLocationId() {
+        return Integer.parseInt(getProperty(LOCATION_ID_PROPERTY));
+    }
+
+    protected String getProperty(String propertyName) {
+        String propertyValue = adminService.getGlobalProperty(propertyName);
+        if (StringUtils.isBlank(propertyValue)) {
+            throw new APIException("Property value for '" + propertyName + "' is not set");
+        }
+        return propertyValue;
     }
 }

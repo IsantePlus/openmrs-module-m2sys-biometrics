@@ -17,8 +17,7 @@ public final class M2SysBiometricsConstants {
 
     public static final String M2SYS_NATIONAL_USERNAME = "m2sys-biometrics.server.national.user";
 
-    public static final String M2SYS_NATIONAL_PASSWORD =
-            "m2sys-biometrics.server.national.password";
+    public static final String M2SYS_NATIONAL_PASSWORD = "m2sys-biometrics.server.national.password";
 
     public static final String M2SYS_LOCATION_ID = "m2sys-biometrics.locationID";
 
