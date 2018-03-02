@@ -108,6 +108,8 @@ public abstract class AbstractBioServerClient extends WebServiceGatewaySupport i
         return response.getDeleteIDResult();
     }
 
+    protected abstract String getServiceUrl();
+
     private int getLocationId() {
         return Integer.parseInt(getProperty(LOCATION_ID_PROPERTY));
     }
