@@ -4,6 +4,7 @@ import org.apache.commons.lang.StringUtils;
 import org.openmrs.api.APIException;
 import org.openmrs.api.AdministrationService;
 import org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants;
+import org.openmrs.module.m2sysbiometrics.bioplugin.LocalBioServerClient;
 import org.openmrs.module.m2sysbiometrics.http.M2SysHttpClient;
 import org.openmrs.module.m2sysbiometrics.model.AbstractM2SysRequest;
 import org.openmrs.module.m2sysbiometrics.model.BiometricCaptureType;
@@ -18,7 +19,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.ResourceAccessException;
 
-import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.M2SYS_SERVER_URL;
+import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.M2SYS_CLOUD_SCANNER_URL;
 import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.getServerStatusDescription;
 
 public abstract class AbstractM2SysClient implements M2SysClient {
@@ -34,6 +35,9 @@ public abstract class AbstractM2SysClient implements M2SysClient {
     @Autowired
     private AccessPointIdResolver apIdResolver;
 
+    @Autowired
+    private LocalBioServerClient localBioServerClient;
+
     /**
      * Gets a status of biometric server.
      */
@@ -44,7 +48,7 @@ public abstract class AbstractM2SysClient implements M2SysClient {
 
         ResponseEntity<String> responseEntity;
         try {
-            responseEntity = getHttpClient().getServerStatus(getServerUrl(), getToken());
+            responseEntity = getHttpClient().getServerStatus(getCloudScannerUrl(), getToken());
         } catch (ResourceAccessException e) {
             logger.error(e.getMessage());
             responseEntity = new ResponseEntity<>(HttpStatus.SERVICE_UNAVAILABLE);
@@ -58,6 +62,15 @@ public abstract class AbstractM2SysClient implements M2SysClient {
 
         logger.debug(String.format("M2SysServer status: %s", result.getDescription()));
         return result;
+    }
+
+    @Override
+    public String getProperty(String propertyName) {
+        String propertyValue = adminService.getGlobalProperty(propertyName);
+        if (StringUtils.isBlank(propertyValue)) {
+            throw new APIException("Property value for '" + propertyName + "' is not set");
+        }
+        return propertyValue;
     }
 
     protected M2SysHttpClient getHttpClient() {
@@ -82,11 +95,11 @@ public abstract class AbstractM2SysClient implements M2SysClient {
     }
 
     protected String url(String path) {
-        return getServerUrl() + path;
+        return getCloudScannerUrl() + path;
     }
 
-    protected String getServerUrl() {
-        return getProperty(M2SYS_SERVER_URL);
+    protected String getCloudScannerUrl() {
+        return getProperty(M2SYS_CLOUD_SCANNER_URL);
     }
 
     protected String getCustomerKey() {
@@ -106,25 +119,10 @@ public abstract class AbstractM2SysClient implements M2SysClient {
     }
 
     protected Token getToken() {
-        String username = getProperty(M2SysBiometricsConstants.M2SYS_USER);
-        String password = getProperty(M2SysBiometricsConstants.M2SYS_PASSWORD);
-        String customerKey = getProperty(M2SysBiometricsConstants.M2SYS_CUSTOMER_KEY);
-        return httpClient.getToken(getServerUrl(), username, password, customerKey);
-    }
-
-    protected String getProperty(String propertyName) {
-        String propertyValue = adminService.getGlobalProperty(propertyName);
-        if (StringUtils.isBlank(propertyValue)) {
-            throw new APIException("Property value for '" + propertyName + "' is not set");
-        }
-        return propertyValue;
+        return localBioServerClient.getToken(this);
     }
 
     protected boolean isSuccessfulStatus(HttpStatus httpStatus) {
         return httpStatus.equals(HttpStatus.OK);
-    }
-
-    protected String getLocalBioServerUrl() {
-        return getProperty(M2SysBiometricsConstants.M2SYS_LOCAL_SERVICE_URL);
     }
 }

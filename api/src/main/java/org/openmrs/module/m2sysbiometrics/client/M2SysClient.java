@@ -20,5 +20,7 @@ public interface M2SysClient {
 
     BiometricSubject lookup(String subjectId);
 
+    String getProperty(String propertyName);
+
     void delete(String subjectId);
 }

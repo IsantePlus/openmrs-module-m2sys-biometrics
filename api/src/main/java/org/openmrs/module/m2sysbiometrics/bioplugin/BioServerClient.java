@@ -1,109 +1,23 @@
 package org.openmrs.module.m2sysbiometrics.bioplugin;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.oxm.jaxb.Jaxb2Marshaller;
-import org.springframework.stereotype.Component;
-import org.springframework.ws.WebServiceMessageFactory;
-import org.springframework.ws.client.core.support.WebServiceGatewaySupport;
+import org.openmrs.module.m2sysbiometrics.client.M2SysClient;
+import org.openmrs.module.m2sysbiometrics.model.Token;
 
-import javax.annotation.PostConstruct;
+public interface BioServerClient {
 
-@Component
-public class BioServerClient extends WebServiceGatewaySupport {
+    String enroll(M2SysClient client, String subjectId, String biometricXml);
 
-    @Autowired
-    @Qualifier("m2sysbiometrics.jax2b")
-    private Jaxb2Marshaller marshaller;
+    String isRegistered(M2SysClient client, String subjectId);
 
-    @Autowired
-    private WebServiceMessageFactory messageFactory;
+    String changeId(M2SysClient client, String oldId, String newId);
 
-    @PostConstruct
-    public void init() {
-        setMarshaller(marshaller);
-        setUnmarshaller(marshaller);
-        setMessageFactory(messageFactory);
-    }
+    String update(M2SysClient client, String subjectId, String biometricXml);
 
-    public String enroll(String serviceUrl, String subjectId, int locationId,
-                       String biometricXml) {
-        Register register = new Register();
-        register.setLocationID(locationId);
-        register.setID(subjectId);
+    String identify(M2SysClient client, String biometricXml);
 
-        register.setBiometricXml(biometricXml);
+    String delete(M2SysClient client, String subjectId);
 
-        RegisterResponse response = (RegisterResponse) getWebServiceTemplate()
-                .marshalSendAndReceive(serviceUrl, register);
+    String getServiceUrl(M2SysClient client);
 
-        return response.getRegisterResult();
-    }
-
-    public String update(String serviceUrl, String subjectId, int locationId,
-                       String biometricXml) {
-        Update update = new Update();
-        update.setLocationID(locationId);
-        update.setID(subjectId);
-
-        update.setBiometricXml(biometricXml);
-
-        UpdateResponse response = (UpdateResponse) getWebServiceTemplate()
-                .marshalSendAndReceive(serviceUrl, update);
-
-        return response.getUpdateResult();
-    }
-
-    public String getInfo(String serviceUrl) {
-        GetInfo getInfo = new GetInfo();
-
-        GetInfoResponse response = (GetInfoResponse) getWebServiceTemplate()
-                .marshalSendAndReceive(serviceUrl, getInfo);
-
-        return response.getGetInfoResult();
-    }
-
-    public String changeId(String serviceUrl, String oldId, String newId) {
-        ChangeID changeID = new ChangeID();
-        changeID.setNewID(newId);
-        changeID.setOldID(oldId);
-
-        ChangeIDResponse response = (ChangeIDResponse) getWebServiceTemplate()
-                .marshalSendAndReceive(serviceUrl, changeID);
-
-        return response.getChangeIDResult();
-    }
-
-    public String identify(String serviceUrl, int locationId,
-                         String biometricXml) {
-        Identify identify = new Identify();
-
-        identify.setBiometricXml(biometricXml);
-        identify.setLocationID(locationId);
-
-        IdentifyResponse response = (IdentifyResponse) getWebServiceTemplate()
-                .marshalSendAndReceive(serviceUrl, identify);
-
-        return response.identifyResult;
-    }
-
-    public String delete(String serviceUrl, String subjectId) {
-        DeleteID deleteID = new DeleteID();
-        deleteID.setID(subjectId);
-
-        DeleteIDResponse response = (DeleteIDResponse) getWebServiceTemplate()
-                .marshalSendAndReceive(serviceUrl, deleteID);
-
-        return response.getDeleteIDResult();
-    }
-
-    public String isRegistered(String serviceUrl, String subjectId) {
-        IsRegistered isRegistered = new IsRegistered();
-        isRegistered.setID(subjectId);
-
-        IsRegisteredResponse response = (IsRegisteredResponse) getWebServiceTemplate()
-                .marshalSendAndReceive(serviceUrl, isRegistered);
-
-        return response.getIsRegisteredResult();
-    }
+    Token getToken(M2SysClient client);
 }
