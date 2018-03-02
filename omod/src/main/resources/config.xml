@@ -70,7 +70,7 @@
         <property>${project.parent.artifactId}.server.url</property>
         <defaultValue></defaultValue>
         <description>
-            The m2sys server url..
+            The m2sys CloudScanr url.
         </description>
     </globalProperty>
 
@@ -78,7 +78,15 @@
         <property>${project.parent.artifactId}.server.user</property>
         <defaultValue></defaultValue>
         <description>
-            The m2sys server username.
+            The m2sys CloudScanr username.
+        </description>
+    </globalProperty>
+
+    <globalProperty>
+        <property>${project.parent.artifactId}.server.national.user</property>
+        <defaultValue></defaultValue>
+        <description>
+            The m2sys national server username.
         </description>
     </globalProperty>
 
@@ -86,7 +94,15 @@
         <property>${project.parent.artifactId}.server.password</property>
         <defaultValue></defaultValue>
         <description>
-            The m2sys server password.
+            The m2sys CloudScanr password.
+        </description>
+    </globalProperty>
+
+    <globalProperty>
+        <property>${project.parent.artifactId}.server.national.password</property>
+        <defaultValue></defaultValue>
+        <description>
+            The m2sys national server password.
         </description>
     </globalProperty>
 
@@ -128,6 +144,14 @@
         <defaultValue></defaultValue>
         <description>
             The URL to the SOAP service of the local (local to the clinic) M2Sys BioPlugin Server.
+        </description>
+    </globalProperty>
+
+    <globalProperty>
+        <property>${project.parent.artifactId}.national-service.url</property>
+        <defaultValue></defaultValue>
+        <description>
+            The URL to the SOAP service of the national M2Sys BioPlugin Server.
         </description>
     </globalProperty>
 

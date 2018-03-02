@@ -97,7 +97,7 @@ public class M2SysV1ClientTest extends M2SysBiometricSensitiveTestBase {
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
-        when(administrationService.getGlobalProperty(M2SysBiometricsConstants.M2SYS_SERVER_URL)).thenReturn(SERVER_URL);
+        when(administrationService.getGlobalProperty(M2SysBiometricsConstants.M2SYS_CLOUD_SCANR_URL)).thenReturn(SERVER_URL);
         when(administrationService.getGlobalProperty(M2SysBiometricsConstants.M2SYS_LOCATION_ID)).thenReturn(LOCATION_ID);
         when(administrationService.getGlobalProperty(M2SysBiometricsConstants.M2SYS_CUSTOMER_KEY)).thenReturn(CUSTOMER_KEY);
         when(administrationService.getGlobalProperty(M2SysBiometricsConstants.M2SYS_CAPTURE_TIMEOUT)).thenReturn(
@@ -107,8 +107,10 @@ public class M2SysV1ClientTest extends M2SysBiometricSensitiveTestBase {
         when(response.toBiometricSubject(FINGERPRINT_ID)).thenReturn(expectedSubject);
         when(response.parseMatchingResult()).thenReturn(expectedMatchingResult);
 
-        when(administrationService.getGlobalProperty(M2SysBiometricsConstants.M2SYS_USER)).thenReturn(USERNAME);
-        when(administrationService.getGlobalProperty(M2SysBiometricsConstants.M2SYS_PASSWORD)).thenReturn(PASSWORD);
+        when(administrationService.getGlobalProperty(M2SysBiometricsConstants.M2SYS_CLOUD_SCANR_USERNAME))
+                .thenReturn(USERNAME);
+        when(administrationService.getGlobalProperty(M2SysBiometricsConstants.M2SYS_CLOUD_SCANR_PASSWORD))
+                .thenReturn(PASSWORD);
 
         when(httpClient.getToken(SERVER_URL, USERNAME, PASSWORD, CUSTOMER_KEY)).thenReturn(token);
     }
