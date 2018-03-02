@@ -12,7 +12,6 @@ import org.mockito.MockitoAnnotations;
 import org.openmrs.api.AdministrationService;
 import org.openmrs.module.m2sysbiometrics.M2SysBiometricSensitiveTestBase;
 import org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants;
-import org.openmrs.module.m2sysbiometrics.bioplugin.LocalBioServerClient;
 import org.openmrs.module.m2sysbiometrics.http.M2SysHttpClient;
 import org.openmrs.module.m2sysbiometrics.model.BiometricCaptureType;
 import org.openmrs.module.m2sysbiometrics.model.M2SysResults;
@@ -89,9 +88,6 @@ public class M2SysV1ClientTest extends M2SysBiometricSensitiveTestBase {
     @Mock
     private AccessPointIdResolver apIdResolver;
 
-    @Mock
-    private LocalBioServerClient localBioServerClient;
-
     @InjectMocks
     private M2SysV1Client m2SysV1Client;
 
@@ -101,7 +97,7 @@ public class M2SysV1ClientTest extends M2SysBiometricSensitiveTestBase {
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
-        when(administrationService.getGlobalProperty(M2SysBiometricsConstants.M2SYS_CLOUD_SCANNER_URL)).thenReturn(SERVER_URL);
+        when(administrationService.getGlobalProperty(M2SysBiometricsConstants.M2SYS_CLOUD_SCANR_URL)).thenReturn(SERVER_URL);
         when(administrationService.getGlobalProperty(M2SysBiometricsConstants.M2SYS_LOCATION_ID)).thenReturn(LOCATION_ID);
         when(administrationService.getGlobalProperty(M2SysBiometricsConstants.M2SYS_CUSTOMER_KEY)).thenReturn(CUSTOMER_KEY);
         when(administrationService.getGlobalProperty(M2SysBiometricsConstants.M2SYS_CAPTURE_TIMEOUT)).thenReturn(
@@ -111,12 +107,12 @@ public class M2SysV1ClientTest extends M2SysBiometricSensitiveTestBase {
         when(response.toBiometricSubject(FINGERPRINT_ID)).thenReturn(expectedSubject);
         when(response.parseMatchingResult()).thenReturn(expectedMatchingResult);
 
-        when(administrationService.getGlobalProperty(M2SysBiometricsConstants.M2SYS_LOCAL_USERNAME))
+        when(administrationService.getGlobalProperty(M2SysBiometricsConstants.M2SYS_CLOUD_SCANR_USERNAME))
                 .thenReturn(USERNAME);
-        when(administrationService.getGlobalProperty(M2SysBiometricsConstants.M2SYS_LOCAL_PASSWORD))
+        when(administrationService.getGlobalProperty(M2SysBiometricsConstants.M2SYS_CLOUD_SCANR_PASSWORD))
                 .thenReturn(PASSWORD);
 
-        when(localBioServerClient.getToken(m2SysV1Client)).thenReturn(token);
+        when(httpClient.getToken(SERVER_URL, USERNAME, PASSWORD, CUSTOMER_KEY)).thenReturn(token);
     }
 
     @Test

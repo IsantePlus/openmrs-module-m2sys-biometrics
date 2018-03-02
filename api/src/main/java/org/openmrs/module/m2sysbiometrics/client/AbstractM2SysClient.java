@@ -19,7 +19,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.ResourceAccessException;
 
-import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.M2SYS_CLOUD_SCANNER_URL;
+import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.M2SYS_CLOUD_SCANR_URL;
 import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.getServerStatusDescription;
 
 public abstract class AbstractM2SysClient implements M2SysClient {
@@ -48,7 +48,7 @@ public abstract class AbstractM2SysClient implements M2SysClient {
 
         ResponseEntity<String> responseEntity;
         try {
-            responseEntity = getHttpClient().getServerStatus(getCloudScannerUrl(), getToken());
+            responseEntity = getHttpClient().getServerStatus(getCloudScanrUrl(), getToken());
         } catch (ResourceAccessException e) {
             logger.error(e.getMessage());
             responseEntity = new ResponseEntity<>(HttpStatus.SERVICE_UNAVAILABLE);
@@ -95,11 +95,11 @@ public abstract class AbstractM2SysClient implements M2SysClient {
     }
 
     protected String url(String path) {
-        return getCloudScannerUrl() + path;
+        return getCloudScanrUrl() + path;
     }
 
-    protected String getCloudScannerUrl() {
-        return getProperty(M2SYS_CLOUD_SCANNER_URL);
+    protected String getCloudScanrUrl() {
+        return getProperty(M2SYS_CLOUD_SCANR_URL);
     }
 
     protected String getCustomerKey() {
@@ -119,7 +119,10 @@ public abstract class AbstractM2SysClient implements M2SysClient {
     }
 
     protected Token getToken() {
-        return localBioServerClient.getToken(this);
+        String username = getProperty(M2SysBiometricsConstants.M2SYS_CLOUD_SCANR_USERNAME);
+        String password = getProperty(M2SysBiometricsConstants.M2SYS_CLOUD_SCANR_PASSWORD);
+        String customerKey = getProperty(M2SysBiometricsConstants.M2SYS_CUSTOMER_KEY);
+        return httpClient.getToken(getCloudScanrUrl(), username, password, customerKey);
     }
 
     protected boolean isSuccessfulStatus(HttpStatus httpStatus) {

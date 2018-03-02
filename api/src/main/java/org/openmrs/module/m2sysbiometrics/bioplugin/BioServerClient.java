@@ -1,7 +1,6 @@
 package org.openmrs.module.m2sysbiometrics.bioplugin;
 
 import org.openmrs.module.m2sysbiometrics.client.M2SysClient;
-import org.openmrs.module.m2sysbiometrics.model.Token;
 
 public interface BioServerClient {
 
@@ -18,6 +17,4 @@ public interface BioServerClient {
     String delete(M2SysClient client, String subjectId);
 
     String getServiceUrl(M2SysClient client);
-
-    Token getToken(M2SysClient client);
 }

@@ -78,12 +78,12 @@
         <property>${project.parent.artifactId}.server.user</property>
         <defaultValue></defaultValue>
         <description>
-            The m2sys local (local to the clinic) server username.
+            The m2sys CloudScanr username.
         </description>
     </globalProperty>
 
     <globalProperty>
-        <property>${project.parent.artifactId}.server.national-user</property>
+        <property>${project.parent.artifactId}.server.national.user</property>
         <defaultValue></defaultValue>
         <description>
             The m2sys national server username.
@@ -94,12 +94,12 @@
         <property>${project.parent.artifactId}.server.password</property>
         <defaultValue></defaultValue>
         <description>
-            The m2sys local (local to the clinic) server password.
+            The m2sys CloudScanr password.
         </description>
     </globalProperty>
 
     <globalProperty>
-        <property>${project.parent.artifactId}.server.national-password</property>
+        <property>${project.parent.artifactId}.server.national.password</property>
         <defaultValue></defaultValue>
         <description>
             The m2sys national server password.

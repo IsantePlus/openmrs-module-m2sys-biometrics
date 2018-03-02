@@ -168,7 +168,7 @@ public class M2SysV105Client extends AbstractM2SysClient {
         Token token = getToken();
 
         return getHttpClient().postRequest(
-                getCloudScannerUrl() + M2SysBiometricsConstants.M2SYS_CAPTURE_ENDPOINT,
+                getCloudScanrUrl() + M2SysBiometricsConstants.M2SYS_CAPTURE_ENDPOINT,
                 request, token, M2SysCaptureResponse.class);
     }
 
