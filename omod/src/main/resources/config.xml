@@ -70,7 +70,7 @@
         <property>${project.parent.artifactId}.server.url</property>
         <defaultValue></defaultValue>
         <description>
-            The m2sys cloud scanner url.
+            The m2sys CloudScanr url.
         </description>
     </globalProperty>
 

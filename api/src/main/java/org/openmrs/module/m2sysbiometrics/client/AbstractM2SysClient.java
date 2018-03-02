@@ -4,7 +4,6 @@ import org.apache.commons.lang.StringUtils;
 import org.openmrs.api.APIException;
 import org.openmrs.api.AdministrationService;
 import org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants;
-import org.openmrs.module.m2sysbiometrics.bioplugin.LocalBioServerClient;
 import org.openmrs.module.m2sysbiometrics.http.M2SysHttpClient;
 import org.openmrs.module.m2sysbiometrics.model.AbstractM2SysRequest;
 import org.openmrs.module.m2sysbiometrics.model.BiometricCaptureType;
@@ -34,9 +33,6 @@ public abstract class AbstractM2SysClient implements M2SysClient {
 
     @Autowired
     private AccessPointIdResolver apIdResolver;
-
-    @Autowired
-    private LocalBioServerClient localBioServerClient;
 
     /**
      * Gets a status of biometric server.
