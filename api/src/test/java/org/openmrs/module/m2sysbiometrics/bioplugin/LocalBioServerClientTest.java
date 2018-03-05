@@ -26,17 +26,27 @@ public class LocalBioServerClientTest {
 
     @Test
     public void shouldReturnScannedFingersNotExist() {
+        //given
         when(localBioServerClient.identify(LOCAL_TEMPLATE_DATA)).thenReturn(EMPTY_RESULT_XML);
         when(localBioServerClient.isFingerScanExists(scannedFingers)).thenCallRealMethod();
 
-        Assert.assertEquals(false, localBioServerClient.isFingerScanExists(scannedFingers));
+        //when
+        boolean result = localBioServerClient.isFingerScanExists(scannedFingers);
+
+        //then
+        Assert.assertEquals(false, result);
     }
 
     @Test
     public void shouldReturnScannedFingersExists() {
+        //given
         when(localBioServerClient.identify(LOCAL_TEMPLATE_DATA)).thenReturn(EXISTING_RESULT_XML);
         when(localBioServerClient.isFingerScanExists(scannedFingers)).thenCallRealMethod();
 
-        Assert.assertEquals(true, localBioServerClient.isFingerScanExists(scannedFingers));
+        //when
+        boolean result = localBioServerClient.isFingerScanExists(scannedFingers);
+
+        //then
+        Assert.assertEquals(true, result);
     }
 }

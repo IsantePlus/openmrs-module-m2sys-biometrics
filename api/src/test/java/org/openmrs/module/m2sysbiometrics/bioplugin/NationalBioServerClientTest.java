@@ -26,17 +26,27 @@ public class NationalBioServerClientTest {
 
     @Test
     public void shouldReturnScannedFingersNotExist() {
+        //given
         when(nationalBioServerClient.identify(NATIONAL_TEMPLATE_DATA)).thenReturn(EMPTY_RESULT_XML);
         when(nationalBioServerClient.isFingerScanExists(scannedFingers)).thenCallRealMethod();
 
-        Assert.assertEquals(false, nationalBioServerClient.isFingerScanExists(scannedFingers));
+        //when
+        boolean result = nationalBioServerClient.isFingerScanExists(scannedFingers);
+
+        //then
+        Assert.assertEquals(false, result);
     }
 
     @Test
     public void shouldReturnScannedFingersExists() {
+        //given
         when(nationalBioServerClient.identify(NATIONAL_TEMPLATE_DATA)).thenReturn(EXISTING_RESULT_XML);
         when(nationalBioServerClient.isFingerScanExists(scannedFingers)).thenCallRealMethod();
 
-        Assert.assertEquals(true, nationalBioServerClient.isFingerScanExists(scannedFingers));
+        //when
+        boolean result = nationalBioServerClient.isFingerScanExists(scannedFingers);
+
+        //then
+        Assert.assertEquals(true, result);
     }
 }
