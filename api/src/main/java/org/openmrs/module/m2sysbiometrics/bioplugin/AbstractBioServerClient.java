@@ -1,9 +1,13 @@
 package org.openmrs.module.m2sysbiometrics.bioplugin;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.openmrs.api.APIException;
 import org.openmrs.api.AdministrationService;
 import org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants;
+import org.openmrs.module.m2sysbiometrics.model.M2SysCaptureResponse;
+import org.openmrs.module.m2sysbiometrics.model.M2SysResults;
+import org.openmrs.module.m2sysbiometrics.xml.XmlResultUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
@@ -106,6 +110,13 @@ public abstract class AbstractBioServerClient extends WebServiceGatewaySupport i
                 .marshalSendAndReceive(getServiceUrl(), deleteID);
 
         return response.getDeleteIDResult();
+    }
+
+    @Override
+    public boolean isFingerScanExists(M2SysCaptureResponse scannedFingers) {
+        String response = identify(scannedFingers.getTemplateData());
+        M2SysResults results = XmlResultUtil.parse(response);
+        return CollectionUtils.isNotEmpty(results.toOpenMrsMatchList());
     }
 
     protected abstract String getServiceUrl();

@@ -1,5 +1,7 @@
 package org.openmrs.module.m2sysbiometrics.bioplugin;
 
+import org.openmrs.module.m2sysbiometrics.model.M2SysCaptureResponse;
+
 public interface BioServerClient {
 
     String enroll(String subjectId, String biometricXml);
@@ -13,4 +15,6 @@ public interface BioServerClient {
     String identify(String biometricXml);
 
     String delete(String subjectId);
+
+    boolean isFingerScanExists(M2SysCaptureResponse scannedFingers);
 }

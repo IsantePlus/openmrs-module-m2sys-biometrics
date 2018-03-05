@@ -4,10 +4,12 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openmrs.Patient;
 import org.openmrs.PatientIdentifierType;
+import org.openmrs.api.APIException;
 import org.openmrs.api.AdministrationService;
 import org.openmrs.api.PatientService;
 import org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants;
 import org.openmrs.module.m2sysbiometrics.bioplugin.LocalBioServerClient;
+import org.openmrs.module.m2sysbiometrics.bioplugin.NationalBioServerClient;
 import org.openmrs.module.m2sysbiometrics.exception.M2SysBiometricsException;
 import org.openmrs.module.m2sysbiometrics.model.Finger;
 import org.openmrs.module.m2sysbiometrics.model.Fingers;
@@ -15,6 +17,7 @@ import org.openmrs.module.m2sysbiometrics.model.M2SysCaptureRequest;
 import org.openmrs.module.m2sysbiometrics.model.M2SysCaptureResponse;
 import org.openmrs.module.m2sysbiometrics.model.M2SysResult;
 import org.openmrs.module.m2sysbiometrics.model.M2SysResults;
+import org.openmrs.module.m2sysbiometrics.model.FingerScanStatus;
 import org.openmrs.module.m2sysbiometrics.model.Token;
 import org.openmrs.module.m2sysbiometrics.xml.XmlResultUtil;
 import org.openmrs.module.registrationcore.RegistrationCoreConstants;
@@ -40,6 +43,9 @@ public class M2SysV105Client extends AbstractM2SysClient {
     private LocalBioServerClient localBioServerClient;
 
     @Autowired
+    private NationalBioServerClient nationalBioServerClient;
+
+    @Autowired
     private PatientService patientService;
 
     @Autowired
@@ -56,6 +62,12 @@ public class M2SysV105Client extends AbstractM2SysClient {
     @Override
     public BiometricSubject enroll(BiometricSubject subject) {
         M2SysCaptureResponse capture = scanDoubleFingers();
+
+        FingerScanStatus fingerScanStatus = checkIfFingerScanExists(capture);
+
+        //TODO: add handling for local/national scanned finger status instead:
+        LOG.info("Fingerprint exists locally: ", fingerScanStatus.isExistsLocally());
+        LOG.info("Fingerprint exists nationally: ", fingerScanStatus.isExistsNationally());
 
         String response = localBioServerClient.enroll(subject.getSubjectId(), capture.getTemplateData());
         M2SysResults results = XmlResultUtil.parse(response);
@@ -185,5 +197,23 @@ public class M2SysV105Client extends AbstractM2SysClient {
         }
 
         return null;
+    }
+
+    private FingerScanStatus checkIfFingerScanExists(M2SysCaptureResponse fingerScan) {
+        boolean existsLocally = false;
+        boolean existsNationally = false;
+        try {
+            existsLocally = localBioServerClient.isFingerScanExists(fingerScan);
+        } catch (APIException localClientAPIEx) {
+            LOG.error("Connection failure to local server.", localClientAPIEx);
+        }
+
+        try {
+            existsNationally = nationalBioServerClient.isFingerScanExists(fingerScan);
+        } catch (APIException nationalClientAPIEx) {
+            LOG.error("Connection failure to national server.", nationalClientAPIEx);
+        }
+
+        return new FingerScanStatus(existsLocally, existsNationally);
     }
 }
