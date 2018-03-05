@@ -7,8 +7,8 @@ import org.springframework.stereotype.Component;
 public class LocalBioServerClient extends AbstractBioServerClient {
 
     @Override
-    protected String getServiceUrl() {
-        return getProperty(M2SysBiometricsConstants.M2SYS_LOCAL_SERVICE_URL);
+    protected String getServerUrlPropertyName() {
+        return M2SysBiometricsConstants.M2SYS_LOCAL_SERVICE_URL;
     }
 }
 

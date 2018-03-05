@@ -1,9 +1,10 @@
 package org.openmrs.module.m2sysbiometrics.client;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openmrs.Patient;
-import org.openmrs.api.APIException;
 import org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants;
+import org.openmrs.module.m2sysbiometrics.bioplugin.AbstractBioServerClient;
 import org.openmrs.module.m2sysbiometrics.bioplugin.LocalBioServerClient;
 import org.openmrs.module.m2sysbiometrics.bioplugin.NationalBioServerClient;
 import org.openmrs.module.m2sysbiometrics.exception.M2SysBiometricsException;
@@ -23,10 +24,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.ws.client.WebServiceIOException;
 
 import javax.annotation.PostConstruct;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
+import java.net.ConnectException;
 import java.util.List;
 
 @Component("m2sysbiometrics.M2SysV1Client")
@@ -176,20 +179,27 @@ public class M2SysV105Client extends AbstractM2SysClient {
     }
 
     private FingerScanStatus checkIfFingerScanExists(M2SysCaptureResponse fingerScan) {
-        boolean existsLocally = false;
+        boolean existsLocally = isFingerScanExists(fingerScan, localBioServerClient);
         boolean existsNationally = false;
-        try {
-            existsLocally = localBioServerClient.isFingerScanExists(fingerScan);
-        } catch (APIException localClientAPIEx) {
-            LOG.error("Connection failure to local server.", localClientAPIEx);
-        }
 
-        try {
-            existsNationally = nationalBioServerClient.isFingerScanExists(fingerScan);
-        } catch (APIException nationalClientAPIEx) {
-            LOG.error("Connection failure to national server.", nationalClientAPIEx);
+        if (nationalBioServerClient.isServerUrlConfigured()) {
+            try {
+                existsNationally = isFingerScanExists(fingerScan, nationalBioServerClient);
+            } catch (WebServiceIOException wsException) {
+                if (wsException.getCause() instanceof ConnectException) {
+                    LOG.error("Connection failure to national server.", wsException);
+                } else {
+                    throw wsException;
+                }
+            }
         }
 
         return new FingerScanStatus(existsLocally, existsNationally);
+    }
+
+    private boolean isFingerScanExists(M2SysCaptureResponse fingerScan, AbstractBioServerClient client) {
+        String response = client.identify(fingerScan.getTemplateData());
+        M2SysResults results = XmlResultUtil.parse(response);
+        return CollectionUtils.isNotEmpty(results.toOpenMrsMatchList());
     }
 }

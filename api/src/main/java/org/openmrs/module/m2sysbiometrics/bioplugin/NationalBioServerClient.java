@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 public class NationalBioServerClient extends AbstractBioServerClient {
 
     @Override
-    protected String getServiceUrl() {
-        return getProperty(M2SysBiometricsConstants.M2SYS_NATIONAL_SERVICE_URL);
+    protected String getServerUrlPropertyName() {
+        return M2SysBiometricsConstants.M2SYS_NATIONAL_SERVICE_URL;
     }
 }

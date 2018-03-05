@@ -1,13 +1,9 @@
 package org.openmrs.module.m2sysbiometrics.bioplugin;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.openmrs.api.APIException;
 import org.openmrs.api.AdministrationService;
 import org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants;
-import org.openmrs.module.m2sysbiometrics.model.M2SysCaptureResponse;
-import org.openmrs.module.m2sysbiometrics.model.M2SysResults;
-import org.openmrs.module.m2sysbiometrics.xml.XmlResultUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
@@ -113,17 +109,12 @@ public abstract class AbstractBioServerClient extends WebServiceGatewaySupport i
     }
 
     @Override
-    public boolean isFingerScanExists(M2SysCaptureResponse scannedFingers) {
-        String response = identify(scannedFingers.getTemplateData());
-        M2SysResults results = XmlResultUtil.parse(response);
-        return CollectionUtils.isNotEmpty(results.toOpenMrsMatchList());
+    public boolean isServerUrlConfigured() {
+        String propertyValue = adminService.getGlobalProperty(getServerUrlPropertyName());
+        return StringUtils.isNotBlank(propertyValue);
     }
 
-    protected abstract String getServiceUrl();
-
-    private int getLocationId() {
-        return Integer.parseInt(getProperty(LOCATION_ID_PROPERTY));
-    }
+    protected abstract String getServerUrlPropertyName();
 
     protected String getProperty(String propertyName) {
         String propertyValue = adminService.getGlobalProperty(propertyName);
@@ -131,5 +122,13 @@ public abstract class AbstractBioServerClient extends WebServiceGatewaySupport i
             throw new APIException("Property value for '" + propertyName + "' is not set");
         }
         return propertyValue;
+    }
+
+    private String getServiceUrl() {
+        return getProperty(getServerUrlPropertyName());
+    }
+
+    private int getLocationId() {
+        return Integer.parseInt(getProperty(LOCATION_ID_PROPERTY));
     }
 }
