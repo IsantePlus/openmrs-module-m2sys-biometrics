@@ -1,26 +1,22 @@
 package org.openmrs.module.m2sysbiometrics.client;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openmrs.Patient;
-import org.openmrs.PatientIdentifierType;
 import org.openmrs.api.APIException;
-import org.openmrs.api.AdministrationService;
-import org.openmrs.api.PatientService;
 import org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants;
 import org.openmrs.module.m2sysbiometrics.bioplugin.LocalBioServerClient;
 import org.openmrs.module.m2sysbiometrics.bioplugin.NationalBioServerClient;
 import org.openmrs.module.m2sysbiometrics.exception.M2SysBiometricsException;
 import org.openmrs.module.m2sysbiometrics.model.Finger;
+import org.openmrs.module.m2sysbiometrics.model.FingerScanStatus;
 import org.openmrs.module.m2sysbiometrics.model.Fingers;
 import org.openmrs.module.m2sysbiometrics.model.M2SysCaptureRequest;
 import org.openmrs.module.m2sysbiometrics.model.M2SysCaptureResponse;
 import org.openmrs.module.m2sysbiometrics.model.M2SysResult;
 import org.openmrs.module.m2sysbiometrics.model.M2SysResults;
-import org.openmrs.module.m2sysbiometrics.model.FingerScanStatus;
 import org.openmrs.module.m2sysbiometrics.model.Token;
+import org.openmrs.module.m2sysbiometrics.util.PatientHelper;
 import org.openmrs.module.m2sysbiometrics.xml.XmlResultUtil;
-import org.openmrs.module.registrationcore.RegistrationCoreConstants;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricMatch;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricSubject;
 import org.slf4j.Logger;
@@ -31,7 +27,6 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
-import java.util.Collections;
 import java.util.List;
 
 @Component("m2sysbiometrics.M2SysV1Client")
@@ -46,10 +41,7 @@ public class M2SysV105Client extends AbstractM2SysClient {
     private NationalBioServerClient nationalBioServerClient;
 
     @Autowired
-    private PatientService patientService;
-
-    @Autowired
-    private AdministrationService adminService;
+    private PatientHelper patientHelper;
 
     private JAXBContext jaxbContext;
 
@@ -77,7 +69,7 @@ public class M2SysV105Client extends AbstractM2SysClient {
 
             LOG.info("Got error response from M2Sys: {}. Checking if tied to patient.", responseValue);
 
-            Patient patient = checkIfPatientExists(responseValue);
+            Patient patient = patientHelper.findByLocalFpId(responseValue);
             if (patient == null) {
                 LOG.info("No patient matching fingerprint ID: {}", responseValue);
 
@@ -181,22 +173,6 @@ public class M2SysV105Client extends AbstractM2SysClient {
         return getHttpClient().postRequest(
                 getCloudScanrUrl() + M2SysBiometricsConstants.M2SYS_CAPTURE_ENDPOINT,
                 request, token, M2SysCaptureResponse.class);
-    }
-
-    private Patient checkIfPatientExists(String fingerprintId) {
-        String identifierUuid = adminService.getGlobalProperty(
-                RegistrationCoreConstants.GP_BIOMETRICS_PERSON_IDENTIFIER_TYPE_UUID, null);
-
-        if (StringUtils.isNotBlank(identifierUuid)) {
-            PatientIdentifierType idType = patientService.getPatientIdentifierTypeByUuid(identifierUuid);
-            if (idType != null) {
-                List<Patient> patients = patientService.getPatients(null, fingerprintId,
-                        Collections.singletonList(idType), true);
-                return CollectionUtils.isEmpty(patients) ? null : patients.get(0);
-            }
-        }
-
-        return null;
     }
 
     private FingerScanStatus checkIfFingerScanExists(M2SysCaptureResponse fingerScan) {
