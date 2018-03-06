@@ -108,11 +108,13 @@ public abstract class AbstractBioServerClient extends WebServiceGatewaySupport i
         return response.getDeleteIDResult();
     }
 
-    protected abstract String getServiceUrl();
-
-    private int getLocationId() {
-        return Integer.parseInt(getProperty(LOCATION_ID_PROPERTY));
+    @Override
+    public boolean isServerUrlConfigured() {
+        String propertyValue = adminService.getGlobalProperty(getServerUrlPropertyName());
+        return StringUtils.isNotBlank(propertyValue);
     }
+
+    protected abstract String getServerUrlPropertyName();
 
     protected String getProperty(String propertyName) {
         String propertyValue = adminService.getGlobalProperty(propertyName);
@@ -120,5 +122,13 @@ public abstract class AbstractBioServerClient extends WebServiceGatewaySupport i
             throw new APIException("Property value for '" + propertyName + "' is not set");
         }
         return propertyValue;
+    }
+
+    private String getServiceUrl() {
+        return getProperty(getServerUrlPropertyName());
+    }
+
+    private int getLocationId() {
+        return Integer.parseInt(getProperty(LOCATION_ID_PROPERTY));
     }
 }

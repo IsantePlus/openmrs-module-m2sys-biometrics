@@ -13,4 +13,6 @@ public interface BioServerClient {
     String identify(String biometricXml);
 
     String delete(String subjectId);
+
+    boolean isServerUrlConfigured();
 }
