@@ -24,12 +24,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.ws.client.WebServiceIOException;
 
 import javax.annotation.PostConstruct;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
-import java.net.ConnectException;
 import java.util.List;
 
 @Component("m2sysbiometrics.M2SysV1Client")
@@ -179,25 +177,21 @@ public class M2SysV105Client extends AbstractM2SysClient {
     }
 
     private FingerScanStatus checkIfFingerScanExists(M2SysCaptureResponse fingerScan) {
-        boolean existsLocally = isFingerScanExists(fingerScan, localBioServerClient);
+        boolean existsLocally = isFingerScanRegistered(fingerScan, localBioServerClient);
         boolean existsNationally = false;
 
         if (nationalBioServerClient.isServerUrlConfigured()) {
             try {
-                existsNationally = isFingerScanExists(fingerScan, nationalBioServerClient);
-            } catch (WebServiceIOException wsException) {
-                if (wsException.getCause() instanceof ConnectException) {
-                    LOG.error("Connection failure to national server.", wsException);
-                } else {
-                    throw wsException;
-                }
+                existsNationally = isFingerScanRegistered(fingerScan, nationalBioServerClient);
+            } catch (RuntimeException exception) {
+                LOG.error("Connection failure to national server.", exception);
             }
         }
 
         return new FingerScanStatus(existsLocally, existsNationally);
     }
 
-    private boolean isFingerScanExists(M2SysCaptureResponse fingerScan, AbstractBioServerClient client) {
+    private boolean isFingerScanRegistered(M2SysCaptureResponse fingerScan, AbstractBioServerClient client) {
         String response = client.identify(fingerScan.getTemplateData());
         M2SysResults results = XmlResultUtil.parse(response);
         return CollectionUtils.isNotEmpty(results.toOpenMrsMatchList());
