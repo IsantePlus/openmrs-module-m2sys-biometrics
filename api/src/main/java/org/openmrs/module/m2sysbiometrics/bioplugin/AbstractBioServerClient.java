@@ -41,8 +41,7 @@ public abstract class AbstractBioServerClient extends WebServiceGatewaySupport i
 
         register.setBiometricXml(biometricXml);
 
-        RegisterResponse response = (RegisterResponse) getWebServiceTemplate()
-                .marshalSendAndReceive(getServiceUrl(), register);
+        RegisterResponse response = (RegisterResponse) getResponse(register);
 
         return response.getRegisterResult();
     }
@@ -52,8 +51,7 @@ public abstract class AbstractBioServerClient extends WebServiceGatewaySupport i
         IsRegistered isRegistered = new IsRegistered();
         isRegistered.setID(subjectId);
 
-        IsRegisteredResponse response = (IsRegisteredResponse) getWebServiceTemplate()
-                .marshalSendAndReceive(getServiceUrl(), isRegistered);
+        IsRegisteredResponse response = (IsRegisteredResponse) getResponse(isRegistered);
 
         return response.getIsRegisteredResult();
     }
@@ -64,8 +62,7 @@ public abstract class AbstractBioServerClient extends WebServiceGatewaySupport i
         changeID.setNewID(newId);
         changeID.setOldID(oldId);
 
-        ChangeIDResponse response = (ChangeIDResponse) getWebServiceTemplate()
-                .marshalSendAndReceive(getServiceUrl(), changeID);
+        ChangeIDResponse response = (ChangeIDResponse) getResponse(changeID);
 
         return response.getChangeIDResult();
     }
@@ -78,8 +75,7 @@ public abstract class AbstractBioServerClient extends WebServiceGatewaySupport i
 
         update.setBiometricXml(biometricXml);
 
-        UpdateResponse response = (UpdateResponse) getWebServiceTemplate()
-                .marshalSendAndReceive(getServiceUrl(), update);
+        UpdateResponse response = (UpdateResponse) getResponse(update);
 
         return response.getUpdateResult();
     }
@@ -91,8 +87,7 @@ public abstract class AbstractBioServerClient extends WebServiceGatewaySupport i
         identify.setBiometricXml(biometricXml);
         identify.setLocationID(getLocationId());
 
-        IdentifyResponse response = (IdentifyResponse) getWebServiceTemplate()
-                .marshalSendAndReceive(getServiceUrl(), identify);
+        IdentifyResponse response = (IdentifyResponse) getResponse(identify);
 
         return response.identifyResult;
     }
@@ -102,9 +97,7 @@ public abstract class AbstractBioServerClient extends WebServiceGatewaySupport i
         DeleteID deleteID = new DeleteID();
         deleteID.setID(subjectId);
 
-        DeleteIDResponse response = (DeleteIDResponse) getWebServiceTemplate()
-                .marshalSendAndReceive(getServiceUrl(), deleteID);
-
+        DeleteIDResponse response = (DeleteIDResponse) getResponse(deleteID);
         return response.getDeleteIDResult();
     }
 
@@ -116,6 +109,8 @@ public abstract class AbstractBioServerClient extends WebServiceGatewaySupport i
 
     protected abstract String getServerUrlPropertyName();
 
+    protected abstract Object getResponse(Object requestPayload);
+
     protected String getProperty(String propertyName) {
         String propertyValue = adminService.getGlobalProperty(propertyName);
         if (StringUtils.isBlank(propertyValue)) {
@@ -124,7 +119,7 @@ public abstract class AbstractBioServerClient extends WebServiceGatewaySupport i
         return propertyValue;
     }
 
-    private String getServiceUrl() {
+    protected String getServiceUrl() {
         return getProperty(getServerUrlPropertyName());
     }
 
