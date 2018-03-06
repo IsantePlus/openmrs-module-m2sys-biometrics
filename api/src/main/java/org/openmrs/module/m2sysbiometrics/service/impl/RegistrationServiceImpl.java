@@ -84,5 +84,4 @@ public class RegistrationServiceImpl implements RegistrationService {
                     + patient.getPersonName().getFullName());
         }
     }
-
 }
