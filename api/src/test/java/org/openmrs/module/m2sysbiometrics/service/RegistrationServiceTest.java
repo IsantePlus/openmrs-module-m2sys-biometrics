@@ -53,22 +53,19 @@ public class RegistrationServiceTest {
         when(localBioServerClient.enroll(subject.getSubjectId(), capture.getTemplateData())).thenReturn(EXISTING_RESULT_XML);
 
         //when
-        registrationService.register(localBioServerClient, subject, capture);
+        registrationService.registerLocally(subject, capture);
 
         //then
         verify(patientHelper, times(0)).findByLocalFpId(any());
     }
 
     @Test
-    public void shouldRegisterNationally() throws Exception {
+    public void shouldTryToRegisterNationallyWithoutException() throws Exception {
         //given
         when(nationalBioServerClient.enroll(subject.getSubjectId(), capture.getTemplateData())).thenReturn(EXISTING_RESULT_XML);
 
         //when
-        registrationService.register(nationalBioServerClient, subject, capture);
-
-        //then
-        verify(patientHelper, times(0)).findByNationalFpId(any());
+        registrationService.registerNationally(subject, capture);
     }
 
     @Test(expected = M2SysBiometricsException.class)
@@ -78,20 +75,7 @@ public class RegistrationServiceTest {
         when(localBioServerClient.enroll(subject.getSubjectId(), capture.getTemplateData())).thenReturn(EMPTY_RESULT_XML);
 
         //when
-        registrationService.register(localBioServerClient, subject, capture);
-
-        //then
-        verify(patientHelper, times(1)).findByNationalFpId(any());
-    }
-
-    @Test
-    public void shouldNotRegisterNationallyWithoutException() throws Exception {
-        //given
-        when(patientHelper.findByNationalFpId(any())).thenReturn(existingPatient);
-        when(nationalBioServerClient.enroll(subject.getSubjectId(), capture.getTemplateData())).thenReturn(EMPTY_RESULT_XML);
-
-        //when
-        registrationService.register(nationalBioServerClient, subject, capture);
+        registrationService.registerLocally(subject, capture);
 
         //then
         verify(patientHelper, times(1)).findByNationalFpId(any());

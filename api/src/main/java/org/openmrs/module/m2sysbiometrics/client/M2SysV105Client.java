@@ -56,10 +56,10 @@ public class M2SysV105Client extends AbstractM2SysClient {
 
         FingerScanStatus fingerScanStatus = checkIfFingerScanExists(capture);
 
-        registrationService.register(localBioServerClient, subject, capture);
+        registrationService.registerLocally(subject, capture);
 
         if (nationalBioServerClient.isServerUrlConfigured() && !fingerScanStatus.isRegisteredNationally()) {
-            registrationService.register(nationalBioServerClient, subject, capture);
+            registrationService.registerNationally(subject, capture);
         }
 
         Fingers fingers = capture.getFingerData(jaxbContext);

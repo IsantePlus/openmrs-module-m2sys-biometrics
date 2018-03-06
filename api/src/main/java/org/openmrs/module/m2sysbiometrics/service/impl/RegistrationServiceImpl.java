@@ -25,30 +25,33 @@ public class RegistrationServiceImpl implements RegistrationService {
     @Autowired
     private PatientHelper patientHelper;
 
+    @Autowired
+    private LocalBioServerClient localBioServerClient;
+
+    @Autowired
+    private NationalBioServerClient nationalBioServerClient;
+
     @Override
-    public void register(LocalBioServerClient client, BiometricSubject subject, M2SysCaptureResponse capture) {
-        String response = client.enroll(subject.getSubjectId(), capture.getTemplateData());
+    public void registerLocally(BiometricSubject subject, M2SysCaptureResponse capture) {
+        String response = localBioServerClient.enroll(subject.getSubjectId(), capture.getTemplateData());
         M2SysResults results = XmlResultUtil.parse(response);
 
         if (!results.isRegisterSuccess()) {
             String responseValue = results.firstValue();
             LOG.info("Got error response from the local server: {}. Checking if tied to patient.", responseValue);
             Patient patient = patientHelper.findByLocalFpId(responseValue);
-            handleRegistrationError(subject, results, patient, client);
+            handleRegistrationError(subject, results, patient, localBioServerClient);
         }
     }
 
     @Override
-    public void register(NationalBioServerClient client, BiometricSubject subject, M2SysCaptureResponse capture) {
+    public void registerNationally(BiometricSubject subject, M2SysCaptureResponse capture) {
         try {
-            String response = client.enroll(subject.getSubjectId(), capture.getTemplateData());
+            String response = nationalBioServerClient.enroll(subject.getSubjectId(), capture.getTemplateData());
             M2SysResults results = XmlResultUtil.parse(response);
 
             if (!results.isRegisterSuccess()) {
-                String responseValue = results.firstValue();
-                LOG.info("Got error response from the national server: {}. Checking if tied to patient.", responseValue);
-                Patient patient = patientHelper.findByNationalFpId(responseValue);
-                handleRegistrationError(subject, results, patient, client);
+                LOG.error("Registration with the national fingerprint server failed.");
             }
         } catch (RuntimeException exception) {
             LOG.error("Registration with the national fingerprint server failed.", exception);
