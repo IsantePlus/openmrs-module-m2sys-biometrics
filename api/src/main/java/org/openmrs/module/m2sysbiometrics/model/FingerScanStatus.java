@@ -2,20 +2,20 @@ package org.openmrs.module.m2sysbiometrics.model;
 
 public class FingerScanStatus {
 
-    private boolean existsLocally;
+    private boolean registeredLocally;
 
-    private boolean existsNationally;
+    private boolean registeredNationally;
 
-    public FingerScanStatus(boolean existLocally, boolean existNationally) {
-        this.existsLocally = existLocally;
-        this.existsNationally = existNationally;
+    public FingerScanStatus(boolean registeredLocally, boolean registeredNationally) {
+        this.registeredLocally = registeredLocally;
+        this.registeredNationally = registeredNationally;
     }
 
-    public boolean isExistsLocally() {
-        return existsLocally;
+    public boolean isRegisteredLocally() {
+        return registeredLocally;
     }
 
-    public boolean isExistsNationally() {
-        return existsNationally;
+    public boolean isRegisteredNationally() {
+        return registeredNationally;
     }
 }

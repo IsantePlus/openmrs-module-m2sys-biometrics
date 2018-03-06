@@ -59,8 +59,8 @@ public class M2SysV105Client extends AbstractM2SysClient {
         FingerScanStatus fingerScanStatus = checkIfFingerScanExists(capture);
 
         //TODO: add handling for local/national scanned finger status instead:
-        LOG.info("Fingerprint exists locally: ", fingerScanStatus.isExistsLocally());
-        LOG.info("Fingerprint exists nationally: ", fingerScanStatus.isExistsNationally());
+        LOG.info("Fingerprint exists locally: ", fingerScanStatus.isRegisteredLocally());
+        LOG.info("Fingerprint exists nationally: ", fingerScanStatus.isRegisteredNationally());
 
         String response = localBioServerClient.enroll(subject.getSubjectId(), capture.getTemplateData());
         M2SysResults results = XmlResultUtil.parse(response);
@@ -177,18 +177,18 @@ public class M2SysV105Client extends AbstractM2SysClient {
     }
 
     private FingerScanStatus checkIfFingerScanExists(M2SysCaptureResponse fingerScan) {
-        boolean existsLocally = isFingerScanRegistered(fingerScan, localBioServerClient);
-        boolean existsNationally = false;
+        boolean registeredLocally = isFingerScanRegistered(fingerScan, localBioServerClient);
+        boolean registeredNationally = false;
 
         if (nationalBioServerClient.isServerUrlConfigured()) {
             try {
-                existsNationally = isFingerScanRegistered(fingerScan, nationalBioServerClient);
+                registeredNationally = isFingerScanRegistered(fingerScan, nationalBioServerClient);
             } catch (RuntimeException exception) {
                 LOG.error("Connection failure to national server.", exception);
             }
         }
 
-        return new FingerScanStatus(existsLocally, existsNationally);
+        return new FingerScanStatus(registeredLocally, registeredNationally);
     }
 
     private boolean isFingerScanRegistered(M2SysCaptureResponse fingerScan, AbstractBioServerClient client) {
