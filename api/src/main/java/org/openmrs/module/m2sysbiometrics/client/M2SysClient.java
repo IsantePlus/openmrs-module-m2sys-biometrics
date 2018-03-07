@@ -16,7 +16,7 @@ public interface M2SysClient {
 
     BiometricSubject updateSubjectId(String oldId, String newId);
 
-    List<BiometricMatch> search(BiometricSubject subject);
+    List<BiometricMatch> search();
 
     BiometricSubject lookup(String subjectId);
 
