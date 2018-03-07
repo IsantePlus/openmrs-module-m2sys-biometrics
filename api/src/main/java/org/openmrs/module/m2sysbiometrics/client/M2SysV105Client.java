@@ -1,8 +1,6 @@
 package org.openmrs.module.m2sysbiometrics.client;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.openmrs.Patient;
 import org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants;
 import org.openmrs.module.m2sysbiometrics.bioplugin.AbstractBioServerClient;
 import org.openmrs.module.m2sysbiometrics.bioplugin.LocalBioServerClient;
@@ -16,7 +14,7 @@ import org.openmrs.module.m2sysbiometrics.model.M2SysCaptureResponse;
 import org.openmrs.module.m2sysbiometrics.model.M2SysResult;
 import org.openmrs.module.m2sysbiometrics.model.M2SysResults;
 import org.openmrs.module.m2sysbiometrics.model.Token;
-import org.openmrs.module.m2sysbiometrics.util.PatientHelper;
+import org.openmrs.module.m2sysbiometrics.service.RegistrationService;
 import org.openmrs.module.m2sysbiometrics.xml.XmlResultUtil;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricMatch;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricSubject;
@@ -42,7 +40,7 @@ public class M2SysV105Client extends AbstractM2SysClient {
     private NationalBioServerClient nationalBioServerClient;
 
     @Autowired
-    private PatientHelper patientHelper;
+    private RegistrationService registrationService;
 
     private JAXBContext jaxbContext;
 
@@ -58,44 +56,10 @@ public class M2SysV105Client extends AbstractM2SysClient {
 
         FingerScanStatus fingerScanStatus = checkIfFingerScanExists(capture);
 
-        //TODO: add handling for local/national scanned finger status instead:
-        LOG.info("Fingerprint exists locally: ", fingerScanStatus.isRegisteredLocally());
-        LOG.info("Fingerprint exists nationally: ", fingerScanStatus.isRegisteredNationally());
+        registrationService.registerLocally(subject, capture);
 
-        String response = localBioServerClient.enroll(subject.getSubjectId(), capture.getTemplateData());
-        M2SysResults results = XmlResultUtil.parse(response);
-
-        if (!results.isRegisterSuccess()) {
-            String responseValue = results.firstValue();
-
-            LOG.info("Got error response from M2Sys: {}. Checking if tied to patient.", responseValue);
-
-            Patient patient = patientHelper.findByLocalFpId(responseValue);
-            if (patient == null) {
-                LOG.info("No patient matching fingerprint ID: {}", responseValue);
-
-                String isRegisterResponse = localBioServerClient.isRegistered(results.firstValue());
-                M2SysResults isRegisterResults = XmlResultUtil.parse(isRegisterResponse);
-
-                if (isRegisterResults.isLookupNotFound()) {
-                    throw new M2SysBiometricsException("No success during fingerprint registration: "
-                            + responseValue);
-                } else {
-                    LOG.info("Fingerprints are registered with ID {} but do not match any patient, fixing.",
-                            responseValue);
-                    if (!StringUtils.equals(subject.getSubjectId(), responseValue)) {
-                        LOG.info("Changing existing fingerprint ID {} to {}",
-                                responseValue, subject.getSubjectId());
-
-                        localBioServerClient.changeId(responseValue, subject.getSubjectId());
-                    } else {
-                        LOG.info("User already has the same fingerprints registered under his fingerprint ID");
-                    }
-                }
-            } else {
-                throw new M2SysBiometricsException("Fingerprints already match patient: "
-                        + patient.getPersonName().getFullName());
-            }
+        if (nationalBioServerClient.isServerUrlConfigured() && !fingerScanStatus.isRegisteredNationally()) {
+            registrationService.registerNationally(subject, capture);
         }
 
         Fingers fingers = capture.getFingerData(jaxbContext);
