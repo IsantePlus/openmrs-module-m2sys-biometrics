@@ -8,6 +8,8 @@ import org.openmrs.module.m2sysbiometrics.M2SysBiometricSensitiveTestBase;
 import org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants;
 import org.openmrs.module.m2sysbiometrics.M2SysEngine;
 import org.openmrs.module.m2sysbiometrics.bioplugin.BioServerClient;
+import org.openmrs.module.m2sysbiometrics.bioplugin.LocalBioServerClient;
+import org.openmrs.module.m2sysbiometrics.bioplugin.NationalBioServerClient;
 import org.openmrs.module.m2sysbiometrics.http.M2SysHttpClient;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricSubject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,11 +33,12 @@ public class M2SysIT extends M2SysBiometricSensitiveTestBase {
     private AdministrationService adminService;
 
     @Autowired
-    private BioServerClient bioServerClient;
+    private NationalBioServerClient nationalBioServerClient;
+
+    @Autowired
+    private LocalBioServerClient localBioServerClient;
 
     private ObjectMapper objectMapper = new ObjectMapper();
-
-    private String localServiceUrl;
 
     @Before
     public void setUp() {
@@ -45,7 +48,10 @@ public class M2SysIT extends M2SysBiometricSensitiveTestBase {
         String accessPointId = System.getenv("m2sys-biometrics.accessPointID");
         String apiUrl = System.getenv("m2sys-biometrics.server.url");
 
-        localServiceUrl = System.getenv("m2sys-biometrics.local-service.url");
+        String localServiceUrl = System.getenv("m2sys-biometrics.local-service.url");
+        String nationalServiceUrl = System.getenv("m2sys.biometrics.national-service.url");
+        String nationalServiceUsername = "ss"; // System.getenv("m2sys.biometrics.national-service.username");
+        String nationalServicePassword = System.getenv("m2sys.biometrics.national-service.password");
 
         adminService.setGlobalProperty(M2SysBiometricsConstants.M2SYS_CUSTOMER_KEY, custKey);
         adminService.setGlobalProperty(M2SysBiometricsConstants.M2SYS_CLOUD_SCANR_PASSWORD, password);
@@ -56,8 +62,15 @@ public class M2SysIT extends M2SysBiometricSensitiveTestBase {
                 String.valueOf(CAPTURE_TIMEOUT));
         adminService.setGlobalProperty(M2SysBiometricsConstants.M2SYS_LOCATION_ID,
                 String.valueOf(LOCATION_ID));
+
         adminService.setGlobalProperty(M2SysBiometricsConstants.M2SYS_LOCAL_SERVICE_URL,
                 localServiceUrl);
+        adminService.setGlobalProperty(M2SysBiometricsConstants.M2SYS_NATIONAL_SERVICE_URL,
+                 nationalServiceUrl);
+        adminService.setGlobalProperty(M2SysBiometricsConstants.M2SYS_NATIONAL_USERNAME,
+                nationalServiceUsername);
+        adminService.setGlobalProperty(M2SysBiometricsConstants.M2SYS_NATIONAL_PASSWORD,
+                nationalServicePassword);
     }
 
     @Test
@@ -68,7 +81,12 @@ public class M2SysIT extends M2SysBiometricSensitiveTestBase {
         //engine.enroll(subject);
 
         //engine.delete(subject.getSubjectId());
-        engine.enroll(subject);
+        //engine.enroll(subject);
+
+        String response = localBioServerClient.isRegistered("test");
+        response = nationalBioServerClient.isRegistered("SEARCH_TEST2");
+
+        assertNotNull(response);
 
        // List<BiometricMatch> matches = engine.search(subject);
 
