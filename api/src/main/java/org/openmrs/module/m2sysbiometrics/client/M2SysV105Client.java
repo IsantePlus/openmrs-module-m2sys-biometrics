@@ -54,17 +54,16 @@ public class M2SysV105Client extends AbstractM2SysClient {
     @Override
     public BiometricSubject enroll(BiometricSubject subject) {
         M2SysCaptureResponse capture = scanDoubleFingers();
-
         FingerScanStatus fingerScanStatus = checkIfFingerScanExists(capture);
 
-        registrationService.registerLocally(subject, capture);
-
-        if (nationalBioServerClient.isServerUrlConfigured() && !fingerScanStatus.isRegisteredNationally()) {
+        if (!fingerScanStatus.isRegisteredLocally() && fingerScanStatus.isRegisteredNationally()) {
+            registrationService.fetchFromNational(fingerScanStatus.getNationalBiometricSubject());
+        } else if (nationalBioServerClient.isServerUrlConfigured() && !fingerScanStatus.isRegisteredNationally()) {
             registrationService.registerNationally(subject, capture);
         }
+        registrationService.registerLocally(subject, capture);
 
         Fingers fingers = capture.getFingerData(jaxbContext);
-
         subject.setFingerprints(fingers.toTwoOpenMrsFingerprints());
 
         return subject;
