@@ -1,6 +1,6 @@
 package org.openmrs.module.m2sysbiometrics.client;
 
-import static org.openmrs.module.m2sysbiometrics.util.M2SysClientUtil.searchMostFitBiometricSubject;
+import static org.openmrs.module.m2sysbiometrics.util.M2SysClientUtil.searchMostAdequateBiometricSubject;
 
 import org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants;
 import org.openmrs.module.m2sysbiometrics.bioplugin.LocalBioServerClient;
@@ -140,12 +140,12 @@ public class M2SysV105Client extends AbstractM2SysClient {
     }
 
     private FingerScanStatus checkIfFingerScanExists(M2SysCaptureResponse fingerScan) {
-        BiometricSubject localBiometricSubject = searchMostFitBiometricSubject(fingerScan, localBioServerClient);
+        BiometricSubject localBiometricSubject = searchMostAdequateBiometricSubject(fingerScan, localBioServerClient);
         BiometricSubject nationalBiometricSubject = null;
 
         if (nationalBioServerClient.isServerUrlConfigured()) {
             try {
-                nationalBiometricSubject = searchMostFitBiometricSubject(fingerScan, localBioServerClient);
+                nationalBiometricSubject = searchMostAdequateBiometricSubject(fingerScan, localBioServerClient);
 
             } catch (RuntimeException exception) {
                 LOG.error("Connection failure to national server.", exception);

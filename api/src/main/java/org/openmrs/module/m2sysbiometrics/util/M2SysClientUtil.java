@@ -1,7 +1,6 @@
 package org.openmrs.module.m2sysbiometrics.util;
 
 import java.util.List;
-import org.apache.commons.collections.CollectionUtils;
 import org.openmrs.module.m2sysbiometrics.bioplugin.BioServerClient;
 import org.openmrs.module.m2sysbiometrics.model.M2SysCaptureResponse;
 import org.openmrs.module.m2sysbiometrics.model.M2SysResults;
@@ -18,13 +17,17 @@ public final class M2SysClientUtil {
         return results.toOpenMrsMatchList();
     }
 
-    public static BiometricSubject searchMostFitBiometricSubject(M2SysCaptureResponse fingerScan, BioServerClient client) {
-        List<BiometricMatch> biometricMatchList = search(fingerScan, client);
-        if (CollectionUtils.isEmpty(biometricMatchList)) {
-            return null;
-        }
-        String subjectId = biometricMatchList.stream().sorted().findFirst().get().getSubjectId();
-        return new BiometricSubject(subjectId);
+    public static BiometricMatch searchMostAdequate(M2SysCaptureResponse fingerScan, BioServerClient client) {
+        return M2SysClientUtil.search(fingerScan, client)
+                .stream()
+                .max(BiometricMatch::compareTo)
+                .orElse(null);
+    }
+
+    public static BiometricSubject searchMostAdequateBiometricSubject(M2SysCaptureResponse fingerScan,
+            BioServerClient client) {
+        BiometricMatch biometricMatch = searchMostAdequate(fingerScan, client);
+        return biometricMatch == null ? null : new BiometricSubject(biometricMatch.getSubjectId());
     }
 
     private M2SysClientUtil() {

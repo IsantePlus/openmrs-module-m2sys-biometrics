@@ -2,6 +2,7 @@ package org.openmrs.module.m2sysbiometrics.service.impl;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openmrs.Patient;
+import org.openmrs.api.AdministrationService;
 import org.openmrs.module.m2sysbiometrics.bioplugin.AbstractBioServerClient;
 import org.openmrs.module.m2sysbiometrics.bioplugin.LocalBioServerClient;
 import org.openmrs.module.m2sysbiometrics.bioplugin.NationalBioServerClient;
@@ -36,6 +37,9 @@ public class RegistrationServiceImpl implements RegistrationService {
     @Autowired
     private RegistrationCoreService registrationCoreService;
 
+    @Autowired
+    private AdministrationService administrationService;
+
     @Override
     public void registerLocally(BiometricSubject subject, M2SysCaptureResponse capture) {
         String response = localBioServerClient.enroll(subject.getSubjectId(), capture.getTemplateData());
@@ -66,7 +70,7 @@ public class RegistrationServiceImpl implements RegistrationService {
     @Override
     public void fetchFromNational(BiometricSubject nationalBiometricSubject, M2SysCaptureResponse fingerScan) {
         registrationCoreService.importMpiPatient(nationalBiometricSubject.getSubjectId(),
-                RegistrationCoreConstants.GP_BIOMETRICS_NATIONAL_PERSON_IDENTIFIER_TYPE_UUID);
+                getNationalPatientIdentifierTypeUuid());
         registerLocally(nationalBiometricSubject, fingerScan);
     }
 
@@ -98,5 +102,15 @@ public class RegistrationServiceImpl implements RegistrationService {
             throw new M2SysBiometricsException("Fingerprints already match patient: "
                     + patient.getPersonName().getFullName());
         }
+    }
+
+    private String getNationalPatientIdentifierTypeUuid() {
+        String uuid = administrationService.getGlobalProperty(
+                RegistrationCoreConstants.GP_BIOMETRICS_NATIONAL_PERSON_IDENTIFIER_TYPE_UUID);
+        if (StringUtils.isBlank(uuid)) {
+            throw new M2SysBiometricsException(String.format("Global property '%s' is not set",
+                    RegistrationCoreConstants.GP_BIOMETRICS_NATIONAL_PERSON_IDENTIFIER_TYPE_UUID));
+        }
+        return  uuid;
     }
 }
