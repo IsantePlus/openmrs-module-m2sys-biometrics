@@ -4,28 +4,28 @@ import org.openmrs.module.registrationcore.api.biometrics.model.BiometricSubject
 
 public class FingerScanStatus {
 
-    private boolean registeredLocally;
+    private BiometricSubject localBiometricSubject;
 
-    private boolean registeredNationally;
+    private BiometricSubject nationalBiometricSubject;
 
-    private BiometricSubject biometricSubject;
-
-    public FingerScanStatus(boolean registeredLocally, boolean registeredNationally,
-            BiometricSubject biometricSubject) {
-        this.registeredLocally = registeredLocally;
-        this.registeredNationally = registeredNationally;
-        this.biometricSubject = biometricSubject;
+    public FingerScanStatus(BiometricSubject localBiometricSubject, BiometricSubject nationalBiometricSubject) {
+        this.localBiometricSubject = localBiometricSubject;
+        this.nationalBiometricSubject = nationalBiometricSubject;
     }
 
     public boolean isRegisteredLocally() {
-        return registeredLocally;
+        return localBiometricSubject != null;
     }
 
     public boolean isRegisteredNationally() {
-        return registeredNationally;
+        return nationalBiometricSubject != null;
     }
 
-    public BiometricSubject getBiometricSubject() {
-        return biometricSubject;
+    public BiometricSubject getLocalBiometricSubject() {
+        return localBiometricSubject;
+    }
+
+    public BiometricSubject getNationalBiometricSubject() {
+        return nationalBiometricSubject;
     }
 }

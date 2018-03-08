@@ -276,7 +276,7 @@ public class M2SysV1ClientTest extends M2SysBiometricSensitiveTestBase {
                 mock(BiometricMatch.class));
         when(response.toMatchList()).thenReturn(matchList);
 
-        List<BiometricMatch> result = m2SysV1Client.search(new BiometricSubject());
+        List<BiometricMatch> result = m2SysV1Client.search();
 
         assertEquals(matchList, result);
         verify(httpClient).postRequest(eq(url), requestCaptor.capture(), eq(token));

@@ -74,7 +74,7 @@ public class M2SysEngine implements BiometricEngine {
      */
     @Override
     public List<BiometricMatch> search(BiometricSubject subject) {
-        return client.search(subject);
+        return client.search();
     }
 
     /**

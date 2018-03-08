@@ -106,7 +106,7 @@ public class M2SysV1Client extends AbstractM2SysClient {
      * @return a list of matching data from M2Sys Server
      */
     @Override
-    public List<BiometricMatch> search(BiometricSubject subject) {
+    public List<BiometricMatch> search() {
         getLogger().info("Called search method");
         M2SysRequest request = new M2SysRequest();
         addCommonValues(request);
