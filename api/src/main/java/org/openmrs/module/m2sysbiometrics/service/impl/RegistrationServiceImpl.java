@@ -64,9 +64,10 @@ public class RegistrationServiceImpl implements RegistrationService {
     }
 
     @Override
-    public void fetchFromNational(BiometricSubject nationalBiometricSubject) {
+    public void fetchFromNational(BiometricSubject nationalBiometricSubject, M2SysCaptureResponse fingerScan) {
         registrationCoreService.importMpiPatient(nationalBiometricSubject.getSubjectId(),
                 RegistrationCoreConstants.GP_BIOMETRICS_NATIONAL_PERSON_IDENTIFIER_TYPE_UUID);
+        registerLocally(nationalBiometricSubject, fingerScan);
     }
 
     private void handleRegistrationError(BiometricSubject subject, M2SysResults results, Patient patient,
