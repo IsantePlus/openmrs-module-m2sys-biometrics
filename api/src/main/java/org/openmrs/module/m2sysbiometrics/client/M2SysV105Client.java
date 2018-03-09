@@ -1,5 +1,6 @@
 package org.openmrs.module.m2sysbiometrics.client;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants;
 import org.openmrs.module.m2sysbiometrics.bioplugin.LocalBioServerClient;
 import org.openmrs.module.m2sysbiometrics.bioplugin.NationalBioServerClient;
@@ -107,8 +108,16 @@ public class M2SysV105Client extends AbstractM2SysClient {
 
     @Override
     public List<BiometricMatch> search() {
-        M2SysCaptureResponse capture = scanDoubleFingers();
-        return searchService.search(capture, localBioServerClient);
+        M2SysCaptureResponse fingerScan = scanDoubleFingers();
+        List<BiometricMatch> results = searchService.search(fingerScan, localBioServerClient);
+        if (CollectionUtils.isEmpty(results)) {
+           BiometricMatch nationalResult = searchService.findMostAdequate(fingerScan, nationalBioServerClient);
+           if (nationalResult != null) {
+               registrationService.fetchFromNational(new BiometricSubject(nationalResult.getSubjectId()), fingerScan);
+               results.add(nationalResult);
+           }
+        }
+        return results;
     }
 
     @Override
