@@ -108,6 +108,18 @@ public class M2SysV105Client extends AbstractM2SysClient {
     @Override
     public List<BiometricMatch> search() {
         M2SysCaptureResponse capture = scanDoubleFingers();
+        FingerScanStatus fingerScanStatus = checkIfFingerScanExists(capture);
+
+        if (nationalBioServerClient.isServerUrlConfigured()) {
+            try {
+                if (fingerScanStatus.isRegisteredLocally()) {
+                    registrationService.synchronizeFingerprints(capture, fingerScanStatus);
+                }
+            } catch (RuntimeException exception) {
+                LOG.error("Connection failure to national server.", exception);
+            }
+        }
+
         return searchService.search(capture, localBioServerClient);
     }
 
