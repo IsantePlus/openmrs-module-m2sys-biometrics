@@ -1,6 +1,8 @@
 package org.openmrs.module.m2sysbiometrics.util.impl;
 
-import org.apache.commons.lang.StringUtils;
+import java.util.HashMap;
+import java.util.Map;
+import javax.servlet.http.HttpServletRequest;
 import org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants;
 import org.openmrs.module.m2sysbiometrics.util.AccessPointIdResolver;
 import org.openmrs.module.m2sysbiometrics.util.M2SysProperties;
@@ -11,10 +13,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
-
-import javax.servlet.http.HttpServletRequest;
-import java.util.HashMap;
-import java.util.Map;
 
 @Component
 public class RequestAddressBasedResolver implements AccessPointIdResolver {
@@ -43,12 +41,8 @@ public class RequestAddressBasedResolver implements AccessPointIdResolver {
     private String getAccessPointId(String callerAddress) {
         LOG.debug("Retrieving Access Point ID mapped for {}", callerAddress);
 
-        String idMapProp = properties.uncheckedGetGlobalProperty(M2SysBiometricsConstants.M2SYS_ACCESS_POINT_MAP);
-
-        if (StringUtils.isBlank(idMapProp)) {
-            LOG.debug("{} is not defined, using default address", M2SysBiometricsConstants.M2SYS_ACCESS_POINT_MAP);
-            return defaultId(callerAddress);
-        } else {
+        if (properties.isGlobalPropertySet(M2SysBiometricsConstants.M2SYS_ACCESS_POINT_MAP)) {
+            String idMapProp = properties.getGlobalProperty(M2SysBiometricsConstants.M2SYS_ACCESS_POINT_MAP);
             Map<String, String> idMap = idMap(idMapProp);
 
             if (idMap.containsKey(callerAddress)) {
@@ -58,6 +52,9 @@ public class RequestAddressBasedResolver implements AccessPointIdResolver {
                 LOG.warn("{} is not mapped to any Access Point ID, using default", callerAddress);
                 return defaultId(callerAddress);
             }
+        } else {
+            LOG.debug("{} is not defined, using default address", M2SysBiometricsConstants.M2SYS_ACCESS_POINT_MAP);
+            return defaultId(callerAddress);
         }
     }
 

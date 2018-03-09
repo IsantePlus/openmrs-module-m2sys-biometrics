@@ -23,8 +23,4 @@ public class M2SysProperties {
     public boolean isGlobalPropertySet(String propertyName) {
         return StringUtils.isNotBlank(adminService.getGlobalProperty(propertyName));
     }
-
-    public String uncheckedGetGlobalProperty(String propertyName) {
-        return adminService.getGlobalProperty(propertyName);
-    }
 }

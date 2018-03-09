@@ -78,7 +78,9 @@ public class PatientHelperTest {
     @Test
     public void shouldFindPatientByLocalId() {
         // given
-        when(properties.uncheckedGetGlobalProperty(GP_BIOMETRICS_PERSON_IDENTIFIER_TYPE_UUID))
+        when(properties.isGlobalPropertySet(GP_BIOMETRICS_PERSON_IDENTIFIER_TYPE_UUID))
+                .thenReturn(true);
+        when(properties.getGlobalProperty(GP_BIOMETRICS_PERSON_IDENTIFIER_TYPE_UUID))
                 .thenReturn(LOCAL_ID_TYPE_UUID);
         when(patientService.getPatientIdentifierTypeByUuid(LOCAL_ID_TYPE_UUID)).thenReturn(idType);
         when(patientService.getPatients(null, SUBJECT_ID, singletonList(idType), true))
@@ -108,7 +110,7 @@ public class PatientHelperTest {
     @Test
     public void shouldReturnNullIfNationalIdTypeMissing() {
         // given
-        when(properties.uncheckedGetGlobalProperty(GP_BIOMETRICS_NATIONAL_PERSON_IDENTIFIER_TYPE_UUID))
+        when(properties.getGlobalProperty(GP_BIOMETRICS_NATIONAL_PERSON_IDENTIFIER_TYPE_UUID))
                 .thenReturn(NATIONAL_ID_TYPE_UUID);
         when(patientService.getPatientIdentifierTypeByUuid(NATIONAL_ID_TYPE_UUID)).thenReturn(null);
 
@@ -123,7 +125,9 @@ public class PatientHelperTest {
     @Test
     public void shouldFindPatientByNationalId() {
         // given
-        when(properties.uncheckedGetGlobalProperty(GP_BIOMETRICS_NATIONAL_PERSON_IDENTIFIER_TYPE_UUID))
+        when(properties.isGlobalPropertySet(GP_BIOMETRICS_NATIONAL_PERSON_IDENTIFIER_TYPE_UUID))
+                .thenReturn(true);
+        when(properties.getGlobalProperty(GP_BIOMETRICS_NATIONAL_PERSON_IDENTIFIER_TYPE_UUID))
                 .thenReturn(NATIONAL_ID_TYPE_UUID);
         when(patientService.getPatientIdentifierTypeByUuid(NATIONAL_ID_TYPE_UUID)).thenReturn(idType);
         when(patientService.getPatients(null, SUBJECT_ID, singletonList(idType), true))
