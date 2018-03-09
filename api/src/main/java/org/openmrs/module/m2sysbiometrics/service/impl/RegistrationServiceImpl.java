@@ -2,7 +2,6 @@ package org.openmrs.module.m2sysbiometrics.service.impl;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openmrs.Patient;
-import org.openmrs.api.AdministrationService;
 import org.openmrs.module.m2sysbiometrics.bioplugin.AbstractBioServerClient;
 import org.openmrs.module.m2sysbiometrics.bioplugin.LocalBioServerClient;
 import org.openmrs.module.m2sysbiometrics.bioplugin.NationalBioServerClient;
@@ -10,6 +9,7 @@ import org.openmrs.module.m2sysbiometrics.exception.M2SysBiometricsException;
 import org.openmrs.module.m2sysbiometrics.model.M2SysCaptureResponse;
 import org.openmrs.module.m2sysbiometrics.model.M2SysResults;
 import org.openmrs.module.m2sysbiometrics.service.RegistrationService;
+import org.openmrs.module.m2sysbiometrics.util.M2SysHelper;
 import org.openmrs.module.m2sysbiometrics.util.PatientHelper;
 import org.openmrs.module.m2sysbiometrics.xml.XmlResultUtil;
 import org.openmrs.module.registrationcore.RegistrationCoreConstants;
@@ -38,7 +38,7 @@ public class RegistrationServiceImpl implements RegistrationService {
     private RegistrationCoreService registrationCoreService;
 
     @Autowired
-    private AdministrationService administrationService;
+    private M2SysHelper m2SysHelper;
 
     @Override
     public void registerLocally(BiometricSubject subject, M2SysCaptureResponse capture) {
@@ -105,12 +105,6 @@ public class RegistrationServiceImpl implements RegistrationService {
     }
 
     private String getNationalPatientIdentifierTypeUuid() {
-        String uuid = administrationService.getGlobalProperty(
-                RegistrationCoreConstants.GP_BIOMETRICS_NATIONAL_PERSON_IDENTIFIER_TYPE_UUID);
-        if (StringUtils.isBlank(uuid)) {
-            throw new M2SysBiometricsException(String.format("Global property '%s' is not set",
-                    RegistrationCoreConstants.GP_BIOMETRICS_NATIONAL_PERSON_IDENTIFIER_TYPE_UUID));
-        }
-        return  uuid;
+        return m2SysHelper.getGlobalProperty(RegistrationCoreConstants.GP_BIOMETRICS_NATIONAL_PERSON_IDENTIFIER_TYPE_UUID);
     }
 }

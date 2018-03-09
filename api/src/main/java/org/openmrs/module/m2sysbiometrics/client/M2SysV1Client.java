@@ -102,7 +102,6 @@ public class M2SysV1Client extends AbstractM2SysClient {
     /**
      * Searching a biometric data using a given pattern subject.
      *
-     * @param subject a pattern subject
      * @return a list of matching data from M2Sys Server
      */
     @Override

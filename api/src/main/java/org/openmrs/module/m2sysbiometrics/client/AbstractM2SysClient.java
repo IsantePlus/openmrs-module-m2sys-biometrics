@@ -1,8 +1,5 @@
 package org.openmrs.module.m2sysbiometrics.client;
 
-import org.apache.commons.lang.StringUtils;
-import org.openmrs.api.APIException;
-import org.openmrs.api.AdministrationService;
 import org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants;
 import org.openmrs.module.m2sysbiometrics.http.M2SysHttpClient;
 import org.openmrs.module.m2sysbiometrics.model.AbstractM2SysRequest;
@@ -10,6 +7,7 @@ import org.openmrs.module.m2sysbiometrics.model.BiometricCaptureType;
 import org.openmrs.module.m2sysbiometrics.model.M2SysRequest;
 import org.openmrs.module.m2sysbiometrics.model.Token;
 import org.openmrs.module.m2sysbiometrics.util.AccessPointIdResolver;
+import org.openmrs.module.m2sysbiometrics.util.M2SysHelper;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricEngineStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,10 +27,10 @@ public abstract class AbstractM2SysClient implements M2SysClient {
     private M2SysHttpClient httpClient;
 
     @Autowired
-    private AdministrationService adminService;
+    private AccessPointIdResolver apIdResolver;
 
     @Autowired
-    private AccessPointIdResolver apIdResolver;
+    private M2SysHelper m2SysHelper;
 
     /**
      * Gets a status of biometric server.
@@ -86,11 +84,11 @@ public abstract class AbstractM2SysClient implements M2SysClient {
     }
 
     protected String getCloudScanrUrl() {
-        return getProperty(M2SYS_CLOUD_SCANR_URL);
+        return m2SysHelper.getGlobalProperty(M2SYS_CLOUD_SCANR_URL);
     }
 
     protected String getCustomerKey() {
-        return getProperty(M2SysBiometricsConstants.M2SYS_CUSTOMER_KEY);
+        return m2SysHelper.getGlobalProperty(M2SysBiometricsConstants.M2SYS_CUSTOMER_KEY);
     }
 
     protected String getAccessPointId() {
@@ -113,11 +111,7 @@ public abstract class AbstractM2SysClient implements M2SysClient {
     }
 
     protected String getProperty(String propertyName) {
-        String propertyValue = adminService.getGlobalProperty(propertyName);
-        if (StringUtils.isBlank(propertyValue)) {
-            throw new APIException("Property value for '" + propertyName + "' is not set");
-        }
-        return propertyValue;
+        return m2SysHelper.getGlobalProperty(propertyName);
     }
 
     protected boolean isSuccessfulStatus(HttpStatus httpStatus) {
