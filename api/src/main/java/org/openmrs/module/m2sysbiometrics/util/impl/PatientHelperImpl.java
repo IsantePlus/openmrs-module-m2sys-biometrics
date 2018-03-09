@@ -4,8 +4,8 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openmrs.Patient;
 import org.openmrs.PatientIdentifierType;
-import org.openmrs.api.AdministrationService;
 import org.openmrs.api.PatientService;
+import org.openmrs.module.m2sysbiometrics.util.M2SysProperties;
 import org.openmrs.module.m2sysbiometrics.util.PatientHelper;
 import org.openmrs.module.registrationcore.RegistrationCoreConstants;
 import org.slf4j.Logger;
@@ -25,7 +25,7 @@ public class PatientHelperImpl implements PatientHelper {
     private PatientService patientService;
 
     @Autowired
-    private AdministrationService adminService;
+    private M2SysProperties properties;
 
     @Override
     public Patient findByLocalFpId(String subjectId) {
@@ -40,7 +40,7 @@ public class PatientHelperImpl implements PatientHelper {
     }
 
     private Patient findByIdType(String subjectId, String idTypeProp) {
-        String identifierUuid = adminService.getGlobalProperty(idTypeProp, null);
+        String identifierUuid = properties.uncheckedGetGlobalProperty(idTypeProp);
 
         if (StringUtils.isNotBlank(identifierUuid)) {
             PatientIdentifierType idType = patientService.getPatientIdentifierTypeByUuid(identifierUuid);

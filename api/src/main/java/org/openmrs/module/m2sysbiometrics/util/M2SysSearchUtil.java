@@ -8,7 +8,7 @@ import org.openmrs.module.m2sysbiometrics.xml.XmlResultUtil;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricMatch;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricSubject;
 
-public final class M2SysClientUtil {
+public final class M2SysSearchUtil {
 
     public static List<BiometricMatch> search(M2SysCaptureResponse fingerScan, BioServerClient client) {
         String response = client.identify(fingerScan.getTemplateData());
@@ -17,19 +17,19 @@ public final class M2SysClientUtil {
         return results.toOpenMrsMatchList();
     }
 
-    public static BiometricMatch searchMostAdequate(M2SysCaptureResponse fingerScan, BioServerClient client) {
-        return M2SysClientUtil.search(fingerScan, client)
+    public static BiometricMatch findMostAdequate(M2SysCaptureResponse fingerScan, BioServerClient client) {
+        return search(fingerScan, client)
                 .stream()
                 .max(BiometricMatch::compareTo)
                 .orElse(null);
     }
 
-    public static BiometricSubject searchMostAdequateBiometricSubject(M2SysCaptureResponse fingerScan,
+    public static BiometricSubject findMostAdequateBiometricSubject(M2SysCaptureResponse fingerScan,
             BioServerClient client) {
-        BiometricMatch biometricMatch = searchMostAdequate(fingerScan, client);
+        BiometricMatch biometricMatch = findMostAdequate(fingerScan, client);
         return biometricMatch == null ? null : new BiometricSubject(biometricMatch.getSubjectId());
     }
 
-    private M2SysClientUtil() {
+    private M2SysSearchUtil() {
     }
 }

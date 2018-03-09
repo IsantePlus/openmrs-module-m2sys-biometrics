@@ -7,7 +7,6 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.openmrs.Patient;
 import org.openmrs.PatientIdentifierType;
-import org.openmrs.api.AdministrationService;
 import org.openmrs.api.PatientService;
 import org.openmrs.module.m2sysbiometrics.util.impl.PatientHelperImpl;
 
@@ -21,7 +20,6 @@ import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 import static org.openmrs.module.registrationcore.RegistrationCoreConstants.GP_BIOMETRICS_NATIONAL_PERSON_IDENTIFIER_TYPE_UUID;
 import static org.openmrs.module.registrationcore.RegistrationCoreConstants.GP_BIOMETRICS_PERSON_IDENTIFIER_TYPE_UUID;
@@ -40,7 +38,7 @@ public class PatientHelperTest {
     private PatientService patientService;
 
     @Mock
-    private AdministrationService adminService;
+    private M2SysProperties properties;
 
     @Mock
     private PatientIdentifierType idType;
@@ -51,7 +49,7 @@ public class PatientHelperTest {
     @Test
     public void shouldReturnNullIfLocalFpIdNotDefined() {
         // given
-        when(adminService.getGlobalProperty(GP_BIOMETRICS_PERSON_IDENTIFIER_TYPE_UUID, null))
+        when(properties.getGlobalProperty(GP_BIOMETRICS_PERSON_IDENTIFIER_TYPE_UUID))
                 .thenReturn(null);
 
         // when
@@ -65,7 +63,7 @@ public class PatientHelperTest {
     @Test
     public void shouldReturnNullIfLocalIdTypeMissing() {
         // given
-        when(adminService.getGlobalProperty(GP_BIOMETRICS_PERSON_IDENTIFIER_TYPE_UUID, null))
+        when(properties.getGlobalProperty(GP_BIOMETRICS_PERSON_IDENTIFIER_TYPE_UUID))
                 .thenReturn(LOCAL_ID_TYPE_UUID);
         when(patientService.getPatientIdentifierTypeByUuid(LOCAL_ID_TYPE_UUID)).thenReturn(null);
 
@@ -80,7 +78,7 @@ public class PatientHelperTest {
     @Test
     public void shouldFindPatientByLocalId() {
         // given
-        when(adminService.getGlobalProperty(GP_BIOMETRICS_PERSON_IDENTIFIER_TYPE_UUID, null))
+        when(properties.uncheckedGetGlobalProperty(GP_BIOMETRICS_PERSON_IDENTIFIER_TYPE_UUID))
                 .thenReturn(LOCAL_ID_TYPE_UUID);
         when(patientService.getPatientIdentifierTypeByUuid(LOCAL_ID_TYPE_UUID)).thenReturn(idType);
         when(patientService.getPatients(null, SUBJECT_ID, singletonList(idType), true))
@@ -96,7 +94,7 @@ public class PatientHelperTest {
     @Test
     public void shouldReturnNullIfNationalFpIdNotDefined() {
         // given
-        when(adminService.getGlobalProperty(GP_BIOMETRICS_NATIONAL_PERSON_IDENTIFIER_TYPE_UUID, null))
+        when(properties.getGlobalProperty(GP_BIOMETRICS_NATIONAL_PERSON_IDENTIFIER_TYPE_UUID))
                 .thenReturn(null);
 
         // when
@@ -110,7 +108,7 @@ public class PatientHelperTest {
     @Test
     public void shouldReturnNullIfNationalIdTypeMissing() {
         // given
-        when(adminService.getGlobalProperty(GP_BIOMETRICS_NATIONAL_PERSON_IDENTIFIER_TYPE_UUID, null))
+        when(properties.uncheckedGetGlobalProperty(GP_BIOMETRICS_NATIONAL_PERSON_IDENTIFIER_TYPE_UUID))
                 .thenReturn(NATIONAL_ID_TYPE_UUID);
         when(patientService.getPatientIdentifierTypeByUuid(NATIONAL_ID_TYPE_UUID)).thenReturn(null);
 
@@ -125,7 +123,7 @@ public class PatientHelperTest {
     @Test
     public void shouldFindPatientByNationalId() {
         // given
-        when(adminService.getGlobalProperty(GP_BIOMETRICS_NATIONAL_PERSON_IDENTIFIER_TYPE_UUID, null))
+        when(properties.uncheckedGetGlobalProperty(GP_BIOMETRICS_NATIONAL_PERSON_IDENTIFIER_TYPE_UUID))
                 .thenReturn(NATIONAL_ID_TYPE_UUID);
         when(patientService.getPatientIdentifierTypeByUuid(NATIONAL_ID_TYPE_UUID)).thenReturn(idType);
         when(patientService.getPatients(null, SUBJECT_ID, singletonList(idType), true))

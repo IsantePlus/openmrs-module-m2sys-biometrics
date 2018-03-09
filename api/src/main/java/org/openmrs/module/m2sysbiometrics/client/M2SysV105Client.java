@@ -1,6 +1,6 @@
 package org.openmrs.module.m2sysbiometrics.client;
 
-import static org.openmrs.module.m2sysbiometrics.util.M2SysClientUtil.searchMostAdequateBiometricSubject;
+import static org.openmrs.module.m2sysbiometrics.util.M2SysSearchUtil.findMostAdequateBiometricSubject;
 
 import org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants;
 import org.openmrs.module.m2sysbiometrics.bioplugin.LocalBioServerClient;
@@ -15,7 +15,7 @@ import org.openmrs.module.m2sysbiometrics.model.M2SysResult;
 import org.openmrs.module.m2sysbiometrics.model.M2SysResults;
 import org.openmrs.module.m2sysbiometrics.model.Token;
 import org.openmrs.module.m2sysbiometrics.service.RegistrationService;
-import org.openmrs.module.m2sysbiometrics.util.M2SysClientUtil;
+import org.openmrs.module.m2sysbiometrics.util.M2SysSearchUtil;
 import org.openmrs.module.m2sysbiometrics.xml.XmlResultUtil;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricMatch;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricSubject;
@@ -107,7 +107,7 @@ public class M2SysV105Client extends AbstractM2SysClient {
     @Override
     public List<BiometricMatch> search() {
         M2SysCaptureResponse capture = scanDoubleFingers();
-        return M2SysClientUtil.search(capture, localBioServerClient);
+        return M2SysSearchUtil.search(capture, localBioServerClient);
     }
 
     @Override
@@ -141,12 +141,12 @@ public class M2SysV105Client extends AbstractM2SysClient {
     }
 
     private FingerScanStatus checkIfFingerScanExists(M2SysCaptureResponse fingerScan) {
-        BiometricSubject localBiometricSubject = searchMostAdequateBiometricSubject(fingerScan, localBioServerClient);
+        BiometricSubject localBiometricSubject = findMostAdequateBiometricSubject(fingerScan, localBioServerClient);
         BiometricSubject nationalBiometricSubject = null;
 
         if (nationalBioServerClient.isServerUrlConfigured()) {
             try {
-                nationalBiometricSubject = searchMostAdequateBiometricSubject(fingerScan, localBioServerClient);
+                nationalBiometricSubject = findMostAdequateBiometricSubject(fingerScan, nationalBioServerClient);
             } catch (RuntimeException exception) {
                 LOG.error("Connection failure to national server.", exception);
             }

@@ -7,7 +7,7 @@ import org.openmrs.module.m2sysbiometrics.model.BiometricCaptureType;
 import org.openmrs.module.m2sysbiometrics.model.M2SysRequest;
 import org.openmrs.module.m2sysbiometrics.model.Token;
 import org.openmrs.module.m2sysbiometrics.util.AccessPointIdResolver;
-import org.openmrs.module.m2sysbiometrics.util.M2SysHelper;
+import org.openmrs.module.m2sysbiometrics.util.M2SysProperties;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricEngineStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +30,7 @@ public abstract class AbstractM2SysClient implements M2SysClient {
     private AccessPointIdResolver apIdResolver;
 
     @Autowired
-    private M2SysHelper m2SysHelper;
+    private M2SysProperties properties;
 
     /**
      * Gets a status of biometric server.
@@ -84,11 +84,11 @@ public abstract class AbstractM2SysClient implements M2SysClient {
     }
 
     protected String getCloudScanrUrl() {
-        return m2SysHelper.getGlobalProperty(M2SYS_CLOUD_SCANR_URL);
+        return properties.getGlobalProperty(M2SYS_CLOUD_SCANR_URL);
     }
 
     protected String getCustomerKey() {
-        return m2SysHelper.getGlobalProperty(M2SysBiometricsConstants.M2SYS_CUSTOMER_KEY);
+        return properties.getGlobalProperty(M2SysBiometricsConstants.M2SYS_CUSTOMER_KEY);
     }
 
     protected String getAccessPointId() {
@@ -111,7 +111,7 @@ public abstract class AbstractM2SysClient implements M2SysClient {
     }
 
     protected String getProperty(String propertyName) {
-        return m2SysHelper.getGlobalProperty(propertyName);
+        return properties.getGlobalProperty(propertyName);
     }
 
     protected boolean isSuccessfulStatus(HttpStatus httpStatus) {
