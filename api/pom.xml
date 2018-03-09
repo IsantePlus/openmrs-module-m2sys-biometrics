@@ -36,6 +36,9 @@
         <dependency>
             <groupId>org.openmrs.module</groupId>
             <artifactId>registrationcore-api</artifactId>
+            <version>${registrationCoreVersion}</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/registrationcore-api.jar</systemPath>
         </dependency>
 
         <dependency>

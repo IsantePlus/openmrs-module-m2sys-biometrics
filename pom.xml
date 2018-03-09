@@ -86,12 +86,6 @@
                 <version>${mockitoVersion}</version>
                 <scope>test</scope>
             </dependency>
-            <dependency>
-                <groupId>org.openmrs.module</groupId>
-                <artifactId>registrationcore-api</artifactId>
-                <version>${registrationCoreVersion}</version>
-                <scope>provided</scope>
-            </dependency>
 
             <dependency>
                 <groupId>commons-httpclient</groupId>
@@ -177,17 +171,6 @@
     </dependencyManagement>
 
     <repositories>
-        <repository>
-            <id>local-repo</id>
-            <releases>
-                <enabled>true</enabled>
-                <checksumPolicy>ignore</checksumPolicy>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-            <url>file://${project.basedir}/lib</url>
-        </repository>
         <repository>
             <id>openmrs-repo</id>
             <name>OpenMRS Nexus Repository</name>
