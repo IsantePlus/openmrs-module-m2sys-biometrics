@@ -1,9 +1,7 @@
 package org.openmrs.module.m2sysbiometrics.bioplugin;
 
-import org.apache.commons.lang.StringUtils;
-import org.openmrs.api.APIException;
-import org.openmrs.api.AdministrationService;
 import org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants;
+import org.openmrs.module.m2sysbiometrics.util.M2SysProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
@@ -21,7 +19,7 @@ public abstract class AbstractBioServerClient extends WebServiceGatewaySupport i
     private Jaxb2Marshaller marshaller;
 
     @Autowired
-    private AdministrationService adminService;
+    private M2SysProperties properties;
 
     @Autowired
     private WebServiceMessageFactory messageFactory;
@@ -103,8 +101,7 @@ public abstract class AbstractBioServerClient extends WebServiceGatewaySupport i
 
     @Override
     public boolean isServerUrlConfigured() {
-        String propertyValue = adminService.getGlobalProperty(getServerUrlPropertyName());
-        return StringUtils.isNotBlank(propertyValue);
+        return properties.isGlobalPropertySet(getServerUrlPropertyName());
     }
 
     protected abstract String getServerUrlPropertyName();
@@ -112,11 +109,7 @@ public abstract class AbstractBioServerClient extends WebServiceGatewaySupport i
     protected abstract Object getResponse(Object requestPayload);
 
     protected String getProperty(String propertyName) {
-        String propertyValue = adminService.getGlobalProperty(propertyName);
-        if (StringUtils.isBlank(propertyValue)) {
-            throw new APIException("Property value for '" + propertyName + "' is not set");
-        }
-        return propertyValue;
+        return properties.getGlobalProperty(propertyName);
     }
 
     protected String getServiceUrl() {

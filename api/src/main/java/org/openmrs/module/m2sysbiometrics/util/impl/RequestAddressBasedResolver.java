@@ -1,10 +1,11 @@
 package org.openmrs.module.m2sysbiometrics.util.impl;
 
-import org.apache.commons.lang.StringUtils;
-import org.openmrs.api.APIException;
-import org.openmrs.api.AdministrationService;
+import java.util.HashMap;
+import java.util.Map;
+import javax.servlet.http.HttpServletRequest;
 import org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants;
 import org.openmrs.module.m2sysbiometrics.util.AccessPointIdResolver;
+import org.openmrs.module.m2sysbiometrics.util.M2SysProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,17 +14,13 @@ import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import javax.servlet.http.HttpServletRequest;
-import java.util.HashMap;
-import java.util.Map;
-
 @Component
 public class RequestAddressBasedResolver implements AccessPointIdResolver {
 
     private static final Logger LOG = LoggerFactory.getLogger(RequestAddressBasedResolver.class);
 
     @Autowired
-    private AdministrationService adminService;
+    private M2SysProperties properties;
 
     @Override
     public String getAccessPointId() {
@@ -44,12 +41,8 @@ public class RequestAddressBasedResolver implements AccessPointIdResolver {
     private String getAccessPointId(String callerAddress) {
         LOG.debug("Retrieving Access Point ID mapped for {}", callerAddress);
 
-        String idMapProp = adminService.getGlobalProperty(M2SysBiometricsConstants.M2SYS_ACCESS_POINT_MAP, null);
-
-        if (StringUtils.isBlank(idMapProp)) {
-            LOG.debug("{} is not defined, using default address", M2SysBiometricsConstants.M2SYS_ACCESS_POINT_MAP);
-            return defaultId(callerAddress);
-        } else {
+        if (properties.isGlobalPropertySet(M2SysBiometricsConstants.M2SYS_ACCESS_POINT_MAP)) {
+            String idMapProp = properties.getGlobalProperty(M2SysBiometricsConstants.M2SYS_ACCESS_POINT_MAP);
             Map<String, String> idMap = idMap(idMapProp);
 
             if (idMap.containsKey(callerAddress)) {
@@ -59,16 +52,14 @@ public class RequestAddressBasedResolver implements AccessPointIdResolver {
                 LOG.warn("{} is not mapped to any Access Point ID, using default", callerAddress);
                 return defaultId(callerAddress);
             }
+        } else {
+            LOG.debug("{} is not defined, using default address", M2SysBiometricsConstants.M2SYS_ACCESS_POINT_MAP);
+            return defaultId(callerAddress);
         }
     }
 
     private String defaultId(String callerAddress) {
-        String propertyValue = adminService.getGlobalProperty(M2SysBiometricsConstants.M2SYS_ACCESS_POINT_ID);
-        if (StringUtils.isBlank(propertyValue)) {
-            throw new APIException("Property value for '" + M2SysBiometricsConstants.M2SYS_ACCESS_POINT_ID
-                    + "' is not set and IP " + callerAddress + " has not access point configured.");
-        }
-        return propertyValue;
+        return properties.getGlobalProperty(M2SysBiometricsConstants.M2SYS_ACCESS_POINT_ID);
     }
 
     private Map<String, String> idMap(String idMapProp) {

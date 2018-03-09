@@ -9,8 +9,11 @@ import org.openmrs.module.m2sysbiometrics.exception.M2SysBiometricsException;
 import org.openmrs.module.m2sysbiometrics.model.M2SysCaptureResponse;
 import org.openmrs.module.m2sysbiometrics.model.M2SysResults;
 import org.openmrs.module.m2sysbiometrics.service.RegistrationService;
+import org.openmrs.module.m2sysbiometrics.util.M2SysProperties;
 import org.openmrs.module.m2sysbiometrics.util.PatientHelper;
 import org.openmrs.module.m2sysbiometrics.xml.XmlResultUtil;
+import org.openmrs.module.registrationcore.RegistrationCoreConstants;
+import org.openmrs.module.registrationcore.api.RegistrationCoreService;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricSubject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +33,12 @@ public class RegistrationServiceImpl implements RegistrationService {
 
     @Autowired
     private NationalBioServerClient nationalBioServerClient;
+
+    @Autowired
+    private RegistrationCoreService registrationCoreService;
+
+    @Autowired
+    private M2SysProperties properties;
 
     @Override
     public void registerLocally(BiometricSubject subject, M2SysCaptureResponse capture) {
@@ -56,6 +65,13 @@ public class RegistrationServiceImpl implements RegistrationService {
         } catch (RuntimeException exception) {
             LOG.error("Registration with the national fingerprint server failed.", exception);
         }
+    }
+
+    @Override
+    public void fetchFromNational(BiometricSubject nationalBiometricSubject, M2SysCaptureResponse fingerScan) {
+        registrationCoreService.importMpiPatient(nationalBiometricSubject.getSubjectId(),
+                getNationalPatientIdentifierTypeUuid());
+        registerLocally(nationalBiometricSubject, fingerScan);
     }
 
     private void handleRegistrationError(BiometricSubject subject, M2SysResults results, Patient patient,
@@ -86,5 +102,9 @@ public class RegistrationServiceImpl implements RegistrationService {
             throw new M2SysBiometricsException("Fingerprints already match patient: "
                     + patient.getPersonName().getFullName());
         }
+    }
+
+    private String getNationalPatientIdentifierTypeUuid() {
+        return properties.getGlobalProperty(RegistrationCoreConstants.GP_BIOMETRICS_NATIONAL_PERSON_IDENTIFIER_TYPE_UUID);
     }
 }
