@@ -178,6 +178,17 @@
 
     <repositories>
         <repository>
+            <id>local-repo</id>
+            <releases>
+                <enabled>true</enabled>
+                <checksumPolicy>ignore</checksumPolicy>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+            <url>file://${project.basedir}/lib</url>
+        </repository>
+        <repository>
             <id>openmrs-repo</id>
             <name>OpenMRS Nexus Repository</name>
             <url>http://mavenrepo.openmrs.org/nexus/content/repositories/public</url>
