@@ -5,6 +5,7 @@ import org.openmrs.module.registrationcore.api.biometrics.BiometricEngine;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricEngineStatus;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricMatch;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricSubject;
+import org.openmrs.module.registrationcore.api.biometrics.model.EnrollmentResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +31,7 @@ public class M2SysEngine implements BiometricEngine {
     }
 
     @Override
-    public BiometricSubject enroll(BiometricSubject subject) {
+    public EnrollmentResult enroll(BiometricSubject subject) {
         LOGGER.info("Called getStatus enroll");
         if (subject == null) {
             subject = new BiometricSubject();

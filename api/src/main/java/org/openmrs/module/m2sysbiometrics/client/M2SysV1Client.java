@@ -7,6 +7,8 @@ import org.openmrs.module.registrationcore.api.biometrics.model.BiometricMatch;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricSubject;
 
 import java.util.List;
+import org.openmrs.module.registrationcore.api.biometrics.model.EnrollmentResult;
+import org.openmrs.module.registrationcore.api.biometrics.model.EnrollmentStatus;
 
 import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.ERROR_CODE_OF_SUBJECT_NOT_EXIST;
 import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.M2SYS_CHANGE_ID_ENDPOINT;
@@ -23,7 +25,7 @@ import static org.openmrs.module.m2sysbiometrics.util.M2SysResponseUtil.checkUpd
 public class M2SysV1Client extends AbstractM2SysClient {
 
     @Override
-    public BiometricSubject enroll(BiometricSubject subject) {
+    public EnrollmentResult enroll(BiometricSubject subject) {
         M2SysRequest request = new M2SysRequest();
         addCommonValues(request);
         request.setRegistrationId(subject.getSubjectId());
@@ -33,7 +35,7 @@ public class M2SysV1Client extends AbstractM2SysClient {
             BiometricSubject biometricSubject = response.toBiometricSubject(subject.getSubjectId());
             getLogger().debug(String.format("A new BiometricsSubject with %s subjectId has been enrolled",
                     biometricSubject.getSubjectId()));
-            return biometricSubject;
+            return new EnrollmentResult(biometricSubject, EnrollmentStatus.SUCCESS);
         } catch (Exception ex) {
             getLogger().error(String.format("Updating BiometricSubject with %s id failed", subject.getSubjectId()));
             throw ex;

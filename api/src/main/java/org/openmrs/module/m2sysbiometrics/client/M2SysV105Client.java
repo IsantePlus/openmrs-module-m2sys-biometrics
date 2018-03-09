@@ -17,6 +17,8 @@ import org.openmrs.module.m2sysbiometrics.service.SearchService;
 import org.openmrs.module.m2sysbiometrics.xml.XmlResultUtil;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricMatch;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricSubject;
+import org.openmrs.module.registrationcore.api.biometrics.model.EnrollmentResult;
+import org.openmrs.module.registrationcore.api.biometrics.model.EnrollmentStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,17 +55,21 @@ public class M2SysV105Client extends AbstractM2SysClient {
     }
 
     @Override
-    public BiometricSubject enroll(BiometricSubject subject) {
+    public EnrollmentResult enroll(BiometricSubject subject) {
         M2SysCaptureResponse capture = scanDoubleFingers();
         FingerScanStatus fingerScanStatus = checkIfFingerScanExists(capture);
+        EnrollmentStatus enrollmentStatus = EnrollmentStatus.SUCCESS;
 
         if (!fingerScanStatus.isRegisteredLocally()) {
             if (fingerScanStatus.isRegisteredNationally()) {
                 registrationService.fetchFromMpiByNationalFpId(fingerScanStatus.getNationalBiometricSubject(), capture);
                 subject.setSubjectId(fingerScanStatus.getNationalBiometricSubject().getSubjectId());
+                enrollmentStatus = EnrollmentStatus.ALREADY_REGISTERED;
             } else {
                 registrationService.registerLocally(subject, capture);
             }
+        } else {
+            enrollmentStatus = EnrollmentStatus.ALREADY_REGISTERED;
         }
 
         if (nationalBioServerClient.isServerUrlConfigured() && !fingerScanStatus.isRegisteredNationally()) {
@@ -73,7 +79,7 @@ public class M2SysV105Client extends AbstractM2SysClient {
         Fingers fingers = capture.getFingerData(jaxbContext);
         subject.setFingerprints(fingers.toTwoOpenMrsFingerprints());
 
-        return subject;
+        return new EnrollmentResult(subject, enrollmentStatus);
     }
 
     @Override

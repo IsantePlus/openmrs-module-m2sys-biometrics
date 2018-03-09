@@ -24,6 +24,8 @@ import org.openmrs.module.m2sysbiometrics.util.M2SysProperties;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricEngineStatus;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricMatch;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricSubject;
+import org.openmrs.module.registrationcore.api.biometrics.model.EnrollmentResult;
+import org.openmrs.module.registrationcore.api.biometrics.model.EnrollmentStatus;
 import org.openmrs.test.Verifies;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
@@ -158,9 +160,10 @@ public class M2SysV1ClientTest extends M2SysBiometricSensitiveTestBase {
         when(httpClient.postRequest(eq(url), any(M2SysRequest.class), eq(token))).thenReturn(response);
 
         BiometricSubject reqSubject = new BiometricSubject(FINGERPRINT_ID);
-        BiometricSubject subject = m2SysV1Client.enroll(reqSubject);
+        EnrollmentResult enrollmentResult = m2SysV1Client.enroll(reqSubject);
 
-        verifyBiometricSubjectRequest(url, subject);
+        verifyBiometricSubjectRequest(url, enrollmentResult.getBiometricSubject());
+        assertEquals(EnrollmentStatus.SUCCESS, enrollmentResult.getEnrollmentStatus());
     }
 
     @Test
