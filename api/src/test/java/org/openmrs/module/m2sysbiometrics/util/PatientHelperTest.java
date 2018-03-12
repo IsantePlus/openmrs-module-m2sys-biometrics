@@ -6,10 +6,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.openmrs.Patient;
+import org.openmrs.PatientIdentifier;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.api.PatientService;
 import org.openmrs.module.m2sysbiometrics.util.impl.PatientHelperImpl;
 
+import java.util.Collections;
 import java.util.UUID;
 
 import static java.util.Collections.singletonList;
@@ -85,6 +87,9 @@ public class PatientHelperTest {
         when(patientService.getPatientIdentifierTypeByUuid(LOCAL_ID_TYPE_UUID)).thenReturn(idType);
         when(patientService.getPatients(null, SUBJECT_ID, singletonList(idType), true))
                 .thenReturn(singletonList(patient));
+        PatientIdentifier pi = new PatientIdentifier();
+        pi.setIdentifierType(idType);
+        when(patient.getIdentifiers()).thenReturn(Collections.singleton(pi));
 
         // when
         Patient result = patientHelper.findByLocalFpId(SUBJECT_ID);
@@ -132,6 +137,9 @@ public class PatientHelperTest {
         when(patientService.getPatientIdentifierTypeByUuid(NATIONAL_ID_TYPE_UUID)).thenReturn(idType);
         when(patientService.getPatients(null, SUBJECT_ID, singletonList(idType), true))
                 .thenReturn(singletonList(patient));
+        PatientIdentifier pi = new PatientIdentifier();
+        pi.setIdentifierType(idType);
+        when(patient.getIdentifiers()).thenReturn(Collections.singleton(pi));
 
         // when
         Patient result = patientHelper.findByNationalFpId(SUBJECT_ID);
