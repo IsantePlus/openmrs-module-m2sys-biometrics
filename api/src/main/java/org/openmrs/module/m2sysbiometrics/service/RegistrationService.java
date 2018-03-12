@@ -9,5 +9,5 @@ public interface RegistrationService {
 
     void registerNationally(BiometricSubject subject, M2SysCaptureResponse capture);
 
-    void fetchFromNationalById(BiometricSubject nationalBiometricSubject, M2SysCaptureResponse fingerScan);
+    void fetchFromMpiByNationalFpId(BiometricSubject nationalBiometricSubject, M2SysCaptureResponse fingerScan);
 }
