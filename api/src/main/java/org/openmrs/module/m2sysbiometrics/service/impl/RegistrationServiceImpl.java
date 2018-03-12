@@ -1,11 +1,17 @@
 package org.openmrs.module.m2sysbiometrics.service.impl;
 
 import org.apache.commons.lang3.StringUtils;
+import org.openmrs.Location;
 import org.openmrs.Patient;
+import org.openmrs.PatientIdentifier;
+import org.openmrs.PatientIdentifierType;
+import org.openmrs.api.LocationService;
+import org.openmrs.api.PatientService;
 import org.openmrs.module.m2sysbiometrics.bioplugin.AbstractBioServerClient;
 import org.openmrs.module.m2sysbiometrics.bioplugin.LocalBioServerClient;
 import org.openmrs.module.m2sysbiometrics.bioplugin.NationalBioServerClient;
 import org.openmrs.module.m2sysbiometrics.exception.M2SysBiometricsException;
+import org.openmrs.module.m2sysbiometrics.model.FingerScanStatus;
 import org.openmrs.module.m2sysbiometrics.model.M2SysCaptureResponse;
 import org.openmrs.module.m2sysbiometrics.model.M2SysResults;
 import org.openmrs.module.m2sysbiometrics.service.RegistrationService;
@@ -40,6 +46,12 @@ public class RegistrationServiceImpl implements RegistrationService {
     @Autowired
     private M2SysProperties properties;
 
+    @Autowired
+    private PatientService patientService;
+
+    @Autowired
+    private LocationService locationService;
+
     @Override
     public void registerLocally(BiometricSubject subject, M2SysCaptureResponse capture) {
         String response = localBioServerClient.enroll(subject.getSubjectId(), capture.getTemplateData());
@@ -72,6 +84,29 @@ public class RegistrationServiceImpl implements RegistrationService {
         registrationCoreService.importMpiPatient(nationalBiometricSubject.getSubjectId(),
                 getNationalPatientIdentifierTypeUuid());
         registerLocally(nationalBiometricSubject, fingerScan);
+    }
+
+    @Override
+    public void synchronizeFingerprints(M2SysCaptureResponse fingerScan, FingerScanStatus fingerScanStatus) {
+        if (fingerScanStatus.isRegisteredNationally()) {
+            String nationalId = fingerScanStatus.getNationalBiometricSubject().getSubjectId();
+            if (patientHelper.findByNationalFpId(nationalId) == null) {
+                String localId = fingerScanStatus.getLocalBiometricSubject().getSubjectId();
+                Patient patient = patientHelper.findByLocalFpId(localId);
+                attachNationalIdToThePatient(patient, nationalId);
+            }
+        } else {
+            registerNationally(fingerScanStatus.getLocalBiometricSubject(), fingerScan);
+        }
+    }
+
+    private void attachNationalIdToThePatient(Patient patient, String nationalId) {
+        PatientIdentifierType patientIdentifierType = patientService.getPatientIdentifierTypeByUuid(
+                properties.getGlobalProperty(RegistrationCoreConstants.GP_BIOMETRICS_NATIONAL_PERSON_IDENTIFIER_TYPE_UUID));
+        Location location = locationService.getDefaultLocation();
+        PatientIdentifier nationalIdentifier = new PatientIdentifier(nationalId, patientIdentifierType, location);
+        patient.addIdentifier(nationalIdentifier);
+        patientService.savePatient(patient);
     }
 
     private void handleRegistrationError(BiometricSubject subject, M2SysResults results, Patient patient,

@@ -14,6 +14,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.stream.Collectors;
+
 @Component
 public class PatientHelperImpl implements PatientHelper {
 
@@ -44,8 +46,13 @@ public class PatientHelperImpl implements PatientHelper {
             if (idType == null) {
                 LOGGER.warn("Identifier type defined by prop {} is missing: {}", idTypeProp, identifierUuid);
             } else {
+                //Currently method getPatients() doesn't take into consideration the identifierTypes,
+                //so it needs to be filtered anyway
                 List<Patient> patients = patientService.getPatients(null, subjectId,
-                        Collections.singletonList(idType), true);
+                        Collections.singletonList(idType), true).stream()
+                        .filter(p -> p.getIdentifiers().stream().anyMatch(pi -> pi.getIdentifierType().equals(idType)))
+                        .collect(Collectors.toList());
+
                 return CollectionUtils.isEmpty(patients) ? null : patients.get(0);
             }
         }

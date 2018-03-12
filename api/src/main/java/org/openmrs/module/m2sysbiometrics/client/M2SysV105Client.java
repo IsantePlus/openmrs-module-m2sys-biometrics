@@ -1,6 +1,5 @@
 package org.openmrs.module.m2sysbiometrics.client;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants;
 import org.openmrs.module.m2sysbiometrics.bioplugin.LocalBioServerClient;
 import org.openmrs.module.m2sysbiometrics.bioplugin.NationalBioServerClient;
@@ -109,15 +108,26 @@ public class M2SysV105Client extends AbstractM2SysClient {
     @Override
     public List<BiometricMatch> search() {
         M2SysCaptureResponse fingerScan = scanDoubleFingers();
+        FingerScanStatus fingerScanStatus = checkIfFingerScanExists(fingerScan);
         List<BiometricMatch> results = searchService.search(fingerScan, localBioServerClient);
-        if (CollectionUtils.isEmpty(results)) {
-            BiometricMatch nationalResult = searchService.findMostAdequate(fingerScan, nationalBioServerClient);
-            if (nationalResult != null) {
-                registrationService.fetchFromMpiByNationalFpId(new BiometricSubject(nationalResult.getSubjectId()),
-                        fingerScan);
-                results.add(nationalResult);
+
+        if (nationalBioServerClient.isServerUrlConfigured()) {
+            try {
+                if (fingerScanStatus.isRegisteredLocally()) {
+                    registrationService.synchronizeFingerprints(fingerScan, fingerScanStatus);
+                } else {
+                    BiometricMatch nationalResult = searchService.findMostAdequate(fingerScan, nationalBioServerClient);
+                    if (nationalResult != null) {
+                        registrationService.fetchFromMpiByNationalFpId(new BiometricSubject(nationalResult.getSubjectId()),
+                                fingerScan);
+                        results.add(nationalResult);
+                    }
+                }
+            } catch (RuntimeException exception) {
+                LOG.error("Connection failure to national server.", exception);
             }
         }
+
         return results;
     }
 

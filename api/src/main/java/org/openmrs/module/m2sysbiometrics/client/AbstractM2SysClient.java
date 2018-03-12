@@ -96,22 +96,18 @@ public abstract class AbstractM2SysClient implements M2SysClient {
     }
 
     protected float getCaptureTimeOut() {
-        return Float.parseFloat(getProperty(M2SysBiometricsConstants.M2SYS_CAPTURE_TIMEOUT));
+        return Float.parseFloat(properties.getGlobalProperty(M2SysBiometricsConstants.M2SYS_CAPTURE_TIMEOUT));
     }
 
     protected int getLocationID() {
-        return Integer.parseInt(getProperty(M2SysBiometricsConstants.M2SYS_LOCATION_ID));
+        return Integer.parseInt(properties.getGlobalProperty(M2SysBiometricsConstants.M2SYS_LOCATION_ID));
     }
 
     protected Token getToken() {
-        String username = getProperty(M2SysBiometricsConstants.M2SYS_CLOUD_SCANR_USERNAME);
-        String password = getProperty(M2SysBiometricsConstants.M2SYS_CLOUD_SCANR_PASSWORD);
-        String customerKey = getProperty(M2SysBiometricsConstants.M2SYS_CUSTOMER_KEY);
+        String username = properties.getGlobalProperty(M2SysBiometricsConstants.M2SYS_CLOUD_SCANR_USERNAME);
+        String password = properties.getGlobalProperty(M2SysBiometricsConstants.M2SYS_CLOUD_SCANR_PASSWORD);
+        String customerKey = properties.getGlobalProperty(M2SysBiometricsConstants.M2SYS_CUSTOMER_KEY);
         return httpClient.getToken(getCloudScanrUrl(), username, password, customerKey);
-    }
-
-    protected String getProperty(String propertyName) {
-        return properties.getGlobalProperty(propertyName);
     }
 
     protected boolean isSuccessfulStatus(HttpStatus httpStatus) {
