@@ -46,7 +46,7 @@ public class PatientHelperImpl implements PatientHelper {
             if (idType == null) {
                 LOGGER.warn("Identifier type defined by prop {} is missing: {}", idTypeProp, identifierUuid);
             } else {
-                //Currently method getPatients() do not take into consideration the identifierTypes,
+                //Currently method getPatients() doesn't take into consideration the identifierTypes,
                 //so it needs to be filtered anyway
                 List<Patient> patients = patientService.getPatients(null, subjectId,
                         Collections.singletonList(idType), true).stream()

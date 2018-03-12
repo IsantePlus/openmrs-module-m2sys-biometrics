@@ -89,22 +89,22 @@ public class RegistrationServiceImpl implements RegistrationService {
     @Override
     public void synchronizeFingerprints(M2SysCaptureResponse fingerScan, FingerScanStatus fingerScanStatus) {
         if (fingerScanStatus.isRegisteredNationally()) {
-            if (patientHelper.findByNationalFpId(fingerScanStatus.getNationalBiometricSubject().getSubjectId()) == null) {
-                attachNationalIdToThePatient(fingerScanStatus.getLocalBiometricSubject().getSubjectId());
+            String nationalId = fingerScanStatus.getNationalBiometricSubject().getSubjectId();
+            if (patientHelper.findByNationalFpId(nationalId) == null) {
+                String localId = fingerScanStatus.getLocalBiometricSubject().getSubjectId();
+                Patient patient = patientHelper.findByLocalFpId(localId);
+                attachNationalIdToThePatient(patient, nationalId);
             }
         } else {
             registerNationally(fingerScanStatus.getLocalBiometricSubject(), fingerScan);
         }
     }
 
-    private void attachNationalIdToThePatient(String localId) {
-        Patient patient = patientHelper.findByLocalFpId(localId);
-
+    private void attachNationalIdToThePatient(Patient patient, String nationalId) {
         PatientIdentifierType patientIdentifierType = patientService.getPatientIdentifierTypeByUuid(
                 properties.getGlobalProperty(RegistrationCoreConstants.GP_BIOMETRICS_NATIONAL_PERSON_IDENTIFIER_TYPE_UUID));
         Location location = locationService.getDefaultLocation();
-
-        PatientIdentifier nationalIdentifier = new PatientIdentifier(localId, patientIdentifierType, location);
+        PatientIdentifier nationalIdentifier = new PatientIdentifier(nationalId, patientIdentifierType, location);
         patient.addIdentifier(nationalIdentifier);
         patientService.savePatient(patient);
     }
