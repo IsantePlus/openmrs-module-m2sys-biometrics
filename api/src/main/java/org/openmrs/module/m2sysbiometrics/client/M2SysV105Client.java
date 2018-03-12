@@ -60,7 +60,7 @@ public class M2SysV105Client extends AbstractM2SysClient {
 
         if (!fingerScanStatus.isRegisteredLocally()) {
             if (fingerScanStatus.isRegisteredNationally()) {
-                registrationService.fetchFromNational(fingerScanStatus.getNationalBiometricSubject(), capture);
+                registrationService.fetchFromNationalById(fingerScanStatus.getNationalBiometricSubject(), capture);
                 subject.setSubjectId(fingerScanStatus.getNationalBiometricSubject().getSubjectId());
             } else {
                 registrationService.registerLocally(subject, capture);
@@ -113,7 +113,7 @@ public class M2SysV105Client extends AbstractM2SysClient {
         if (CollectionUtils.isEmpty(results)) {
             BiometricMatch nationalResult = searchService.findMostAdequate(fingerScan, nationalBioServerClient);
             if (nationalResult != null) {
-                registrationService.fetchFromNational(new BiometricSubject(nationalResult.getSubjectId()), fingerScan);
+                registrationService.fetchFromNationalById(new BiometricSubject(nationalResult.getSubjectId()), fingerScan);
                 results.add(nationalResult);
             }
         }
