@@ -113,7 +113,8 @@ public class M2SysV105Client extends AbstractM2SysClient {
         if (CollectionUtils.isEmpty(results)) {
             BiometricMatch nationalResult = searchService.findMostAdequate(fingerScan, nationalBioServerClient);
             if (nationalResult != null) {
-                registrationService.fetchFromMpiByNationalFpId(new BiometricSubject(nationalResult.getSubjectId()), fingerScan);
+                registrationService.fetchFromMpiByNationalFpId(new BiometricSubject(nationalResult.getSubjectId()),
+                        fingerScan);
                 results.add(nationalResult);
             }
         }
