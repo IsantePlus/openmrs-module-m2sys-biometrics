@@ -51,7 +51,7 @@ import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.M2SYS_
 import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.M2SYS_SEARCH_ENDPOINT;
 import static org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants.M2SYS_UPDATE_ENDPOINT;
 
-public class M2SysV1ClientTest extends M2SysBiometricSensitiveTestBase {
+public class M2SysV1ClientTest {
 
     private static final String SERVER_URL = "http://testServerAPI/";
 

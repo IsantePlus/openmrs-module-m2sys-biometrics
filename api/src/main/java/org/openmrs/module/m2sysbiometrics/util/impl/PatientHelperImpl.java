@@ -38,18 +38,19 @@ public class PatientHelperImpl implements PatientHelper {
     }
 
     private Patient findByIdType(String subjectId, String idTypeProp) {
+        Patient patient = null;
         if (properties.isGlobalPropertySet(idTypeProp)) {
             String identifierUuid = properties.getGlobalProperty(idTypeProp);
             if (isPatientIdentifierTypeExists(identifierUuid)) {
-                registrationCoreService.findByPatientIdentifier(subjectId, identifierUuid);
+                patient = registrationCoreService.findByPatientIdentifier(subjectId, identifierUuid);
             } else {
                 LOGGER.warn("Identifier type defined by prop {} is missing: {}", idTypeProp, identifierUuid);
             }
         }
-        return null;
+        return patient;
     }
 
-    private boolean isPatientIdentifierTypeExists(String PatientIdentifierTypeUuid) {
-        return patientService.getPatientIdentifierTypeByUuid(PatientIdentifierTypeUuid) != null;
+    private boolean isPatientIdentifierTypeExists(String patientIdentifierTypeUuid) {
+        return patientService.getPatientIdentifierTypeByUuid(patientIdentifierTypeUuid) != null;
     }
 }
