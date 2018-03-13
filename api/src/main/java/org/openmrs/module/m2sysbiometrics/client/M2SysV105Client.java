@@ -59,7 +59,7 @@ public class M2SysV105Client extends AbstractM2SysClient {
 
         if (!fingerScanStatus.isRegisteredLocally()) {
             if (fingerScanStatus.isRegisteredNationally()) {
-                registrationService.fetchFromNational(fingerScanStatus.getNationalBiometricSubject(), capture);
+                registrationService.fetchFromMpiByNationalFpId(fingerScanStatus.getNationalBiometricSubject(), capture);
                 subject.setSubjectId(fingerScanStatus.getNationalBiometricSubject().getSubjectId());
             } else {
                 registrationService.registerLocally(subject, capture);
@@ -109,20 +109,28 @@ public class M2SysV105Client extends AbstractM2SysClient {
 
     @Override
     public List<BiometricMatch> search() {
-        M2SysCaptureResponse capture = scanDoubleFingers();
-        FingerScanStatus fingerScanStatus = checkIfFingerScanExists(capture);
+        M2SysCaptureResponse fingerScan = scanDoubleFingers();
+        FingerScanStatus fingerScanStatus = checkIfFingerScanExists(fingerScan);
+        List<BiometricMatch> results = searchService.search(fingerScan, localBioServerClient);
 
         if (nationalBioServerClient.isServerUrlConfigured()) {
             try {
                 if (fingerScanStatus.isRegisteredLocally()) {
-                    registrationService.synchronizeFingerprints(capture, fingerScanStatus);
+                    registrationService.synchronizeFingerprints(fingerScan, fingerScanStatus);
+                } else {
+                    BiometricMatch nationalResult = searchService.findMostAdequate(fingerScan, nationalBioServerClient);
+                    if (nationalResult != null) {
+                        registrationService.fetchFromMpiByNationalFpId(new BiometricSubject(nationalResult.getSubjectId()),
+                                fingerScan);
+                        results.add(nationalResult);
+                    }
                 }
             } catch (RuntimeException exception) {
                 LOG.error("Connection failure to national server.", exception);
             }
         }
 
-        return searchService.search(capture, localBioServerClient);
+        return results;
     }
 
     @Override

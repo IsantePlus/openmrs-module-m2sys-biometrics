@@ -10,7 +10,7 @@ public interface RegistrationService {
 
     void registerNationally(BiometricSubject subject, M2SysCaptureResponse capture);
 
-    void fetchFromNational(BiometricSubject nationalBiometricSubject, M2SysCaptureResponse fingerScan);
+    void fetchFromMpiByNationalFpId(BiometricSubject nationalBiometricSubject, M2SysCaptureResponse fingerScan);
 
     void synchronizeFingerprints(M2SysCaptureResponse fingerScan, FingerScanStatus fingerScanStatus);
 }
