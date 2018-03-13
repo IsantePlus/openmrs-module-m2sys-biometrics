@@ -64,7 +64,9 @@ public class M2SysV105Client extends AbstractM2SysClient {
             } else {
                 registrationService.registerLocally(subject, capture);
             }
-        } else if (nationalBioServerClient.isServerUrlConfigured() && !fingerScanStatus.isRegisteredNationally()) {
+        }
+
+        if (nationalBioServerClient.isServerUrlConfigured() && !fingerScanStatus.isRegisteredNationally()) {
             registrationService.registerNationally(subject, capture);
         }
 
