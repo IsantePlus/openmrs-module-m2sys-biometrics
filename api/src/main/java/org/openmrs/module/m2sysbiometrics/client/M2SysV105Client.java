@@ -69,6 +69,7 @@ public class M2SysV105Client extends AbstractM2SysClient {
                 registrationService.registerLocally(subject, capture);
             }
         } else {
+            subject.setSubjectId(fingerScanStatus.getLocalBiometricSubject().getSubjectId());
             enrollmentStatus = EnrollmentStatus.ALREADY_REGISTERED;
         }
 
