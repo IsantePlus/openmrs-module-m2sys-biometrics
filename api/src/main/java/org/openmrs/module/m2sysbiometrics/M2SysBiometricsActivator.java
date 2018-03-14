@@ -13,23 +13,28 @@
  */
 package org.openmrs.module.m2sysbiometrics;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.openmrs.api.context.Context;
 import org.openmrs.module.BaseModuleActivator;
+import org.openmrs.module.m2sysbiometrics.scheduler.impl.M2SysSchedulerServiceImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class contains the logic that is run every time this module is either started or shutdown
  */
 public class M2SysBiometricsActivator extends BaseModuleActivator {
 
-    private Log log = LogFactory.getLog(this.getClass());
+    private static final Logger LOGGER = LoggerFactory.getLogger(M2SysBiometricsActivator.class);
 
-    public void startup() {
-        log.info("Starting m2sys Biometrics Module");
+    @Override
+    public void started() {
+        LOGGER.info("Starting m2sys Biometrics Module");
+        Context.getRegisteredComponents(M2SysSchedulerServiceImpl.class).get(0).runM2SysScheduler();
     }
 
-    public void shutdown() {
-        log.info("Shutting down m2sys Biometrics Module");
+    @Override
+    public void stopped() {
+        LOGGER.info("Shutting down m2sys Biometrics Module");
     }
 
 }

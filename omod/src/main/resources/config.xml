@@ -165,6 +165,13 @@
         </description>
     </globalProperty>
 
+    <globalProperty>
+        <property>${project.parent.artifactId}.nationalRegistrationTaskInterval</property>
+        <description>
+            Interval time (in seconds) to execute retry of national registration failures task.
+        </description>
+    </globalProperty>
+
     <!-- /Required Global Properties -->
 
     <!--
