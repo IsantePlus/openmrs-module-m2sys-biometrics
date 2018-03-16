@@ -41,7 +41,7 @@ public class PatientHelperImpl implements PatientHelper {
         Patient patient = null;
         if (properties.isGlobalPropertySet(idTypeProp)) {
             String identifierUuid = properties.getGlobalProperty(idTypeProp);
-            if (isPatientIdentifierTypeExists(identifierUuid)) {
+            if (patientIdentifierTypeExists(identifierUuid)) {
                 patient = registrationCoreService.findByPatientIdentifier(subjectId, identifierUuid);
             } else {
                 LOGGER.warn("Identifier type defined by prop {} is missing: {}", idTypeProp, identifierUuid);
@@ -50,7 +50,7 @@ public class PatientHelperImpl implements PatientHelper {
         return patient;
     }
 
-    private boolean isPatientIdentifierTypeExists(String patientIdentifierTypeUuid) {
+    private boolean patientIdentifierTypeExists(String patientIdentifierTypeUuid) {
         return patientService.getPatientIdentifierTypeByUuid(patientIdentifierTypeUuid) != null;
     }
 }
