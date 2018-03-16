@@ -17,6 +17,8 @@ import org.openmrs.module.m2sysbiometrics.service.impl.RegistrationServiceImpl;
 import org.openmrs.module.m2sysbiometrics.util.PatientHelper;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricSubject;
 
+import java.util.UUID;
+
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -62,10 +64,11 @@ public class RegistrationServiceTest {
     @Test
     public void shouldTryToRegisterNationallyWithoutException() throws Exception {
         //given
-        when(nationalBioServerClient.enroll(subject.getSubjectId(), capture.getTemplateData())).thenReturn(EXISTING_RESULT_XML);
+        String nationalId = UUID.randomUUID().toString();
+        when(nationalBioServerClient.enroll(nationalId, capture.getTemplateData())).thenReturn(EXISTING_RESULT_XML);
 
         //when
-        registrationService.registerNationally(subject.getSubjectId(), capture);
+        registrationService.registerNationally(nationalId, capture);
     }
 
     @Test(expected = M2SysBiometricsException.class)
