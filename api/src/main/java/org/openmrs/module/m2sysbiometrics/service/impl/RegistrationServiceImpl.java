@@ -16,6 +16,7 @@ import org.openmrs.module.m2sysbiometrics.model.M2SysCaptureResponse;
 import org.openmrs.module.m2sysbiometrics.model.M2SysResults;
 import org.openmrs.module.m2sysbiometrics.service.RegistrationService;
 import org.openmrs.module.m2sysbiometrics.util.M2SysProperties;
+import org.openmrs.module.m2sysbiometrics.util.NationalUuidGenerator;
 import org.openmrs.module.m2sysbiometrics.util.PatientHelper;
 import org.openmrs.module.m2sysbiometrics.xml.XmlResultUtil;
 import org.openmrs.module.registrationcore.RegistrationCoreConstants;
@@ -52,9 +53,12 @@ public class RegistrationServiceImpl implements RegistrationService {
     @Autowired
     private LocationService locationService;
 
+    @Autowired
+    private NationalUuidGenerator nationalUuidGenerator;
+
     @Override
-    public void registerLocally(BiometricSubject subject, M2SysCaptureResponse fingerScan) {
-        String response = localBioServerClient.enroll(subject.getSubjectId(), fingerScan.getTemplateData());
+    public void registerLocally(BiometricSubject subject, M2SysCaptureResponse capture) {
+        String response = localBioServerClient.enroll(subject.getSubjectId(), capture.getTemplateData());
         M2SysResults results = XmlResultUtil.parse(response);
 
         if (!results.isRegisterSuccess()) {
@@ -66,9 +70,9 @@ public class RegistrationServiceImpl implements RegistrationService {
     }
 
     @Override
-    public void registerNationally(BiometricSubject subject, M2SysCaptureResponse fingerScan) {
+    public void registerNationally(String nationalId, M2SysCaptureResponse capture) {
         try {
-            String response = nationalBioServerClient.enroll(subject.getSubjectId(), fingerScan.getTemplateData());
+            String response = nationalBioServerClient.enroll(nationalId, capture.getTemplateData());
             M2SysResults results = XmlResultUtil.parse(response);
 
             if (!results.isRegisterSuccess()) {
@@ -96,7 +100,8 @@ public class RegistrationServiceImpl implements RegistrationService {
                 attachNationalIdToThePatient(patient, nationalId);
             }
         } else {
-            registerNationally(fingerScanStatus.getLocalBiometricSubject(), fingerScan);
+            String nationalId = nationalUuidGenerator.generate();
+            registerNationally(nationalId, fingerScan);
         }
     }
 

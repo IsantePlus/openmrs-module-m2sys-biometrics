@@ -6,9 +6,9 @@ import org.openmrs.module.registrationcore.api.biometrics.model.BiometricSubject
 
 public interface RegistrationService {
 
-    void registerLocally(BiometricSubject subject, M2SysCaptureResponse fingerScan);
+    void registerLocally(BiometricSubject subject, M2SysCaptureResponse capture);
 
-    void registerNationally(BiometricSubject subject, M2SysCaptureResponse fingerScan);
+    void registerNationally(String nationalId, M2SysCaptureResponse capture);
 
     void fetchFromMpiByNationalFpId(BiometricSubject nationalBiometricSubject, M2SysCaptureResponse fingerScan);
 
