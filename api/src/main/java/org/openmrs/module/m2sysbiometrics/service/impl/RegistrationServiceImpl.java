@@ -1,13 +1,11 @@
 package org.openmrs.module.m2sysbiometrics.service.impl;
 
-import org.apache.commons.lang3.StringUtils;
 import org.openmrs.Location;
 import org.openmrs.Patient;
 import org.openmrs.PatientIdentifier;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.api.LocationService;
 import org.openmrs.api.PatientService;
-import org.openmrs.module.m2sysbiometrics.bioplugin.AbstractBioServerClient;
 import org.openmrs.module.m2sysbiometrics.bioplugin.LocalBioServerClient;
 import org.openmrs.module.m2sysbiometrics.bioplugin.NationalBioServerClient;
 import org.openmrs.module.m2sysbiometrics.exception.M2SysBiometricsException;
@@ -30,7 +28,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class RegistrationServiceImpl implements RegistrationService {
 
-    private static final Logger LOG = LoggerFactory.getLogger(RegistrationServiceImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RegistrationServiceImpl.class);
 
     @Autowired
     private PatientHelper patientHelper;
@@ -63,9 +61,9 @@ public class RegistrationServiceImpl implements RegistrationService {
 
         if (!results.isRegisterSuccess()) {
             String responseValue = results.firstValue();
-            LOG.info("Got error response from the local server: {}. Checking if tied to patient.", responseValue);
+            LOGGER.info("Got error response from the local server: {}. Checking if tied to patient.", responseValue);
             Patient patient = patientHelper.findByLocalFpId(responseValue);
-            handleRegistrationError(subject, results, patient, localBioServerClient);
+            localBioServerClient.handleRegistrationError(subject, responseValue, patient);
         }
     }
 
@@ -74,12 +72,12 @@ public class RegistrationServiceImpl implements RegistrationService {
         try {
             String response = nationalBioServerClient.enroll(nationalId, capture.getTemplateData());
             M2SysResults results = XmlResultUtil.parse(response);
-
             if (!results.isRegisterSuccess()) {
-                LOG.error("Registration with the national fingerprint server failed.");
+                throw new M2SysBiometricsException("National registration failed");
             }
-        } catch (RuntimeException exception) {
-            LOG.error("Registration with the national fingerprint server failed.", exception);
+        } catch (Exception e) {
+            LOGGER.error("Registration with the national fingerprint server failed.", e);
+            nationalBioServerClient.handleRegistrationError(nationalId, capture);
         }
     }
 
@@ -112,36 +110,6 @@ public class RegistrationServiceImpl implements RegistrationService {
         PatientIdentifier nationalIdentifier = new PatientIdentifier(nationalId, patientIdentifierType, location);
         patient.addIdentifier(nationalIdentifier);
         patientService.savePatient(patient);
-    }
-
-    private void handleRegistrationError(BiometricSubject subject, M2SysResults results, Patient patient,
-                                         AbstractBioServerClient client) {
-        if (patient == null) {
-            String responseValue = results.firstValue();
-            LOG.info("No patient matching fingerprint ID: {}", responseValue);
-
-            String isRegisterResponse = client.isRegistered(results.firstValue());
-            M2SysResults isRegisterResults = XmlResultUtil.parse(isRegisterResponse);
-
-            if (isRegisterResults.isLookupNotFound()) {
-                throw new M2SysBiometricsException("No success during fingerprint registration: "
-                        + responseValue);
-            } else {
-                LOG.info("Fingerprints are registered with ID {} but do not match any patient, fixing.",
-                        responseValue);
-                if (!StringUtils.equals(subject.getSubjectId(), responseValue)) {
-                    LOG.info("Changing existing fingerprint ID {} to {}",
-                            responseValue, subject.getSubjectId());
-
-                    client.changeId(responseValue, subject.getSubjectId());
-                } else {
-                    LOG.info("User already has the same fingerprints registered under his fingerprint ID");
-                }
-            }
-        } else {
-            throw new M2SysBiometricsException("Fingerprints already match patient: "
-                    + patient.getPersonName().getFullName());
-        }
     }
 
     private String getNationalPatientIdentifierTypeUuid() {
