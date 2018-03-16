@@ -48,6 +48,9 @@ public final class M2SysBiometricsConstants {
 
     public static final String ERROR_CODE_OF_SUBJECT_NOT_EXIST = "CS004";
 
+    // if this system var is set, always returns the value as the template, skipping scanning
+    public static final String CONST_TEST_TEMPLATE = "m2sys-biometrics.server.constTestTemplate";
+
     public static String getErrorMessage(String errorCode) {
         return ResourceBundle.getBundle("MessageBundle").getString("m2sys.response.error." + errorCode);
     }

@@ -4,6 +4,7 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
 import org.openmrs.api.AdministrationService;
+import org.openmrs.api.PatientService;
 import org.openmrs.module.m2sysbiometrics.M2SysBiometricSensitiveTestBase;
 import org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants;
 import org.openmrs.module.m2sysbiometrics.M2SysEngine;
@@ -38,7 +39,8 @@ public class M2SysIT extends M2SysBiometricSensitiveTestBase {
     @Autowired
     private LocalBioServerClient localBioServerClient;
 
-    private ObjectMapper objectMapper = new ObjectMapper();
+    @Autowired
+    private PatientService patientService;
 
     @Before
     public void setUp() {
@@ -50,7 +52,7 @@ public class M2SysIT extends M2SysBiometricSensitiveTestBase {
 
         String localServiceUrl = System.getenv("m2sys-biometrics.local-service.url");
         String nationalServiceUrl = System.getenv("m2sys.biometrics.national-service.url");
-        String nationalServiceUsername = "ss"; // System.getenv("m2sys.biometrics.national-service.username");
+        String nationalServiceUsername = System.getenv("m2sys.biometrics.national-service.username");
         String nationalServicePassword = System.getenv("m2sys.biometrics.national-service.password");
 
         adminService.setGlobalProperty(M2SysBiometricsConstants.M2SYS_CUSTOMER_KEY, custKey);
@@ -83,22 +85,18 @@ public class M2SysIT extends M2SysBiometricSensitiveTestBase {
         //engine.delete(subject.getSubjectId());
         //engine.enroll(subject);
 
-        String response = localBioServerClient.isRegistered("test");
-        response = nationalBioServerClient.isRegistered("SEARCH_TEST2");
+        localBioServerClient.delete("0da5aa64-1cbf-490f-9053-ca4076609f07");
+        nationalBioServerClient.delete("NFP_TEST");
+        localBioServerClient.delete("SEARCH_TEST2");
+        nationalBioServerClient.delete("SEARCH_TEST2");
 
-        assertNotNull(response);
 
-       // List<BiometricMatch> matches = engine.search(subject);
+        //String response = nationalBioServerClient.identify(biometricXml);
+        //response = localBioServerClient.identify(biometricXml);
 
-        //bioServerClient.isRegistered(localServiceUrl, subject.getSubjectId());
+        // local 0da5aa64-1cbf-490f-9053-ca4076609f07
+        // national NFP_TEST
 
-/*        subject = engine.enroll(subject);
-        subject = engine.update(subject);*/
-        //List<BiometricMatch> matches = engine.search(subject);
-
-        //engine.enroll(subject);
-
-        //List<BiometricMatch> matches = engine.search(subject);
-        //assertNotNull(matches);
+        engine.enroll(subject);
     }
 }
