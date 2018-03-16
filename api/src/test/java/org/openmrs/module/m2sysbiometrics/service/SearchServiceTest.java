@@ -28,6 +28,8 @@ public class SearchServiceTest {
 
     private static final String ERROR_RESULT_XML = "<Results><result score='0' value='TEMPLATE_FORMAT_ERROR'></Results>";
 
+    private static final String NOT_FOUND_RESULT_XML = "<Results><result score='0' value='-1'></Results>";
+
     @Mock
     private LocalBioServerClient localBioServerClient;
 
@@ -38,6 +40,9 @@ public class SearchServiceTest {
     private SearchService searchService = new SearchServiceImpl();
 
     private M2SysCaptureResponse goodFingerScan = M2SysCaptureResponseMother.withTemplateData("<xml>good fingerprint</xml>");
+
+    private M2SysCaptureResponse notExistingFingerScan = M2SysCaptureResponseMother.withTemplateData(
+            "<xml>not existing good fingerprint</xml>");
 
     private M2SysCaptureResponse badFingerScan = M2SysCaptureResponseMother.withTemplateData("bad fingerprint");
 
@@ -86,6 +91,32 @@ public class SearchServiceTest {
 
         //when
         List<BiometricMatch> results = searchService.searchNationally(badFingerScan);
+
+        //then
+        Assert.assertTrue(results.isEmpty());
+    }
+
+    @Test
+    public void shouldSearchLocallyWithEmptyResult() throws Exception {
+        //given
+        when(localBioServerClient.identify(notExistingFingerScan.getTemplateData()))
+                .thenReturn(NOT_FOUND_RESULT_XML);
+
+        //when
+        List<BiometricMatch> results = searchService.searchLocally(notExistingFingerScan);
+
+        //then
+        Assert.assertTrue(results.isEmpty());
+    }
+
+    @Test
+    public void shouldSearchNationallyWithEmptyResult() throws Exception {
+        //given
+        when(nationalBioServerClient.identify(notExistingFingerScan.getTemplateData()))
+                .thenReturn(NOT_FOUND_RESULT_XML);
+
+        //when
+        List<BiometricMatch> results = searchService.searchNationally(notExistingFingerScan);
 
         //then
         Assert.assertTrue(results.isEmpty());

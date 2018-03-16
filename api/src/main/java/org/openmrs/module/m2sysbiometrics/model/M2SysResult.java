@@ -20,7 +20,8 @@ public class M2SysResult {
     public static final String FAILED = "-1";
     public static final String SUCCESS = "SUCCESS";
     public static final String LICENSE_ERROR = "LICENSE_ERROR";
-    public static final int SEARCH_ERROR = 0;
+    public static final int SEARCH_ERROR_SCORE = 0;
+    public static final String SEARCH_NOT_FOUND = "-1";
 
     @XmlAttribute
     private int score;

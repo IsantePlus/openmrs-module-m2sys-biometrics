@@ -1,5 +1,6 @@
 package org.openmrs.module.m2sysbiometrics.model;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricMatch;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -50,8 +51,14 @@ public class M2SysResults {
     }
 
     public boolean isSearchError() {
-        return results.get(0).getScore() == M2SysResult.SEARCH_ERROR;
-    }
+        boolean searchError = true;
+
+        if (isSearchResultWithoutErrorScore() || firstValueEqualsIgnoreCase(M2SysResult.SEARCH_NOT_FOUND)) {
+            searchError = false;
+        }
+        
+        return searchError;
+    }   
 
     public String firstValue() {
         if (results.isEmpty()) {
@@ -78,5 +85,9 @@ public class M2SysResults {
         }
 
         return matches;
+    }
+
+    private boolean isSearchResultWithoutErrorScore() {
+        return CollectionUtils.isNotEmpty(results) && results.get(0).getScore() != M2SysResult.SEARCH_ERROR_SCORE;
     }
 }

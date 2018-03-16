@@ -30,17 +30,14 @@ public class SearchServiceImpl implements SearchService {
 
     @Override
     public List<BiometricMatch> searchLocally(M2SysCaptureResponse fingerScan) {
-        List<BiometricMatch> biometricMatches;
         String response = localBioServerClient.identify(fingerScan.getTemplateData());
         M2SysResults results = XmlResultUtil.parse(response);
 
         if (results.isSearchError()) {
             throw new M2SysBiometricsException("Error occurred during local fingerprint search: " + results.firstValue());
-        } else {
-            biometricMatches = results.toOpenMrsMatchList();
         }
 
-        return biometricMatches;
+        return results.toOpenMrsMatchList();
     }
 
     @Override
