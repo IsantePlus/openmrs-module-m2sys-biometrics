@@ -49,6 +49,10 @@ public class M2SysResults {
         return firstValueEqualsIgnoreCase(M2SysResult.UPDATE_SUBJECT_ID_SUCCESS);
     }
 
+    public boolean isSearchError() {
+        return results.get(0).getScore() == M2SysResult.SEARCH_ERROR;
+    }
+
     public String firstValue() {
         if (results.isEmpty()) {
             return null;

@@ -1,0 +1,93 @@
+package org.openmrs.module.m2sysbiometrics.service;
+
+import org.junit.Assert;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
+import org.openmrs.module.m2sysbiometrics.bioplugin.LocalBioServerClient;
+import org.openmrs.module.m2sysbiometrics.bioplugin.NationalBioServerClient;
+import org.openmrs.module.m2sysbiometrics.exception.M2SysBiometricsException;
+import org.openmrs.module.m2sysbiometrics.model.M2SysCaptureResponse;
+import org.openmrs.module.m2sysbiometrics.service.impl.SearchServiceImpl;
+import org.openmrs.module.m2sysbiometrics.testdata.M2SysCaptureResponseMother;
+import org.openmrs.module.registrationcore.api.biometrics.model.BiometricMatch;
+
+import java.util.List;
+
+import static org.mockito.Mockito.when;
+
+@RunWith(MockitoJUnitRunner.class)
+public class SearchServiceTest {
+
+    private static final String EXISTING_SUBJECT_ID = "ExistingSubjectId";
+
+    private static final String EXISTING_RESULT_XML = "<Results><result score='72' value='" + EXISTING_SUBJECT_ID +
+            "'></Results>";
+
+    private static final String ERROR_RESULT_XML = "<Results><result score='0' value='TEMPLATE_FORMAT_ERROR'></Results>";
+
+    @Mock
+    private LocalBioServerClient localBioServerClient;
+
+    @Mock
+    private NationalBioServerClient nationalBioServerClient;
+
+    @InjectMocks
+    private SearchService searchService = new SearchServiceImpl();
+
+    private M2SysCaptureResponse goodFingerScan = M2SysCaptureResponseMother.withTemplateData("<xml>good fingerprint</xml>");
+
+    private M2SysCaptureResponse badFingerScan = M2SysCaptureResponseMother.withTemplateData("bad fingerprint");
+
+    @Test
+    public void shouldSearchLocallyWithSuccess() throws Exception {
+        //given
+        when(localBioServerClient.identify(goodFingerScan.getTemplateData()))
+                .thenReturn(EXISTING_RESULT_XML);
+
+        //when
+        List<BiometricMatch> results = searchService.searchLocally(goodFingerScan);
+
+        //then
+        Assert.assertEquals(EXISTING_SUBJECT_ID, results.get(0).getSubjectId());
+    }
+
+    @Test(expected = M2SysBiometricsException.class)
+    public void shouldSearchLocallyWithException() throws Exception {
+        //given
+        when(localBioServerClient.identify(badFingerScan.getTemplateData()))
+                .thenReturn(ERROR_RESULT_XML);
+
+        //when
+        searchService.searchLocally(badFingerScan);
+    }
+
+    @Test
+    public void shouldSearchNationallyWithSuccess() throws Exception {
+        //given
+        when(nationalBioServerClient.identify(goodFingerScan.getTemplateData()))
+                .thenReturn(EXISTING_RESULT_XML);
+
+        //when
+        List<BiometricMatch> results = searchService.searchNationally(goodFingerScan);
+
+        //then
+        Assert.assertEquals(results.size(), 1);
+        Assert.assertEquals(EXISTING_SUBJECT_ID, results.get(0).getSubjectId());
+    }
+
+    @Test
+    public void shouldSearchNationallyWithoutException() throws Exception {
+        //given
+        when(nationalBioServerClient.identify(badFingerScan.getTemplateData()))
+                .thenReturn(ERROR_RESULT_XML);
+
+        //when
+        List<BiometricMatch> results = searchService.searchNationally(badFingerScan);
+
+        //then
+        Assert.assertTrue(results.isEmpty());
+    }
+}
