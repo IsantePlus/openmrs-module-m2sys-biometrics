@@ -14,13 +14,16 @@ import org.openmrs.module.m2sysbiometrics.testdata.BiometricSubjectMother;
 import org.openmrs.module.m2sysbiometrics.testdata.M2SysCaptureResponseMother;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricSubject;
 
+import java.util.UUID;
+
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class UpdateServiceTest {
-    private static final String EXISTING_RESULT_XML = "<Results><result score='1' value='SUCCESS'></Results>";
 
-    private static final String EMPTY_RESULT_XML = "<Results><result score='0' value='empty'></Results>";
+    private static final String UPDATE_SUCCESS_RESULT_XML = "<Results><result score='0' value='SUCCESS'></Results>";
+
+    private static final String ALREADY_EXISTS_RESULT_XML = "<Results><result score='0' value='b0f04-exists'></Results>";
 
     @Mock
     private LocalBioServerClient localBioServerClient;
@@ -38,7 +41,29 @@ public class UpdateServiceTest {
     @Test
     public void shouldUpdateLocally() throws Exception {
         //given
-        when(localBioServerClient.update(subject.getSubjectId(), capture.getTemplateData())).thenReturn(EXISTING_RESULT_XML);
+        when(localBioServerClient.update(subject.getSubjectId(), capture.getTemplateData()))
+                .thenReturn(UPDATE_SUCCESS_RESULT_XML);
+
+        //when
+        updateService.updateLocally(subject, capture);
+    }
+
+    @Test
+    public void shouldUpdateNationally() throws Exception {
+        //given
+        String nationalId = UUID.randomUUID().toString();
+        when(nationalBioServerClient.update(nationalId, capture.getTemplateData()))
+                .thenReturn(UPDATE_SUCCESS_RESULT_XML);
+
+        //when
+        updateService.updateLocally(subject, capture);
+    }
+
+    @Test(expected = M2SysBiometricsException.class)
+    public void shouldUpdateLocallyWithException() throws Exception {
+        //given
+        when(localBioServerClient.update(subject.getSubjectId(), capture.getTemplateData()))
+                .thenReturn(ALREADY_EXISTS_RESULT_XML);
 
         //when
         updateService.updateLocally(subject, capture);
@@ -47,18 +72,11 @@ public class UpdateServiceTest {
     @Test
     public void shouldTryToUpdateNationallyWithoutException() throws Exception {
         //given
-        when(nationalBioServerClient.update(subject.getSubjectId(), capture.getTemplateData())).thenReturn(EXISTING_RESULT_XML);
+        String nationalId = UUID.randomUUID().toString();
+        when(nationalBioServerClient.update(nationalId, capture.getTemplateData()))
+                .thenReturn(ALREADY_EXISTS_RESULT_XML);
 
         //when
         updateService.updateNationally(subject, capture);
-    }
-
-    @Test(expected = M2SysBiometricsException.class)
-    public void shouldUpdateLocallyWithException() throws Exception {
-        //given
-        when(localBioServerClient.update(subject.getSubjectId(), capture.getTemplateData())).thenReturn(EMPTY_RESULT_XML);
-
-        //when
-        updateService.updateLocally(subject, capture);
     }
 }
