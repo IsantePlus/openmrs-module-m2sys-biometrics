@@ -111,14 +111,14 @@ public class M2SysV105Client extends AbstractM2SysClient {
     public List<BiometricMatch> search() {
         M2SysCaptureResponse fingerScan = scanDoubleFingers();
         FingerScanStatus fingerScanStatus = checkIfFingerScanExists(fingerScan);
-        List<BiometricMatch> results = searchService.search(fingerScan, localBioServerClient);
+        List<BiometricMatch> results = searchService.searchLocally(fingerScan);
 
         if (nationalBioServerClient.isServerUrlConfigured()) {
             try {
                 if (fingerScanStatus.isRegisteredLocally()) {
                     registrationService.synchronizeFingerprints(fingerScan, fingerScanStatus);
                 } else {
-                    BiometricMatch nationalResult = searchService.findMostAdequate(fingerScan, nationalBioServerClient);
+                    BiometricMatch nationalResult = searchService.findMostAdequateNationally(fingerScan);
                     if (nationalResult != null) {
                         registrationService.fetchFromMpiByNationalFpId(new BiometricSubject(nationalResult.getSubjectId()),
                                 fingerScan);
@@ -164,14 +164,12 @@ public class M2SysV105Client extends AbstractM2SysClient {
     }
 
     private FingerScanStatus checkIfFingerScanExists(M2SysCaptureResponse fingerScan) {
-        BiometricSubject localBiometricSubject = searchService.findMostAdequateBiometricSubject(fingerScan,
-                localBioServerClient);
+        BiometricSubject localBiometricSubject = searchService.findMostAdequateSubjectLocally(fingerScan);
         BiometricSubject nationalBiometricSubject = null;
 
         if (nationalBioServerClient.isServerUrlConfigured()) {
             try {
-                nationalBiometricSubject = searchService.findMostAdequateBiometricSubject(fingerScan,
-                        nationalBioServerClient);
+                nationalBiometricSubject = searchService.findMostAdequateSubjectNationally(fingerScan);
             } catch (RuntimeException exception) {
                 LOG.error("Connection failure to national server.", exception);
             }
