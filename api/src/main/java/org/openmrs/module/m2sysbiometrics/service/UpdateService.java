@@ -7,5 +7,5 @@ public interface UpdateService {
 
     void updateLocally(BiometricSubject subject, M2SysCaptureResponse capture);
 
-    void updateNationally(String nationalId, M2SysCaptureResponse capture);
+    void updateNationally(BiometricSubject subject, M2SysCaptureResponse capture);
 }

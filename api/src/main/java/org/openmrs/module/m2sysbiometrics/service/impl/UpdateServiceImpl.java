@@ -32,10 +32,10 @@ public class UpdateServiceImpl implements UpdateService {
     }
 
     @Override
-    public void updateNationally(String nationalId, M2SysCaptureResponse fingerScan) {
-        String response = nationalBioServerClient.update(nationalId, fingerScan.getTemplateData());
+    public void updateNationally(BiometricSubject subject, M2SysCaptureResponse fingerScan) {
+        String response = nationalBioServerClient.update(subject.getSubjectId(), fingerScan.getTemplateData());
         if (!XmlResultUtil.parse(response).isUpdateSuccess()) {
-            LOG.error("Unable to update fingerprints nationally for: " + nationalId);
+            LOG.error("Unable to update fingerprints nationally for: " + subject.getSubjectId());
         }
     }
 }
