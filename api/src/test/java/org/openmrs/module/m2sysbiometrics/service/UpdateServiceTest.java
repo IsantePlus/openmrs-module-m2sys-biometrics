@@ -52,11 +52,11 @@ public class UpdateServiceTest {
     public void shouldUpdateNationally() throws Exception {
         //given
         String nationalId = UUID.randomUUID().toString();
-        when(nationalBioServerClient.update(nationalId, capture.getTemplateData()))
+        when(nationalBioServerClient.update(subject.getSubjectId(), capture.getTemplateData()))
                 .thenReturn(UPDATE_SUCCESS_RESULT_XML);
 
         //when
-        updateService.updateLocally(subject, capture);
+        updateService.updateNationally(subject, capture);
     }
 
     @Test(expected = M2SysBiometricsException.class)
@@ -72,8 +72,7 @@ public class UpdateServiceTest {
     @Test
     public void shouldTryToUpdateNationallyWithoutException() throws Exception {
         //given
-        String nationalId = UUID.randomUUID().toString();
-        when(nationalBioServerClient.update(nationalId, capture.getTemplateData()))
+        when(nationalBioServerClient.update(subject.getSubjectId(), capture.getTemplateData()))
                 .thenReturn(ALREADY_EXISTS_RESULT_XML);
 
         //when
