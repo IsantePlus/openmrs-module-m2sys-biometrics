@@ -1,16 +1,22 @@
 package org.openmrs.module.m2sysbiometrics.service;
 
-import java.util.List;
-import org.openmrs.module.m2sysbiometrics.bioplugin.BioServerClient;
 import org.openmrs.module.m2sysbiometrics.model.M2SysCaptureResponse;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricMatch;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricSubject;
 
+import java.util.List;
+
 public interface SearchService {
 
-    List<BiometricMatch> search(M2SysCaptureResponse fingerScan, BioServerClient client);
+    List<BiometricMatch> searchLocally(M2SysCaptureResponse fingerScan);
 
-    BiometricMatch findMostAdequate(M2SysCaptureResponse fingerScan, BioServerClient client);
+    List<BiometricMatch> searchNationally(M2SysCaptureResponse fingerScan);
 
-    BiometricSubject findMostAdequateBiometricSubject(M2SysCaptureResponse fingerScan, BioServerClient client);
+    BiometricMatch findMostAdequateLocally(M2SysCaptureResponse fingerScan);
+
+    BiometricMatch findMostAdequateNationally(M2SysCaptureResponse fingerScan);
+
+    BiometricSubject findMostAdequateSubjectLocally(M2SysCaptureResponse fingerScan);
+
+    BiometricSubject findMostAdequateSubjectNationally(M2SysCaptureResponse fingerScan);
 }
