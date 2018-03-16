@@ -56,7 +56,7 @@ public class UpdateServiceTest {
                 .thenReturn(UPDATE_SUCCESS_RESULT_XML);
 
         //when
-        updateService.updateLocally(subject, capture);
+        updateService.updateNationally(nationalId, capture);
     }
 
     @Test(expected = M2SysBiometricsException.class)
@@ -77,6 +77,6 @@ public class UpdateServiceTest {
                 .thenReturn(ALREADY_EXISTS_RESULT_XML);
 
         //when
-        updateService.updateNationally(subject, capture);
+        updateService.updateNationally(nationalId, capture);
     }
 }
