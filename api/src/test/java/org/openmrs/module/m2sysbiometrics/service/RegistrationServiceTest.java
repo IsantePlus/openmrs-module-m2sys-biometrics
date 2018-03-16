@@ -65,7 +65,7 @@ public class RegistrationServiceTest {
         when(nationalBioServerClient.enroll(subject.getSubjectId(), capture.getTemplateData())).thenReturn(EXISTING_RESULT_XML);
 
         //when
-        registrationService.registerNationally(subject, capture);
+        registrationService.registerNationally(subject.getSubjectId(), capture);
     }
 
     @Test(expected = M2SysBiometricsException.class)

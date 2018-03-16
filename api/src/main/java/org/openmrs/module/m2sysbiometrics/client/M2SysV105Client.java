@@ -14,6 +14,7 @@ import org.openmrs.module.m2sysbiometrics.model.M2SysResults;
 import org.openmrs.module.m2sysbiometrics.model.Token;
 import org.openmrs.module.m2sysbiometrics.service.RegistrationService;
 import org.openmrs.module.m2sysbiometrics.service.SearchService;
+import org.openmrs.module.m2sysbiometrics.util.NationalUuidGenerator;
 import org.openmrs.module.m2sysbiometrics.xml.XmlResultUtil;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricMatch;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricSubject;
@@ -44,6 +45,9 @@ public class M2SysV105Client extends AbstractM2SysClient {
     @Autowired
     private SearchService searchService;
 
+    @Autowired
+    private NationalUuidGenerator nationalUuidGenerator;
+
     private JAXBContext jaxbContext;
 
     @PostConstruct
@@ -67,7 +71,8 @@ public class M2SysV105Client extends AbstractM2SysClient {
         }
 
         if (nationalBioServerClient.isServerUrlConfigured() && !fingerScanStatus.isRegisteredNationally()) {
-            registrationService.registerNationally(subject, capture);
+            String nationalId = nationalUuidGenerator.generate();
+            registrationService.registerNationally(nationalId, capture);
         }
 
         Fingers fingers = capture.getFingerData(jaxbContext);
