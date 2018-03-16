@@ -14,6 +14,7 @@ import org.openmrs.module.m2sysbiometrics.model.M2SysResults;
 import org.openmrs.module.m2sysbiometrics.model.Token;
 import org.openmrs.module.m2sysbiometrics.service.RegistrationService;
 import org.openmrs.module.m2sysbiometrics.service.SearchService;
+import org.openmrs.module.m2sysbiometrics.service.UpdateService;
 import org.openmrs.module.m2sysbiometrics.xml.XmlResultUtil;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricMatch;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricSubject;
@@ -44,6 +45,9 @@ public class M2SysV105Client extends AbstractM2SysClient {
     @Autowired
     private SearchService searchService;
 
+    @Autowired
+    private UpdateService updateService;
+
     private JAXBContext jaxbContext;
 
     @PostConstruct
@@ -54,23 +58,23 @@ public class M2SysV105Client extends AbstractM2SysClient {
 
     @Override
     public BiometricSubject enroll(BiometricSubject subject) {
-        M2SysCaptureResponse capture = scanDoubleFingers();
-        FingerScanStatus fingerScanStatus = checkIfFingerScanExists(capture);
+        M2SysCaptureResponse fingerScan = scanDoubleFingers();
+        FingerScanStatus fingerScanStatus = checkIfFingerScanExists(fingerScan);
 
         if (!fingerScanStatus.isRegisteredLocally()) {
             if (fingerScanStatus.isRegisteredNationally()) {
-                registrationService.fetchFromMpiByNationalFpId(fingerScanStatus.getNationalBiometricSubject(), capture);
+                registrationService.fetchFromMpiByNationalFpId(fingerScanStatus.getNationalBiometricSubject(), fingerScan);
                 subject.setSubjectId(fingerScanStatus.getNationalBiometricSubject().getSubjectId());
             } else {
-                registrationService.registerLocally(subject, capture);
+                registrationService.registerLocally(subject, fingerScan);
             }
         }
 
         if (nationalBioServerClient.isServerUrlConfigured() && !fingerScanStatus.isRegisteredNationally()) {
-            registrationService.registerNationally(subject, capture);
+            registrationService.registerNationally(subject, fingerScan);
         }
 
-        Fingers fingers = capture.getFingerData(jaxbContext);
+        Fingers fingers = fingerScan.getFingerData(jaxbContext);
         subject.setFingerprints(fingers.toTwoOpenMrsFingerprints());
 
         return subject;
@@ -78,17 +82,18 @@ public class M2SysV105Client extends AbstractM2SysClient {
 
     @Override
     public BiometricSubject update(BiometricSubject subject) {
-        M2SysCaptureResponse capture = scanDoubleFingers();
+        M2SysCaptureResponse fingerScan = scanDoubleFingers();
+        FingerScanStatus fingerScanStatus = checkIfFingerScanExists(fingerScan);
 
-        String response = localBioServerClient.update(subject.getSubjectId(), capture.getTemplateData());
-        M2SysResults results = XmlResultUtil.parse(response);
+        updateService.updateLocally(subject, fingerScan);
 
-        if (!results.isUpdateSuccess()) {
-            throw new M2SysBiometricsException("Unable to update fingerprints for: "
-                    + subject.getSubjectId());
+        if (fingerScanStatus.isRegisteredNationally()) {
+            updateService.updateNationally(subject, fingerScan);
+        } else {
+            registrationService.registerNationally(subject, fingerScan);
         }
 
-        Fingers fingers = capture.getFingerData(jaxbContext);
+        Fingers fingers = fingerScan.getFingerData(jaxbContext);
         subject.setFingerprints(fingers.toTwoOpenMrsFingerprints());
 
         return subject;

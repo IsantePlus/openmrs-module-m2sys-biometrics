@@ -53,8 +53,8 @@ public class RegistrationServiceImpl implements RegistrationService {
     private LocationService locationService;
 
     @Override
-    public void registerLocally(BiometricSubject subject, M2SysCaptureResponse capture) {
-        String response = localBioServerClient.enroll(subject.getSubjectId(), capture.getTemplateData());
+    public void registerLocally(BiometricSubject subject, M2SysCaptureResponse fingerScan) {
+        String response = localBioServerClient.enroll(subject.getSubjectId(), fingerScan.getTemplateData());
         M2SysResults results = XmlResultUtil.parse(response);
 
         if (!results.isRegisterSuccess()) {
@@ -66,9 +66,9 @@ public class RegistrationServiceImpl implements RegistrationService {
     }
 
     @Override
-    public void registerNationally(BiometricSubject subject, M2SysCaptureResponse capture) {
+    public void registerNationally(BiometricSubject subject, M2SysCaptureResponse fingerScan) {
         try {
-            String response = nationalBioServerClient.enroll(subject.getSubjectId(), capture.getTemplateData());
+            String response = nationalBioServerClient.enroll(subject.getSubjectId(), fingerScan.getTemplateData());
             M2SysResults results = XmlResultUtil.parse(response);
 
             if (!results.isRegisterSuccess()) {
