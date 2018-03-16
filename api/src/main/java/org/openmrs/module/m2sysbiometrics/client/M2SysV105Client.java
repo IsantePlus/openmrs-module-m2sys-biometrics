@@ -64,33 +64,36 @@ public class M2SysV105Client extends AbstractM2SysClient {
     }
 
     @Override
-    public EnrollmentResult enroll(BiometricSubject subject) {
+    public EnrollmentResult enroll(BiometricSubject localSubject) {
         M2SysCaptureResponse capture = scanDoubleFingers();
         FingerScanStatus fingerScanStatus = checkIfFingerScanExists(capture);
         EnrollmentStatus enrollmentStatus = EnrollmentStatus.SUCCESS;
+        BiometricSubject nationalSubject = fingerScanStatus.getNationalBiometricSubject();
 
         if (!fingerScanStatus.isRegisteredLocally()) {
             if (fingerScanStatus.isRegisteredNationally()) {
                 registrationService.fetchFromMpiByNationalFpId(fingerScanStatus.getNationalBiometricSubject(), capture);
-                subject.setSubjectId(fingerScanStatus.getNationalBiometricSubject().getSubjectId());
+                localSubject.setSubjectId(fingerScanStatus.getNationalBiometricSubject().getSubjectId());
                 enrollmentStatus = EnrollmentStatus.ALREADY_REGISTERED;
             } else {
-                registrationService.registerLocally(subject, capture);
+                registrationService.registerLocally(localSubject, capture);
             }
         } else {
-            subject.setSubjectId(fingerScanStatus.getLocalBiometricSubject().getSubjectId());
+            localSubject.setSubjectId(fingerScanStatus.getLocalBiometricSubject().getSubjectId());
             enrollmentStatus = EnrollmentStatus.ALREADY_REGISTERED;
         }
 
         if (nationalBioServerClient.isServerUrlConfigured() && !fingerScanStatus.isRegisteredNationally()) {
             String nationalId = nationalUuidGenerator.generate();
             registrationService.registerNationally(nationalId, capture);
+            nationalSubject = new BiometricSubject(nationalId);
         }
 
         Fingers fingers = capture.getFingerData(jaxbContext);
-        subject.setFingerprints(fingers.toTwoOpenMrsFingerprints());
+        localSubject.setFingerprints(fingers.toTwoOpenMrsFingerprints());
+        nationalSubject.setFingerprints(fingers.toTwoOpenMrsFingerprints());
 
-        return new EnrollmentResult(subject, enrollmentStatus);
+        return new EnrollmentResult(localSubject, nationalSubject, enrollmentStatus);
     }
 
     @Override
