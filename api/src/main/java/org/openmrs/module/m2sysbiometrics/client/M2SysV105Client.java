@@ -1,24 +1,21 @@
 package org.openmrs.module.m2sysbiometrics.client;
 
-import org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants;
 import org.openmrs.module.m2sysbiometrics.bioplugin.LocalBioServerClient;
 import org.openmrs.module.m2sysbiometrics.bioplugin.NationalBioServerClient;
+import org.openmrs.module.m2sysbiometrics.capture.impl.CloudScanrCaptor;
+import org.openmrs.module.m2sysbiometrics.capture.impl.TestEnvCaptor;
 import org.openmrs.module.m2sysbiometrics.exception.M2SysBiometricsException;
 import org.openmrs.module.m2sysbiometrics.model.Finger;
 import org.openmrs.module.m2sysbiometrics.model.FingerScanStatus;
 import org.openmrs.module.m2sysbiometrics.model.Fingers;
-import org.openmrs.module.m2sysbiometrics.model.M2SysCaptureRequest;
 import org.openmrs.module.m2sysbiometrics.model.M2SysCaptureResponse;
 import org.openmrs.module.m2sysbiometrics.model.M2SysResult;
 import org.openmrs.module.m2sysbiometrics.model.M2SysResults;
-import org.openmrs.module.m2sysbiometrics.model.Token;
 import org.openmrs.module.m2sysbiometrics.service.RegistrationService;
 import org.openmrs.module.m2sysbiometrics.service.SearchService;
 import org.openmrs.module.m2sysbiometrics.xml.XmlResultUtil;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricMatch;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricSubject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -29,8 +26,6 @@ import java.util.List;
 
 @Component("m2sysbiometrics.M2SysV1Client")
 public class M2SysV105Client extends AbstractM2SysClient {
-
-    private static final Logger LOG = LoggerFactory.getLogger(M2SysV105Client.class);
 
     @Autowired
     private LocalBioServerClient localBioServerClient;
@@ -43,6 +38,12 @@ public class M2SysV105Client extends AbstractM2SysClient {
 
     @Autowired
     private SearchService searchService;
+
+    @Autowired
+    private CloudScanrCaptor cloudScanrCaptor;
+
+    @Autowired
+    private TestEnvCaptor testEnvCaptor;
 
     private JAXBContext jaxbContext;
 
@@ -126,7 +127,7 @@ public class M2SysV105Client extends AbstractM2SysClient {
                     }
                 }
             } catch (RuntimeException exception) {
-                LOG.error("Connection failure to national server.", exception);
+                getLogger().error("Connection failure to national server.", exception);
             }
         }
 
@@ -151,17 +152,6 @@ public class M2SysV105Client extends AbstractM2SysClient {
         }
     }
 
-    private M2SysCaptureResponse scanDoubleFingers() {
-        M2SysCaptureRequest request = new M2SysCaptureRequest();
-        addRequiredValues(request);
-        request.setCaptureType(1);
-
-        Token token = getToken();
-
-        return getHttpClient().postRequest(
-                getCloudScanrUrl() + M2SysBiometricsConstants.M2SYS_CAPTURE_ENDPOINT,
-                request, token, M2SysCaptureResponse.class);
-    }
 
     private FingerScanStatus checkIfFingerScanExists(M2SysCaptureResponse fingerScan) {
         BiometricSubject localBiometricSubject = searchService.findMostAdequateBiometricSubject(fingerScan,
@@ -173,10 +163,22 @@ public class M2SysV105Client extends AbstractM2SysClient {
                 nationalBiometricSubject = searchService.findMostAdequateBiometricSubject(fingerScan,
                         nationalBioServerClient);
             } catch (RuntimeException exception) {
-                LOG.error("Connection failure to national server.", exception);
+                getLogger().error("Connection failure to national server.", exception);
             }
         }
 
         return new FingerScanStatus(localBiometricSubject, nationalBiometricSubject);
+    }
+
+    private M2SysCaptureResponse scanDoubleFingers() {
+        M2SysCaptureResponse response = testEnvCaptor.scanDoubleFingers();
+
+        if (response == null) {
+            response = cloudScanrCaptor.scanDoubleFingers();
+        } else {
+            getLogger().warn("Using test template from the environment, skipping capture");
+        }
+
+        return response;
     }
 }
