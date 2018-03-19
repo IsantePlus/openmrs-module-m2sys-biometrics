@@ -11,7 +11,7 @@ import javax.persistence.Lob;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "national_registration_fail")
+@Table(name = "national_registration_failure")
 public class NationalRegistrationFailure extends BaseOpenmrsData {
 
     private static final long serialVersionUID = -5146973328798332082L;
