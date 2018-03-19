@@ -4,7 +4,7 @@ import org.openmrs.api.context.Context;
 import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.m2sysbiometrics.exception.M2SysBiometricsException;
 import org.openmrs.module.m2sysbiometrics.scheduler.M2SysSchedulerService;
-import org.openmrs.module.m2sysbiometrics.scheduler.NationalRegistrationTask;
+import org.openmrs.module.m2sysbiometrics.scheduler.NationalSynchronizationTask;
 import org.openmrs.module.m2sysbiometrics.util.M2SysProperties;
 import org.openmrs.scheduler.SchedulerException;
 import org.openmrs.scheduler.TaskDefinition;
@@ -31,8 +31,8 @@ public class M2SysSchedulerServiceImpl extends BaseOpenmrsService implements M2S
     }
 
     private void scheduleNationalRegistrationsTask() {
-        TaskDefinition nationalRegistrationsTask = createTask(NationalRegistrationTask.TASK_NAME,
-                NationalRegistrationTask.TASK_DESCRIPTION, NationalRegistrationTask.class.getName(),
+        TaskDefinition nationalRegistrationsTask = createTask(NationalSynchronizationTask.TASK_NAME,
+                NationalSynchronizationTask.TASK_DESCRIPTION, NationalSynchronizationTask.class.getName(),
                 getNationalRegistrationInterval());
 
         scheduleTask(nationalRegistrationsTask);
@@ -42,7 +42,7 @@ public class M2SysSchedulerServiceImpl extends BaseOpenmrsService implements M2S
         if (properties.isGlobalPropertySet(M2SYS_NATIONAL_REGISTRATIONS_TASK_INTERVAL)) {
             return Long.parseLong(properties.getGlobalProperty(M2SYS_NATIONAL_REGISTRATIONS_TASK_INTERVAL));
         } else {
-            return NationalRegistrationTask.DEFAULT_INTERVAL_SECONDS;
+            return NationalSynchronizationTask.DEFAULT_INTERVAL_SECONDS;
         }
     }
 

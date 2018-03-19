@@ -11,8 +11,8 @@ import javax.persistence.Lob;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "national_registration_failure")
-public class NationalRegistrationFailure extends BaseOpenmrsData {
+@Table(name = "national_synchronization_failure")
+public class NationalSynchronizationFailure extends BaseOpenmrsData {
 
     private static final long serialVersionUID = -5146973328798332082L;
 
@@ -28,9 +28,13 @@ public class NationalRegistrationFailure extends BaseOpenmrsData {
     @Column(name = "biometric_xml")
     private String biometricXml;
 
-    public NationalRegistrationFailure(String subjectId, String biometricXml) {
+    @Column(name = "update_failure")
+    private boolean update;
+
+    public NationalSynchronizationFailure(String subjectId, String biometricXml, boolean update) {
         this.subjectId = subjectId;
         this.biometricXml = biometricXml;
+        this.update = update;
     }
 
     @Override
@@ -56,5 +60,13 @@ public class NationalRegistrationFailure extends BaseOpenmrsData {
 
     public void setBiometricXml(String biometricXml) {
         this.biometricXml = biometricXml;
+    }
+
+    public boolean isUpdate() {
+        return update;
+    }
+
+    public void setUpdate(boolean update) {
+        this.update = update;
     }
 }

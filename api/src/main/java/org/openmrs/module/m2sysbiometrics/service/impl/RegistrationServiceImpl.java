@@ -13,8 +13,8 @@ import org.openmrs.module.m2sysbiometrics.exception.M2SysBiometricsException;
 import org.openmrs.module.m2sysbiometrics.model.FingerScanStatus;
 import org.openmrs.module.m2sysbiometrics.model.M2SysCaptureResponse;
 import org.openmrs.module.m2sysbiometrics.model.M2SysResults;
-import org.openmrs.module.m2sysbiometrics.model.NationalRegistrationFailure;
-import org.openmrs.module.m2sysbiometrics.service.NationalRegistrationFailureService;
+import org.openmrs.module.m2sysbiometrics.model.NationalSynchronizationFailure;
+import org.openmrs.module.m2sysbiometrics.service.NationalSynchronizationFailureService;
 import org.openmrs.module.m2sysbiometrics.service.RegistrationService;
 import org.openmrs.module.m2sysbiometrics.util.M2SysProperties;
 import org.openmrs.module.m2sysbiometrics.util.NationalUuidGenerator;
@@ -58,7 +58,7 @@ public class RegistrationServiceImpl implements RegistrationService {
     private NationalUuidGenerator nationalUuidGenerator;
 
     @Autowired
-    private NationalRegistrationFailureService nationalRegistrationFailureService;
+    private NationalSynchronizationFailureService nationalSynchronizationFailureService;
 
     @Override
     public void registerLocally(BiometricSubject subject, M2SysCaptureResponse capture) {
@@ -137,11 +137,11 @@ public class RegistrationServiceImpl implements RegistrationService {
         }
     }
 
-    private void handleNationalRegistrationError(String nationalId, M2SysCaptureResponse capture) {
-        NationalRegistrationFailure nationalRegistrationFailure =
-                new NationalRegistrationFailure(nationalId, capture.getTemplateData());
+    private void handleNationalRegistrationError(String nationalId, M2SysCaptureResponse fingerScan) {
+        NationalSynchronizationFailure nationalSynchronizationFailure =
+                new NationalSynchronizationFailure(nationalId, fingerScan.getTemplateData(), false);
 
-        nationalRegistrationFailureService.save(nationalRegistrationFailure);
+        nationalSynchronizationFailureService.save(nationalSynchronizationFailure);
     }
 
     private void attachNationalIdToThePatient(Patient patient, String nationalId) {

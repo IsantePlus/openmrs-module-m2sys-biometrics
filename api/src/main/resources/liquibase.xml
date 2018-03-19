@@ -7,13 +7,13 @@
 
     <changeSet id="m2sysBiometrics-2018-03-14" author="SolDevelo">
         <preConditions onFail="MARK_RAN">
-            <not><tableExists tableName="national_registration_failure"/></not>
+            <not><tableExists tableName="national_synchronization_failure"/></not>
         </preConditions>
         <comment>
-            Creating the table for national registration failures.
+            Creating the table for failures in synchronization with national server.
         </comment>
-        <createTable tableName="national_registration_failure">
-            <column name="national_registration_failure_id" type="int" autoIncrement="true">
+        <createTable tableName="national_synchronization_failure">
+            <column name="national_synchronization_failure_id" type="int" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="uuid" type="char(38)">
@@ -24,6 +24,9 @@
             </column>
             <column name="biometric_xml" type="longtext">
                 <constraints nullable="false" unique="false"/>
+            </column>
+            <column name="update_failure" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
             </column>
             <column name="creator" type="int"/>
             <column name="date_changed" type="datetime" />
@@ -39,8 +42,8 @@
             <column name="voided_by" type="varchar(255)"/>
         </createTable>
         <addUniqueConstraint columnNames="subject_id, biometric_xml"
-                             constraintName="unique_national_registration_failure_data"
-                             tableName="national_registration_failure"/>
+                             constraintName="unique_national_synchronization_failure_data"
+                             tableName="national_synchronization_failure"/>
     </changeSet>
 
 </databaseChangeLog>
