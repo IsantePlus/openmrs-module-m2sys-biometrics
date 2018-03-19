@@ -2,10 +2,6 @@ package org.openmrs.module.m2sysbiometrics.bioplugin;
 
 import org.apache.commons.codec.binary.Base64;
 import org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants;
-import org.openmrs.module.m2sysbiometrics.model.M2SysCaptureResponse;
-import org.openmrs.module.m2sysbiometrics.model.NationalRegistrationFailure;
-import org.openmrs.module.m2sysbiometrics.service.NationalRegistrationFailureService;
-import org.openmrs.module.m2sysbiometrics.util.ContextUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.ws.transport.context.TransportContext;
 import org.springframework.ws.transport.context.TransportContextHolder;
@@ -25,17 +21,6 @@ public class NationalBioServerClient extends AbstractBioServerClient {
     protected Object getResponse(Object requestPayload) {
         return getWebServiceTemplate()
                 .marshalSendAndReceive(getServiceUrl(), requestPayload, message -> addAuthorizationHeader());
-    }
-
-    public void handleRegistrationError(String nationalId, M2SysCaptureResponse capture) {
-
-        NationalRegistrationFailureService service =
-                ContextUtils.getFirstRegisteredComponent(NationalRegistrationFailureService.class);
-
-        NationalRegistrationFailure nationalRegistrationFailure =
-                new NationalRegistrationFailure(nationalId, capture.getTemplateData());
-
-        service.save(nationalRegistrationFailure);
     }
 
     private void addAuthorizationHeader() {

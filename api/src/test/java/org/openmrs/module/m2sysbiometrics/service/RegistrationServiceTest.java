@@ -8,6 +8,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.openmrs.Patient;
 import org.openmrs.module.m2sysbiometrics.bioplugin.LocalBioServerClient;
 import org.openmrs.module.m2sysbiometrics.bioplugin.NationalBioServerClient;
+import org.openmrs.module.m2sysbiometrics.exception.M2SysBiometricsException;
 import org.openmrs.module.m2sysbiometrics.model.M2SysCaptureResponse;
 import org.openmrs.module.m2sysbiometrics.testdata.BiometricSubjectMother;
 import org.openmrs.module.m2sysbiometrics.testdata.M2SysCaptureResponseMother;
@@ -70,7 +71,7 @@ public class RegistrationServiceTest {
         registrationService.registerNationally(nationalId, capture);
     }
 
-    @Test
+    @Test(expected = M2SysBiometricsException.class)
     public void shouldNotRegisterLocallyWithException() throws Exception {
         //given
         when(patientHelper.findByLocalFpId(any())).thenReturn(existingPatient);
@@ -80,6 +81,6 @@ public class RegistrationServiceTest {
         registrationService.registerLocally(subject, capture);
 
         //then
-        verify(localBioServerClient, times(1)).handleRegistrationError(any(), any(), any());
+        verify(patientHelper, times(1)).findByNationalFpId(any());
     }
 }

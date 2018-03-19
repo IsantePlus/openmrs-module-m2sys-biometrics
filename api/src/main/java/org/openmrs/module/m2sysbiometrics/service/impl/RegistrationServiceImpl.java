@@ -1,5 +1,6 @@
 package org.openmrs.module.m2sysbiometrics.service.impl;
 
+import org.apache.commons.lang3.StringUtils;
 import org.openmrs.Location;
 import org.openmrs.Patient;
 import org.openmrs.PatientIdentifier;
@@ -12,7 +13,10 @@ import org.openmrs.module.m2sysbiometrics.exception.M2SysBiometricsException;
 import org.openmrs.module.m2sysbiometrics.model.FingerScanStatus;
 import org.openmrs.module.m2sysbiometrics.model.M2SysCaptureResponse;
 import org.openmrs.module.m2sysbiometrics.model.M2SysResults;
+import org.openmrs.module.m2sysbiometrics.model.NationalRegistrationFailure;
+import org.openmrs.module.m2sysbiometrics.service.NationalRegistrationFailureService;
 import org.openmrs.module.m2sysbiometrics.service.RegistrationService;
+import org.openmrs.module.m2sysbiometrics.util.ContextUtils;
 import org.openmrs.module.m2sysbiometrics.util.M2SysProperties;
 import org.openmrs.module.m2sysbiometrics.util.NationalUuidGenerator;
 import org.openmrs.module.m2sysbiometrics.util.PatientHelper;
@@ -63,7 +67,7 @@ public class RegistrationServiceImpl implements RegistrationService {
             String responseValue = results.firstValue();
             LOGGER.info("Got error response from the local server: {}. Checking if tied to patient.", responseValue);
             Patient patient = patientHelper.findByLocalFpId(responseValue);
-            localBioServerClient.handleRegistrationError(subject, responseValue, patient);
+            handleLocalRegistrationError(subject, responseValue, patient);
         }
     }
 
@@ -77,7 +81,7 @@ public class RegistrationServiceImpl implements RegistrationService {
             }
         } catch (Exception e) {
             LOGGER.error("Registration with the national fingerprint server failed.", e);
-            nationalBioServerClient.handleRegistrationError(nationalId, capture);
+            handleNationalRegistrationError(nationalId, capture);
         }
     }
 
@@ -101,6 +105,44 @@ public class RegistrationServiceImpl implements RegistrationService {
             String nationalId = nationalUuidGenerator.generate();
             registerNationally(nationalId, fingerScan);
         }
+    }
+
+    private void handleLocalRegistrationError(BiometricSubject subject, String responseValue, Patient patient) {
+        if (patient == null) {
+            LOGGER.info("No patient matching fingerprint ID: {}", responseValue);
+
+            String isRegisterResponse = localBioServerClient.isRegistered(responseValue);
+            M2SysResults isRegisterResults = XmlResultUtil.parse(isRegisterResponse);
+
+            if (isRegisterResults.isLookupNotFound()) {
+                throw new M2SysBiometricsException("No success during fingerprint registration: "
+                        + responseValue);
+            } else {
+                LOGGER.info("Fingerprints are registered with ID {} but do not match any patient, fixing.",
+                        responseValue);
+                if (!StringUtils.equals(subject.getSubjectId(), responseValue)) {
+                    LOGGER.info("Changing existing fingerprint ID {} to {}",
+                            responseValue, subject.getSubjectId());
+
+                    localBioServerClient.changeId(responseValue, subject.getSubjectId());
+                } else {
+                    LOGGER.info("User already has the same fingerprints registered under his fingerprint ID");
+                }
+            }
+        } else {
+            throw new M2SysBiometricsException("Fingerprints already match patient: "
+                    + patient.getPersonName().getFullName());
+        }
+    }
+
+    private void handleNationalRegistrationError(String nationalId, M2SysCaptureResponse capture) {
+        NationalRegistrationFailureService service =
+                ContextUtils.getFirstRegisteredComponent(NationalRegistrationFailureService.class);
+
+        NationalRegistrationFailure nationalRegistrationFailure =
+                new NationalRegistrationFailure(nationalId, capture.getTemplateData());
+
+        service.save(nationalRegistrationFailure);
     }
 
     private void attachNationalIdToThePatient(Patient patient, String nationalId) {
