@@ -3,8 +3,8 @@ package org.openmrs.module.m2sysbiometrics.bioplugin;
 import org.apache.commons.codec.binary.Base64;
 import org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants;
 import org.openmrs.module.m2sysbiometrics.model.M2SysCaptureResponse;
-import org.openmrs.module.m2sysbiometrics.model.NationalRegistrationFail;
-import org.openmrs.module.m2sysbiometrics.service.NationalRegistrationFailService;
+import org.openmrs.module.m2sysbiometrics.model.NationalRegistrationFailure;
+import org.openmrs.module.m2sysbiometrics.service.NationalRegistrationFailureService;
 import org.openmrs.module.m2sysbiometrics.util.ContextUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.ws.transport.context.TransportContext;
@@ -29,13 +29,13 @@ public class NationalBioServerClient extends AbstractBioServerClient {
 
     public void handleRegistrationError(String nationalId, M2SysCaptureResponse capture) {
 
-        NationalRegistrationFailService service =
-                ContextUtils.getFirstRegisteredComponent(NationalRegistrationFailService.class);
+        NationalRegistrationFailureService service =
+                ContextUtils.getFirstRegisteredComponent(NationalRegistrationFailureService.class);
 
-        NationalRegistrationFail nationalRegistrationFail =
-                new NationalRegistrationFail(nationalId, capture.getTemplateData());
+        NationalRegistrationFailure nationalRegistrationFailure =
+                new NationalRegistrationFailure(nationalId, capture.getTemplateData());
 
-        service.save(nationalRegistrationFail);
+        service.save(nationalRegistrationFailure);
     }
 
     private void addAuthorizationHeader() {

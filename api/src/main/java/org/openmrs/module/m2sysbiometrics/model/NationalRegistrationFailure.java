@@ -12,7 +12,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "national_registration_fail")
-public class NationalRegistrationFail extends BaseOpenmrsData {
+public class NationalRegistrationFailure extends BaseOpenmrsData {
 
     private static final long serialVersionUID = -5146973328798332082L;
 
@@ -28,7 +28,7 @@ public class NationalRegistrationFail extends BaseOpenmrsData {
     @Column(name = "biometric_xml")
     private String biometricXml;
 
-    public NationalRegistrationFail(String subjectId, String biometricXml) {
+    public NationalRegistrationFailure(String subjectId, String biometricXml) {
         this.subjectId = subjectId;
         this.biometricXml = biometricXml;
     }

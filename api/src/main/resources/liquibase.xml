@@ -7,13 +7,13 @@
 
     <changeSet id="m2sysBiometrics-2018-03-14" author="SolDevelo">
         <preConditions onFail="MARK_RAN">
-            <not><tableExists tableName="national_registration_fail"/></not>
+            <not><tableExists tableName="national_registration_failure"/></not>
         </preConditions>
         <comment>
-            Creating the table for national registration fails.
+            Creating the table for national registration failures.
         </comment>
-        <createTable tableName="national_registration_fail">
-            <column name="national_registration_fail_id" type="int" autoIncrement="true">
+        <createTable tableName="national_registration_failure">
+            <column name="national_registration_failure_id" type="int" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="uuid" type="char(38)">
@@ -38,8 +38,9 @@
             <column name="void_reason" type="varchar(255)" />
             <column name="voided_by" type="varchar(255)"/>
         </createTable>
-        <addUniqueConstraint columnNames="subject_id, biometric_xml" constraintName="unique_national_registration_fail_data"
-                             tableName="national_registration_fail"/>
+        <addUniqueConstraint columnNames="subject_id, biometric_xml"
+                             constraintName="unique_national_registration_failure_data"
+                             tableName="national_registration_failure"/>
     </changeSet>
 
 </databaseChangeLog>
