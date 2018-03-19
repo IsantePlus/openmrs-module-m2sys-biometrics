@@ -16,7 +16,6 @@ import org.openmrs.module.m2sysbiometrics.model.M2SysResults;
 import org.openmrs.module.m2sysbiometrics.model.NationalRegistrationFailure;
 import org.openmrs.module.m2sysbiometrics.service.NationalRegistrationFailureService;
 import org.openmrs.module.m2sysbiometrics.service.RegistrationService;
-import org.openmrs.module.m2sysbiometrics.util.ContextUtils;
 import org.openmrs.module.m2sysbiometrics.util.M2SysProperties;
 import org.openmrs.module.m2sysbiometrics.util.NationalUuidGenerator;
 import org.openmrs.module.m2sysbiometrics.util.PatientHelper;
@@ -57,6 +56,9 @@ public class RegistrationServiceImpl implements RegistrationService {
 
     @Autowired
     private NationalUuidGenerator nationalUuidGenerator;
+
+    @Autowired
+    private NationalRegistrationFailureService nationalRegistrationFailureService;
 
     @Override
     public void registerLocally(BiometricSubject subject, M2SysCaptureResponse capture) {
@@ -136,13 +138,10 @@ public class RegistrationServiceImpl implements RegistrationService {
     }
 
     private void handleNationalRegistrationError(String nationalId, M2SysCaptureResponse capture) {
-        NationalRegistrationFailureService service =
-                ContextUtils.getFirstRegisteredComponent(NationalRegistrationFailureService.class);
-
         NationalRegistrationFailure nationalRegistrationFailure =
                 new NationalRegistrationFailure(nationalId, capture.getTemplateData());
 
-        service.save(nationalRegistrationFailure);
+        nationalRegistrationFailureService.save(nationalRegistrationFailure);
     }
 
     private void attachNationalIdToThePatient(Patient patient, String nationalId) {
