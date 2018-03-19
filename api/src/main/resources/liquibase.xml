@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9
+                  http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <changeSet id="m2sysBiometrics-2018-03-14" author="SolDevelo">
+        <preConditions onFail="MARK_RAN">
+            <not><tableExists tableName="national_synchronization_failure"/></not>
+        </preConditions>
+        <comment>
+            Creating the table for failures in synchronization with national server.
+        </comment>
+        <createTable tableName="national_synchronization_failure">
+            <column name="national_synchronization_failure_id" type="int" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="uuid" type="char(38)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="subject_id" type="varchar(255)">
+                <constraints nullable="false" unique="false"/>
+            </column>
+            <column name="biometric_xml" type="longtext">
+                <constraints nullable="false" unique="false"/>
+            </column>
+            <column name="update_failure" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="creator" type="int"/>
+            <column name="date_changed" type="datetime" />
+            <column name="date_created" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="changed_by" type="varchar(255)" />
+            <column name="voided" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_voided" type="datetime" />
+            <column name="void_reason" type="varchar(255)" />
+            <column name="voided_by" type="varchar(255)"/>
+        </createTable>
+        <addUniqueConstraint columnNames="subject_id, biometric_xml"
+                             constraintName="unique_national_synchronization_failure_data"
+                             tableName="national_synchronization_failure"/>
+    </changeSet>
+
+</databaseChangeLog>

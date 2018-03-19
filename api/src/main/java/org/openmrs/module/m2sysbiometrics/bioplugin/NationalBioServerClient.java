@@ -9,7 +9,6 @@ import org.springframework.ws.transport.http.HttpUrlConnection;
 
 import java.nio.charset.Charset;
 
-
 @Component
 public class NationalBioServerClient extends AbstractBioServerClient {
 
