@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class UpdateServiceImpl implements UpdateService {
 
-    private static final Logger LOG = LoggerFactory.getLogger(UpdateServiceImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(UpdateServiceImpl.class);
 
     @Autowired
     private LocalBioServerClient localBioServerClient;
@@ -40,7 +40,7 @@ public class UpdateServiceImpl implements UpdateService {
     public void updateNationally(String nationalId, M2SysCaptureResponse fingerScan) {
         String response = nationalBioServerClient.update(nationalId, fingerScan.getTemplateData());
         if (!XmlResultUtil.parse(response).isUpdateSuccess()) {
-            LOG.error("Unable to update fingerprints nationally for: " + nationalId);
+            LOGGER.error("Unable to update fingerprints nationally for: " + nationalId);
 
             handleNationalRegistrationError(nationalId, fingerScan);
         }
