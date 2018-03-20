@@ -20,7 +20,6 @@ import org.openmrs.module.m2sysbiometrics.util.M2SysProperties;
 import org.openmrs.module.m2sysbiometrics.util.NationalUuidGenerator;
 import org.openmrs.module.m2sysbiometrics.util.PatientHelper;
 import org.openmrs.module.m2sysbiometrics.xml.XmlResultUtil;
-import org.openmrs.module.registrationcore.RegistrationCoreConstants;
 import org.openmrs.module.registrationcore.api.RegistrationCoreService;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricSubject;
 import org.slf4j.Logger;
@@ -89,9 +88,17 @@ public class RegistrationServiceImpl implements RegistrationService {
 
     @Override
     public void fetchFromMpiByNationalFpId(BiometricSubject nationalBiometricSubject, M2SysCaptureResponse fingerScan) {
-        registrationCoreService.importMpiPatient(nationalBiometricSubject.getSubjectId(),
-                getNationalPatientIdentifierTypeUuid());
+        String nationalId = nationalBiometricSubject.getSubjectId();
+        registrationCoreService.importMpiPatient(nationalId, properties.getNationalPatientIdentifierTypeUuid());
+
+        Patient patient = patientHelper.findByNationalFpId(nationalId);
+        if (patient == null) {
+            throw new M2SysBiometricsException(String.format(
+                    "Error during fetching patient from MPI with national fingerprint ID %s", nationalId));
+        }
+
         registerLocally(nationalBiometricSubject, fingerScan);
+        attachLocalIdToThePatient(patient, nationalId);
     }
 
     @Override
@@ -144,16 +151,19 @@ public class RegistrationServiceImpl implements RegistrationService {
         nationalSynchronizationFailureService.save(nationalSynchronizationFailure);
     }
 
-    private void attachNationalIdToThePatient(Patient patient, String nationalId) {
-        PatientIdentifierType patientIdentifierType = patientService.getPatientIdentifierTypeByUuid(
-                properties.getGlobalProperty(RegistrationCoreConstants.GP_BIOMETRICS_NATIONAL_PERSON_IDENTIFIER_TYPE_UUID));
+    private void attachIdToThePatient(Patient patient, String id, String identifierTypeUuid) {
+        PatientIdentifierType patientIdentifierType = patientService.getPatientIdentifierTypeByUuid(identifierTypeUuid);
         Location location = locationService.getDefaultLocation();
-        PatientIdentifier nationalIdentifier = new PatientIdentifier(nationalId, patientIdentifierType, location);
-        patient.addIdentifier(nationalIdentifier);
+        PatientIdentifier identifier = new PatientIdentifier(id, patientIdentifierType, location);
+        patient.addIdentifier(identifier);
         patientService.savePatient(patient);
     }
 
-    private String getNationalPatientIdentifierTypeUuid() {
-        return properties.getGlobalProperty(RegistrationCoreConstants.GP_BIOMETRICS_NATIONAL_PERSON_IDENTIFIER_TYPE_UUID);
+    private void attachNationalIdToThePatient(Patient patient, String nationalId) {
+        attachIdToThePatient(patient, nationalId, properties.getNationalPatientIdentifierTypeUuid());
+    }
+
+    private void attachLocalIdToThePatient(Patient patient, String localId) {
+        attachIdToThePatient(patient, localId, properties.getLocalPatientIdentifierTypeUuid());
     }
 }
