@@ -74,8 +74,10 @@ public class RegistrationServiceImpl implements RegistrationService {
     }
 
     @Override
-    public void registerNationally(String nationalId, M2SysCaptureResponse capture) {
+    public void registerNationally(M2SysCaptureResponse capture) {
+        String nationalId = "";
         try {
+            nationalId = nationalUuidGenerator.generate();
             String response = nationalBioServerClient.enroll(nationalId, capture.getTemplateData());
             M2SysResults results = XmlResultUtil.parse(response);
             if (!results.isRegisterSuccess()) {
@@ -104,8 +106,7 @@ public class RegistrationServiceImpl implements RegistrationService {
                 attachNationalIdToThePatient(patient, nationalId);
             }
         } else {
-            String nationalId = nationalUuidGenerator.generate();
-            registerNationally(nationalId, fingerScan);
+            registerNationally(fingerScan);
         }
     }
 
