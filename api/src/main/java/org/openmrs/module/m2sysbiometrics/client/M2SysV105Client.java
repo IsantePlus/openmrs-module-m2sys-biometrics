@@ -93,13 +93,14 @@ public class M2SysV105Client extends AbstractM2SysClient {
 
         updateService.updateLocally(subject, fingerScan);
 
-        String nationalId;
-        if (fingerScanStatus.isRegisteredNationally()) {
-            nationalId = fingerScanStatus.getNationalBiometricSubject().getSubjectId();
-            updateService.updateNationally(nationalId, fingerScan);
-        } else {
-            nationalId = nationalUuidGenerator.generate();
-            registrationService.registerNationally(nationalId, fingerScan);
+        if (nationalBioServerClient.isServerUrlConfigured()) {
+            if (fingerScanStatus.isRegisteredNationally()) {
+                BiometricSubject nationalSubject = fingerScanStatus.getNationalBiometricSubject();
+                updateService.updateNationally(nationalSubject, fingerScan);
+            } else {
+                String nationalId = nationalUuidGenerator.generate();
+                registrationService.registerNationally(nationalId, fingerScan);
+            }
         }
 
         Fingers fingers = fingerScan.getFingerData(jaxbContext);

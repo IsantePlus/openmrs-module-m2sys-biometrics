@@ -14,8 +14,6 @@ import org.openmrs.module.m2sysbiometrics.testdata.BiometricSubjectMother;
 import org.openmrs.module.m2sysbiometrics.testdata.M2SysCaptureResponseMother;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricSubject;
 
-import java.util.UUID;
-
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -42,49 +40,50 @@ public class UpdateServiceTest {
 
     private BiometricSubject subject = BiometricSubjectMother.withSubjectId("subject");
 
-    private M2SysCaptureResponse capture = M2SysCaptureResponseMother.withTemplateData("templateData");
+    private BiometricSubject nationalSubject = BiometricSubjectMother.withSubjectId("nationalSubject");
+
+    private M2SysCaptureResponse fingerScan = M2SysCaptureResponseMother.withTemplateData("templateData");
 
     @Test
     public void shouldUpdateLocally() throws Exception {
         //given
-        when(localBioServerClient.update(subject.getSubjectId(), capture.getTemplateData()))
+        when(localBioServerClient.update(subject.getSubjectId(), fingerScan.getTemplateData()))
                 .thenReturn(UPDATE_SUCCESS_RESULT_XML);
 
         //when
-        updateService.updateLocally(subject, capture);
+        updateService.updateLocally(subject, fingerScan);
     }
 
     @Test
     public void shouldUpdateNationally() throws Exception {
         //given
-        String nationalId = UUID.randomUUID().toString();
-        when(nationalBioServerClient.update(nationalId, capture.getTemplateData()))
+        when(nationalBioServerClient.update(nationalSubject.getSubjectId(), fingerScan.getTemplateData()))
                 .thenReturn(UPDATE_SUCCESS_RESULT_XML);
 
         //when
-        updateService.updateNationally(nationalId, capture);
+        updateService.updateNationally(nationalSubject, fingerScan);
     }
 
     @Test(expected = M2SysBiometricsException.class)
     public void shouldUpdateLocallyWithException() throws Exception {
         //given
-        when(localBioServerClient.update(subject.getSubjectId(), capture.getTemplateData()))
+        when(localBioServerClient.update(subject.getSubjectId(), fingerScan.getTemplateData()))
                 .thenReturn(ALREADY_EXISTS_RESULT_XML);
 
         //when
-        updateService.updateLocally(subject, capture);
+        updateService.updateLocally(subject, fingerScan);
     }
 
     @Test
     public void shouldTryToUpdateNationallyWithoutException() throws Exception {
         //given
-        String nationalId = UUID.randomUUID().toString();
-        when(nationalBioServerClient.update(nationalId, capture.getTemplateData()))
+
+        when(nationalBioServerClient.update(nationalSubject.getSubjectId(), fingerScan.getTemplateData()))
                 .thenReturn(ALREADY_EXISTS_RESULT_XML);
         when(nationalSynchronizationFailureService.save(any())).thenReturn(null);
 
         //when
-        updateService.updateNationally(nationalId, capture);
+        updateService.updateNationally(nationalSubject, fingerScan);
 
         //then
         verify(nationalSynchronizationFailureService, times(1)).save(any());

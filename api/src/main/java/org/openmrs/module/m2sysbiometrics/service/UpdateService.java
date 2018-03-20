@@ -5,7 +5,7 @@ import org.openmrs.module.registrationcore.api.biometrics.model.BiometricSubject
 
 public interface UpdateService {
 
-    void updateLocally(BiometricSubject subject, M2SysCaptureResponse capture);
+    void updateLocally(BiometricSubject subject, M2SysCaptureResponse fingerScan);
 
-    void updateNationally(String nationalId, M2SysCaptureResponse capture);
+    void updateNationally(BiometricSubject nationalSubject, M2SysCaptureResponse fingerScan);
 }
