@@ -3,6 +3,7 @@ package org.openmrs.module.m2sysbiometrics.service.impl;
 import org.openmrs.module.m2sysbiometrics.bioplugin.LocalBioServerClient;
 import org.openmrs.module.m2sysbiometrics.bioplugin.NationalBioServerClient;
 import org.openmrs.module.m2sysbiometrics.exception.M2SysBiometricsException;
+import org.openmrs.module.m2sysbiometrics.model.FingerScanStatus;
 import org.openmrs.module.m2sysbiometrics.model.M2SysCaptureResponse;
 import org.openmrs.module.m2sysbiometrics.model.M2SysResults;
 import org.openmrs.module.m2sysbiometrics.service.SearchService;
@@ -72,13 +73,27 @@ public class SearchServiceImpl implements SearchService {
     }
 
     @Override
-    public BiometricSubject findMostAdequateSubjectLocally(M2SysCaptureResponse fingerScan) {
+    public FingerScanStatus checkIfFingerScanExists(M2SysCaptureResponse fingerScan) {
+        BiometricSubject localBiometricSubject = findMostAdequateSubjectLocally(fingerScan);
+        BiometricSubject nationalBiometricSubject = null;
+
+        if (nationalBioServerClient.isServerUrlConfigured()) {
+            try {
+                nationalBiometricSubject = findMostAdequateSubjectNationally(fingerScan);
+            } catch (RuntimeException exception) {
+                LOGGER.error("Connection failure to national server.", exception);
+            }
+        }
+
+        return new FingerScanStatus(localBiometricSubject, nationalBiometricSubject);
+    }
+
+    private BiometricSubject findMostAdequateSubjectLocally(M2SysCaptureResponse fingerScan) {
         BiometricMatch biometricMatch = findMostAdequateLocally(fingerScan);
         return biometricMatch == null ? null : new BiometricSubject(biometricMatch.getSubjectId());
     }
 
-    @Override
-    public BiometricSubject findMostAdequateSubjectNationally(M2SysCaptureResponse fingerScan) {
+    private BiometricSubject findMostAdequateSubjectNationally(M2SysCaptureResponse fingerScan) {
         BiometricMatch biometricMatch = findMostAdequateNationally(fingerScan);
         return biometricMatch == null ? null : new BiometricSubject(biometricMatch.getSubjectId());
     }
