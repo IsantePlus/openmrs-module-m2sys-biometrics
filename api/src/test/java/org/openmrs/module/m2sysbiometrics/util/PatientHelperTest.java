@@ -13,6 +13,7 @@ import org.openmrs.module.m2sysbiometrics.util.impl.PatientHelperImpl;
 
 import java.util.Collections;
 import java.util.UUID;
+import org.openmrs.module.registrationcore.api.RegistrationCoreService;
 
 import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
@@ -20,6 +21,8 @@ import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -38,6 +41,9 @@ public class PatientHelperTest {
 
     @Mock
     private PatientService patientService;
+
+    @Mock
+    private RegistrationCoreService registrationCoreService;
 
     @Mock
     private M2SysProperties properties;
@@ -84,9 +90,11 @@ public class PatientHelperTest {
                 .thenReturn(true);
         when(properties.getGlobalProperty(GP_BIOMETRICS_PERSON_IDENTIFIER_TYPE_UUID))
                 .thenReturn(LOCAL_ID_TYPE_UUID);
+
+        when(registrationCoreService.findByPatientIdentifier(SUBJECT_ID, LOCAL_ID_TYPE_UUID))
+                .thenReturn(patient);
         when(patientService.getPatientIdentifierTypeByUuid(LOCAL_ID_TYPE_UUID)).thenReturn(idType);
-        when(patientService.getPatients(null, SUBJECT_ID, singletonList(idType), true))
-                .thenReturn(singletonList(patient));
+
         PatientIdentifier pi = new PatientIdentifier();
         pi.setIdentifierType(idType);
         when(patient.getIdentifiers()).thenReturn(Collections.singleton(pi));
@@ -134,9 +142,11 @@ public class PatientHelperTest {
                 .thenReturn(true);
         when(properties.getGlobalProperty(GP_BIOMETRICS_NATIONAL_PERSON_IDENTIFIER_TYPE_UUID))
                 .thenReturn(NATIONAL_ID_TYPE_UUID);
+
         when(patientService.getPatientIdentifierTypeByUuid(NATIONAL_ID_TYPE_UUID)).thenReturn(idType);
-        when(patientService.getPatients(null, SUBJECT_ID, singletonList(idType), true))
-                .thenReturn(singletonList(patient));
+        when(registrationCoreService.findByPatientIdentifier(SUBJECT_ID, NATIONAL_ID_TYPE_UUID))
+                .thenReturn(patient);
+
         PatientIdentifier pi = new PatientIdentifier();
         pi.setIdentifierType(idType);
         when(patient.getIdentifiers()).thenReturn(Collections.singleton(pi));

@@ -5,12 +5,13 @@ import org.openmrs.module.registrationcore.api.biometrics.model.BiometricMatch;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricSubject;
 
 import java.util.List;
+import org.openmrs.module.registrationcore.api.biometrics.model.EnrollmentResult;
 
 public interface M2SysClient {
 
     BiometricEngineStatus getStatus();
 
-    BiometricSubject enroll(BiometricSubject subject);
+    EnrollmentResult enroll(BiometricSubject subject);
 
     BiometricSubject update(BiometricSubject subject);
 

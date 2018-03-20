@@ -15,9 +15,12 @@ import org.openmrs.module.m2sysbiometrics.service.RegistrationService;
 import org.openmrs.module.m2sysbiometrics.service.SearchService;
 import org.openmrs.module.m2sysbiometrics.util.NationalUuidGenerator;
 import org.openmrs.module.m2sysbiometrics.service.UpdateService;
+import org.openmrs.module.m2sysbiometrics.util.PatientHelper;
 import org.openmrs.module.m2sysbiometrics.xml.XmlResultUtil;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricMatch;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricSubject;
+import org.openmrs.module.registrationcore.api.biometrics.model.EnrollmentResult;
+import org.openmrs.module.registrationcore.api.biometrics.model.EnrollmentStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -42,6 +45,9 @@ public class M2SysV105Client extends AbstractM2SysClient {
     private SearchService searchService;
 
     @Autowired
+    private PatientHelper patientHelper;
+
+    @Autowired
     private NationalUuidGenerator nationalUuidGenerator;
 
     @Autowired
@@ -62,28 +68,36 @@ public class M2SysV105Client extends AbstractM2SysClient {
     }
 
     @Override
-    public BiometricSubject enroll(BiometricSubject subject) {
+    public EnrollmentResult enroll(BiometricSubject localSubject) {
         M2SysCaptureResponse capture = scanDoubleFingers();
         FingerScanStatus fingerScanStatus = checkIfFingerScanExists(capture);
+        EnrollmentStatus enrollmentStatus = EnrollmentStatus.SUCCESS;
+        BiometricSubject nationalSubject = fingerScanStatus.getNationalBiometricSubject();
 
         if (!fingerScanStatus.isRegisteredLocally()) {
             if (fingerScanStatus.isRegisteredNationally()) {
                 registrationService.fetchFromMpiByNationalFpId(fingerScanStatus.getNationalBiometricSubject(), capture);
-                subject.setSubjectId(fingerScanStatus.getNationalBiometricSubject().getSubjectId());
+                localSubject.setSubjectId(fingerScanStatus.getNationalBiometricSubject().getSubjectId());
+                enrollmentStatus = EnrollmentStatus.ALREADY_REGISTERED;
             } else {
-                registrationService.registerLocally(subject, capture);
+                registrationService.registerLocally(localSubject, capture);
             }
+        } else {
+            localSubject.setSubjectId(fingerScanStatus.getLocalBiometricSubject().getSubjectId());
+            enrollmentStatus = EnrollmentStatus.ALREADY_REGISTERED;
         }
 
         if (nationalBioServerClient.isServerUrlConfigured() && !fingerScanStatus.isRegisteredNationally()) {
             String nationalId = nationalUuidGenerator.generate();
             registrationService.registerNationally(nationalId, capture);
+            nationalSubject = new BiometricSubject(nationalId);
         }
 
         Fingers fingers = capture.getFingerData(jaxbContext);
-        subject.setFingerprints(fingers.toTwoOpenMrsFingerprints());
+        localSubject.setFingerprints(fingers.toTwoOpenMrsFingerprints());
+        nationalSubject.setFingerprints(fingers.toTwoOpenMrsFingerprints());
 
-        return subject;
+        return new EnrollmentResult(localSubject, nationalSubject, enrollmentStatus);
     }
 
     @Override
@@ -168,8 +182,10 @@ public class M2SysV105Client extends AbstractM2SysClient {
 
 
     private FingerScanStatus checkIfFingerScanExists(M2SysCaptureResponse fingerScan) {
-        BiometricSubject localBiometricSubject = searchService.findMostAdequateSubjectLocally(fingerScan);
         BiometricSubject nationalBiometricSubject = null;
+
+        BiometricSubject localBiometricSubject = searchService.findMostAdequateSubjectLocally(fingerScan);
+        localBiometricSubject = validateLocalSubjectExistence(localBiometricSubject);
 
         if (nationalBioServerClient.isServerUrlConfigured()) {
             try {
@@ -192,5 +208,11 @@ public class M2SysV105Client extends AbstractM2SysClient {
         }
 
         return response;
+    }
+
+    private BiometricSubject validateLocalSubjectExistence(BiometricSubject localBiometricSubject) {
+        return localBiometricSubject == null || patientHelper.findByLocalFpId(localBiometricSubject.getSubjectId()) == null
+                ? null
+                : localBiometricSubject;
     }
 }

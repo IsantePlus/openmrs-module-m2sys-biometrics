@@ -4,6 +4,7 @@ import org.apache.commons.lang.StringUtils;
 import org.openmrs.api.APIException;
 import org.openmrs.api.AdministrationService;
 import org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants;
+import org.openmrs.module.registrationcore.RegistrationCoreConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -47,5 +48,13 @@ public class M2SysProperties {
 
     public String getAccessPointId() {
         return getGlobalProperty(M2SysBiometricsConstants.M2SYS_ACCESS_POINT_ID);
+    }
+
+    public String getNationalPatientIdentifierTypeUuid() {
+        return getGlobalProperty(RegistrationCoreConstants.GP_BIOMETRICS_NATIONAL_PERSON_IDENTIFIER_TYPE_UUID);
+    }
+
+    public String getLocalPatientIdentifierTypeUuid() {
+        return getGlobalProperty(RegistrationCoreConstants.GP_BIOMETRICS_PERSON_IDENTIFIER_TYPE_UUID);
     }
 }

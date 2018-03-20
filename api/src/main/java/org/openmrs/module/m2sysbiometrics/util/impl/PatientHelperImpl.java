@@ -1,25 +1,23 @@
 package org.openmrs.module.m2sysbiometrics.util.impl;
 
-import java.util.Collections;
-import java.util.List;
-import org.apache.commons.collections.CollectionUtils;
 import org.openmrs.Patient;
-import org.openmrs.PatientIdentifierType;
 import org.openmrs.api.PatientService;
 import org.openmrs.module.m2sysbiometrics.util.M2SysProperties;
 import org.openmrs.module.m2sysbiometrics.util.PatientHelper;
 import org.openmrs.module.registrationcore.RegistrationCoreConstants;
+import org.openmrs.module.registrationcore.api.RegistrationCoreService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.stream.Collectors;
-
 @Component
 public class PatientHelperImpl implements PatientHelper {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PatientHelperImpl.class);
+
+    @Autowired
+    private RegistrationCoreService registrationCoreService;
 
     @Autowired
     private PatientService patientService;
@@ -40,22 +38,19 @@ public class PatientHelperImpl implements PatientHelper {
     }
 
     private Patient findByIdType(String subjectId, String idTypeProp) {
+        Patient patient = null;
         if (properties.isGlobalPropertySet(idTypeProp)) {
             String identifierUuid = properties.getGlobalProperty(idTypeProp);
-            PatientIdentifierType idType = patientService.getPatientIdentifierTypeByUuid(identifierUuid);
-            if (idType == null) {
-                LOGGER.warn("Identifier type defined by prop {} is missing: {}", idTypeProp, identifierUuid);
+            if (patientIdentifierTypeExists(identifierUuid)) {
+                patient = registrationCoreService.findByPatientIdentifier(subjectId, identifierUuid);
             } else {
-                //Currently method getPatients() doesn't take into consideration the identifierTypes,
-                //so it needs to be filtered anyway
-                List<Patient> patients = patientService.getPatients(null, subjectId,
-                        Collections.singletonList(idType), true).stream()
-                        .filter(p -> p.getIdentifiers().stream().anyMatch(pi -> pi.getIdentifierType().equals(idType)))
-                        .collect(Collectors.toList());
-
-                return CollectionUtils.isEmpty(patients) ? null : patients.get(0);
+                LOGGER.warn("Identifier type defined by prop {} is missing: {}", idTypeProp, identifierUuid);
             }
         }
-        return null;
+        return patient;
+    }
+
+    private boolean patientIdentifierTypeExists(String patientIdentifierTypeUuid) {
+        return patientService.getPatientIdentifierTypeByUuid(patientIdentifierTypeUuid) != null;
     }
 }
