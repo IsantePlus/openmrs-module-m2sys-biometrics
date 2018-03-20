@@ -32,7 +32,6 @@ public class NationalSynchronizationFailure extends BaseOpenmrsData {
     private boolean update;
 
     public NationalSynchronizationFailure() {
-
     }
 
     public NationalSynchronizationFailure(String subjectId, String biometricXml, boolean update) {

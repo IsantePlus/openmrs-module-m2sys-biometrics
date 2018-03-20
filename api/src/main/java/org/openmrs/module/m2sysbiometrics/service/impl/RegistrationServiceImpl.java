@@ -25,9 +25,9 @@ import org.openmrs.module.registrationcore.api.biometrics.model.BiometricSubject
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
-@Component
+@Service(value = "registrationService")
 public class RegistrationServiceImpl implements RegistrationService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RegistrationServiceImpl.class);
@@ -149,7 +149,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         NationalSynchronizationFailure nationalSynchronizationFailure =
                 new NationalSynchronizationFailure(nationalId, fingerScan.getTemplateData(), false);
 
-        nationalSynchronizationFailureService.save(nationalSynchronizationFailure);
+        nationalSynchronizationFailureService.saveOrUpdate(nationalSynchronizationFailure);
     }
 
     private void attachIdToThePatient(Patient patient, String id, String identifierTypeUuid) {

@@ -9,7 +9,7 @@ import java.util.List;
 public interface NationalSynchronizationFailureService extends OpenmrsService {
 
     @Transactional
-    NationalSynchronizationFailure save(NationalSynchronizationFailure nationalSynchronizationFailure);
+    NationalSynchronizationFailure saveOrUpdate(NationalSynchronizationFailure nationalSynchronizationFailure);
 
     @Transactional
     void delete(NationalSynchronizationFailure nationalSynchronizationFailure);
