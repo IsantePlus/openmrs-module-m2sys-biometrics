@@ -13,6 +13,7 @@ import org.openmrs.module.m2sysbiometrics.model.M2SysResult;
 import org.openmrs.module.m2sysbiometrics.model.M2SysResults;
 import org.openmrs.module.m2sysbiometrics.service.RegistrationService;
 import org.openmrs.module.m2sysbiometrics.service.SearchService;
+import org.openmrs.module.m2sysbiometrics.service.UpdateService;
 import org.openmrs.module.m2sysbiometrics.xml.XmlResultUtil;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricMatch;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricSubject;
@@ -44,6 +45,9 @@ public class M2SysV105Client extends AbstractM2SysClient {
 
     @Autowired
     private TestEnvCaptor testEnvCaptor;
+
+    @Autowired
+    private UpdateService updateService;
 
     private JAXBContext jaxbContext;
 
@@ -79,17 +83,21 @@ public class M2SysV105Client extends AbstractM2SysClient {
 
     @Override
     public BiometricSubject update(BiometricSubject subject) {
-        M2SysCaptureResponse capture = scanDoubleFingers();
+        M2SysCaptureResponse fingerScan = scanDoubleFingers();
+        FingerScanStatus fingerScanStatus = searchService.checkIfFingerScanExists(fingerScan);
 
-        String response = localBioServerClient.update(subject.getSubjectId(), capture.getTemplateData());
-        M2SysResults results = XmlResultUtil.parse(response);
+        updateService.updateLocally(subject, fingerScan);
 
-        if (!results.isUpdateSuccess()) {
-            throw new M2SysBiometricsException("Unable to update fingerprints for: "
-                    + subject.getSubjectId());
+        if (nationalBioServerClient.isServerUrlConfigured()) {
+            if (fingerScanStatus.isRegisteredNationally()) {
+                BiometricSubject nationalSubject = fingerScanStatus.getNationalBiometricSubject();
+                updateService.updateNationally(nationalSubject, fingerScan);
+            } else {
+                registrationService.registerNationally(fingerScan);
+            }
         }
 
-        Fingers fingers = capture.getFingerData(jaxbContext);
+        Fingers fingers = fingerScan.getFingerData(jaxbContext);
         subject.setFingerprints(fingers.toTwoOpenMrsFingerprints());
 
         return subject;
