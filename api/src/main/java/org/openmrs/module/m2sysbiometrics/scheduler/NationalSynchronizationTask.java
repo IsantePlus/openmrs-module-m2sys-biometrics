@@ -7,6 +7,7 @@ import org.openmrs.module.m2sysbiometrics.model.NationalSynchronizationFailure;
 import org.openmrs.module.m2sysbiometrics.service.NationalSynchronizationFailureService;
 import org.openmrs.module.m2sysbiometrics.service.RegistrationService;
 import org.openmrs.module.m2sysbiometrics.service.SearchService;
+import org.openmrs.module.m2sysbiometrics.util.PatientHelper;
 import org.openmrs.scheduler.tasks.AbstractTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,6 +29,8 @@ public class NationalSynchronizationTask extends AbstractTask {
 
     private SearchService searchService;
 
+    private PatientHelper patientHelper;
+
     @Override
     public void execute() {
         LOGGER.info("Executing " + TASK_NAME  + "...");
@@ -44,17 +47,27 @@ public class NationalSynchronizationTask extends AbstractTask {
 
         searchService = Context.getRegisteredComponent(
                 "searchService", SearchService.class);
+
+        patientHelper = Context.getRegisteredComponent(
+                "patientHelper", PatientHelper.class);
     }
 
     private void retryRegistrationFailures() {
-        for (NationalSynchronizationFailure failure : nationalSynchronizationFailureService.findAllRegistrationFailures()) {
+        nationalSynchronizationFailureService.findAllRegistrationFailures().forEach(this::retryRegistrationFailure);
+    }
+
+    private void retryRegistrationFailure(NationalSynchronizationFailure failure) {
+        M2SysCaptureResponse fingerScan = new M2SysCaptureResponse();
+        fingerScan.setTemplateData(failure.getBiometricXml());
+        FingerScanStatus fingerScanStatus = searchService.checkIfFingerScanExists(fingerScan);
+
+        registrationService.synchronizeFingerprints(fingerScan, fingerScanStatus);
+
+        fingerScanStatus = searchService.checkIfFingerScanExists(fingerScan);
+
+        if (fingerScanStatus.isRegisteredNationally() && patientHelper.findByNationalFpId(
+                fingerScanStatus.getNationalBiometricSubject().getSubjectId()) != null) {
             nationalSynchronizationFailureService.delete(failure);
-
-            M2SysCaptureResponse fingerScan = new M2SysCaptureResponse();
-            fingerScan.setTemplateData(failure.getBiometricXml());
-            FingerScanStatus fingerScanStatus = searchService.checkIfFingerScanExists(fingerScan);
-
-            registrationService.synchronizeFingerprints(fingerScan, fingerScanStatus);
         }
     }
 }

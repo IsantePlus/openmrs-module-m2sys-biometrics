@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@Service
+@Service(value = "nationalSynchronizationFailureService")
 public class NationalSynchronizationFailureServiceImpl extends BaseOpenmrsService
         implements NationalSynchronizationFailureService {
 
@@ -17,7 +17,13 @@ public class NationalSynchronizationFailureServiceImpl extends BaseOpenmrsServic
     private M2SysNationalSynchronizationFailureDao dao;
 
     @Override
-    public NationalSynchronizationFailure save(NationalSynchronizationFailure nationalSynchronizationFailure) {
+    public NationalSynchronizationFailure saveOrUpdate(NationalSynchronizationFailure nationalSynchronizationFailure) {
+        if (nationalSynchronizationFailure.getBiometricXml() != null) {
+            for (NationalSynchronizationFailure failureFromDB : dao.findAllRegistrationFailuresByBiometricXml(
+                    nationalSynchronizationFailure.getBiometricXml())) {
+                dao.delete(failureFromDB);
+            }
+        }
         return dao.save(nationalSynchronizationFailure);
     }
 

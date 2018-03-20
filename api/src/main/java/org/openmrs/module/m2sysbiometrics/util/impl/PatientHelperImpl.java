@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.stream.Collectors;
 
-@Component
+@Component(value = "patientHelper")
 public class PatientHelperImpl implements PatientHelper {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PatientHelperImpl.class);
