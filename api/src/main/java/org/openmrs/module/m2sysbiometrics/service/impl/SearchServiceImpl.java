@@ -20,7 +20,7 @@ import java.util.List;
 @Component
 public class SearchServiceImpl implements SearchService {
 
-    private static final Logger LOG = LoggerFactory.getLogger(SearchServiceImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SearchServiceImpl.class);
 
     @Autowired
     private LocalBioServerClient localBioServerClient;
@@ -47,7 +47,7 @@ public class SearchServiceImpl implements SearchService {
         M2SysResults results = XmlResultUtil.parse(response);
 
         if (results.isSearchError()) {
-            LOG.error("Error occurred during national fingerprint search: " + results.firstValue());
+            LOGGER.error("Error occurred during national fingerprint search: " + results.firstValue());
         } else {
             biometricMatches = results.toOpenMrsMatchList();
         }
