@@ -4,6 +4,8 @@ import org.openmrs.module.m2sysbiometrics.bioplugin.LocalBioServerClient;
 import org.openmrs.module.m2sysbiometrics.bioplugin.NationalBioServerClient;
 import org.openmrs.module.m2sysbiometrics.exception.M2SysBiometricsException;
 import org.openmrs.module.m2sysbiometrics.model.M2SysCaptureResponse;
+import org.openmrs.module.m2sysbiometrics.model.NationalSynchronizationFailure;
+import org.openmrs.module.m2sysbiometrics.service.NationalSynchronizationFailureService;
 import org.openmrs.module.m2sysbiometrics.service.UpdateService;
 import org.openmrs.module.m2sysbiometrics.xml.XmlResultUtil;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricSubject;
@@ -22,6 +24,9 @@ public class UpdateServiceImpl implements UpdateService {
 
     @Autowired
     private NationalBioServerClient nationalBioServerClient;
+
+    @Autowired
+    private NationalSynchronizationFailureService nationalSynchronizationFailureService;
     
     @Override
     public void updateLocally(BiometricSubject subject, M2SysCaptureResponse fingerScan) {
@@ -32,10 +37,18 @@ public class UpdateServiceImpl implements UpdateService {
     }
 
     @Override
-    public void updateNationally(BiometricSubject subject, M2SysCaptureResponse fingerScan) {
-        String response = nationalBioServerClient.update(subject.getSubjectId(), fingerScan.getTemplateData());
+    public void updateNationally(String nationalId, M2SysCaptureResponse fingerScan) {
+        String response = nationalBioServerClient.update(nationalId, fingerScan.getTemplateData());
         if (!XmlResultUtil.parse(response).isUpdateSuccess()) {
-            LOG.error("Unable to update fingerprints nationally for: " + subject.getSubjectId());
+            LOG.error("Unable to update fingerprints nationally for: " + nationalId);
+
+            handleNationalRegistrationError(nationalId, fingerScan);
         }
+    }
+
+    private void handleNationalRegistrationError(String nationalId, M2SysCaptureResponse fingerScan) {
+        NationalSynchronizationFailure nationalSynchronizationFailure =
+                new NationalSynchronizationFailure(nationalId, fingerScan.getTemplateData(), true);
+        nationalSynchronizationFailureService.save(nationalSynchronizationFailure);
     }
 }

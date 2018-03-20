@@ -16,6 +16,9 @@ import org.openmrs.module.registrationcore.api.biometrics.model.BiometricSubject
 
 import java.util.UUID;
 
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -30,6 +33,9 @@ public class UpdateServiceTest {
 
     @Mock
     private NationalBioServerClient nationalBioServerClient;
+
+    @Mock
+    private NationalSynchronizationFailureService nationalSynchronizationFailureService;
 
     @InjectMocks
     private UpdateService updateService = new UpdateServiceImpl();
@@ -52,11 +58,11 @@ public class UpdateServiceTest {
     public void shouldUpdateNationally() throws Exception {
         //given
         String nationalId = UUID.randomUUID().toString();
-        when(nationalBioServerClient.update(subject.getSubjectId(), capture.getTemplateData()))
+        when(nationalBioServerClient.update(nationalId, capture.getTemplateData()))
                 .thenReturn(UPDATE_SUCCESS_RESULT_XML);
 
         //when
-        updateService.updateNationally(subject, capture);
+        updateService.updateNationally(nationalId, capture);
     }
 
     @Test(expected = M2SysBiometricsException.class)
@@ -72,10 +78,15 @@ public class UpdateServiceTest {
     @Test
     public void shouldTryToUpdateNationallyWithoutException() throws Exception {
         //given
-        when(nationalBioServerClient.update(subject.getSubjectId(), capture.getTemplateData()))
+        String nationalId = UUID.randomUUID().toString();
+        when(nationalBioServerClient.update(nationalId, capture.getTemplateData()))
                 .thenReturn(ALREADY_EXISTS_RESULT_XML);
+        when(nationalSynchronizationFailureService.save(any())).thenReturn(null);
 
         //when
-        updateService.updateNationally(subject, capture);
+        updateService.updateNationally(nationalId, capture);
+
+        //then
+        verify(nationalSynchronizationFailureService, times(1)).save(any());
     }
 }
