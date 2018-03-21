@@ -53,6 +53,6 @@ public class UpdateServiceImpl implements UpdateService {
     private void handleNationalRegistrationError(BiometricSubject nationalSubject, M2SysCaptureResponse fingerScan) {
         NationalSynchronizationFailure nationalSynchronizationFailure =
                 new NationalSynchronizationFailure(nationalSubject.getSubjectId(), fingerScan.getTemplateData(), true);
-        nationalSynchronizationFailureService.save(nationalSynchronizationFailure);
+        nationalSynchronizationFailureService.saveOrUpdate(nationalSynchronizationFailure);
     }
 }

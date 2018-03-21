@@ -80,12 +80,12 @@ public class UpdateServiceTest {
 
         when(nationalBioServerClient.update(nationalSubject.getSubjectId(), fingerScan.getTemplateData()))
                 .thenReturn(ALREADY_EXISTS_RESULT_XML);
-        when(nationalSynchronizationFailureService.save(any())).thenReturn(null);
+        when(nationalSynchronizationFailureService.saveOrUpdate(any())).thenReturn(null);
 
         //when
         updateService.updateNationally(nationalSubject, fingerScan);
 
         //then
-        verify(nationalSynchronizationFailureService, times(1)).save(any());
+        verify(nationalSynchronizationFailureService, times(1)).saveOrUpdate(any());
     }
 }

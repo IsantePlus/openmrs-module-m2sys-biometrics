@@ -7,7 +7,9 @@ import org.openmrs.module.m2sysbiometrics.service.NationalSynchronizationFailure
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-@Service
+import java.util.List;
+
+@Service(value = "nationalSynchronizationFailureService")
 public class NationalSynchronizationFailureServiceImpl extends BaseOpenmrsService
         implements NationalSynchronizationFailureService {
 
@@ -15,7 +17,23 @@ public class NationalSynchronizationFailureServiceImpl extends BaseOpenmrsServic
     private M2SysNationalSynchronizationFailureDao dao;
 
     @Override
-    public NationalSynchronizationFailure save(NationalSynchronizationFailure nationalSynchronizationFailure) {
+    public NationalSynchronizationFailure saveOrUpdate(NationalSynchronizationFailure nationalSynchronizationFailure) {
+        if (nationalSynchronizationFailure.getBiometricXml() != null) {
+            for (NationalSynchronizationFailure failureFromDB : dao.findAllRegistrationFailuresByBiometricXml(
+                    nationalSynchronizationFailure.getBiometricXml())) {
+                dao.delete(failureFromDB);
+            }
+        }
         return dao.save(nationalSynchronizationFailure);
+    }
+
+    @Override
+    public void delete(NationalSynchronizationFailure nationalSynchronizationFailure) {
+        dao.delete(nationalSynchronizationFailure);
+    }
+
+    @Override
+    public List<NationalSynchronizationFailure> findAllRegistrationFailures() {
+        return dao.findAllRegistrationFailures();
     }
 }
