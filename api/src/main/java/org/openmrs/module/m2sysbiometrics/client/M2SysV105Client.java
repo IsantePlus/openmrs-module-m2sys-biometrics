@@ -27,6 +27,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
+import java.util.ArrayList;
 import java.util.List;
 
 @Component("m2sysbiometrics.M2SysV1Client")
@@ -140,13 +141,17 @@ public class M2SysV105Client extends AbstractM2SysClient {
     public List<BiometricMatch> search() {
         M2SysCaptureResponse fingerScan = scanDoubleFingers();
         FingerScanStatus fingerScanStatus = checkIfFingerScanExists(fingerScan);
-        List<BiometricMatch> results = searchService.searchLocally(fingerScan);
+        List<BiometricMatch> results = new ArrayList<>();
+
+        if (fingerScanStatus.isRegisteredLocally()) {
+            results = searchService.searchLocally(fingerScan);
+        }
 
         if (nationalBioServerClient.isServerUrlConfigured()) {
             try {
                 if (fingerScanStatus.isRegisteredLocally()) {
                     registrationService.synchronizeFingerprints(fingerScan, fingerScanStatus);
-                } else {
+                } else if (fingerScanStatus.isRegisteredNationally()) {
                     BiometricMatch nationalResult = searchService.findMostAdequateNationally(fingerScan);
                     if (nationalResult != null) {
                         registrationService.fetchFromMpiByNationalFpId(new BiometricSubject(nationalResult.getSubjectId()),
