@@ -151,7 +151,7 @@ public class M2SysV105Client extends AbstractM2SysClient {
             try {
                 if (fingerScanStatus.isRegisteredLocally()) {
                     registrationService.synchronizeFingerprints(fingerScan, fingerScanStatus);
-                } else {
+                } else if (fingerScanStatus.isRegisteredNationally()) {
                     BiometricMatch nationalResult = searchService.findMostAdequateNationally(fingerScan);
                     if (nationalResult != null) {
                         registrationService.fetchFromMpiByNationalFpId(new BiometricSubject(nationalResult.getSubjectId()),
