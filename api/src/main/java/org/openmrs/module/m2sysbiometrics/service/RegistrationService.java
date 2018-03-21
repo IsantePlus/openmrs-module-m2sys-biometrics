@@ -8,7 +8,7 @@ public interface RegistrationService {
 
     void registerLocally(BiometricSubject subject, M2SysCaptureResponse capture);
 
-    void registerNationally(String nationalId, M2SysCaptureResponse capture);
+    void registerNationally(M2SysCaptureResponse capture);
 
     void fetchFromMpiByNationalFpId(BiometricSubject nationalBiometricSubject, M2SysCaptureResponse fingerScan);
 

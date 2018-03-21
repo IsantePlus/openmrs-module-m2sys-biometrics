@@ -3,21 +3,23 @@ package org.openmrs.module.m2sysbiometrics.service.impl;
 import org.openmrs.module.m2sysbiometrics.bioplugin.LocalBioServerClient;
 import org.openmrs.module.m2sysbiometrics.bioplugin.NationalBioServerClient;
 import org.openmrs.module.m2sysbiometrics.exception.M2SysBiometricsException;
+import org.openmrs.module.m2sysbiometrics.model.FingerScanStatus;
 import org.openmrs.module.m2sysbiometrics.model.M2SysCaptureResponse;
 import org.openmrs.module.m2sysbiometrics.model.M2SysResults;
 import org.openmrs.module.m2sysbiometrics.service.SearchService;
+import org.openmrs.module.m2sysbiometrics.util.PatientHelper;
 import org.openmrs.module.m2sysbiometrics.xml.XmlResultUtil;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricMatch;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricSubject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Component
+@Service(value = "searchService")
 public class SearchServiceImpl implements SearchService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SearchServiceImpl.class);
@@ -27,6 +29,9 @@ public class SearchServiceImpl implements SearchService {
 
     @Autowired
     private NationalBioServerClient nationalBioServerClient;
+
+    @Autowired
+    private PatientHelper patientHelper;
 
     @Override
     public List<BiometricMatch> searchLocally(M2SysCaptureResponse fingerScan) {
@@ -72,13 +77,35 @@ public class SearchServiceImpl implements SearchService {
     }
 
     @Override
-    public BiometricSubject findMostAdequateSubjectLocally(M2SysCaptureResponse fingerScan) {
+    public FingerScanStatus checkIfFingerScanExists(M2SysCaptureResponse fingerScan) {
+        BiometricSubject nationalBiometricSubject = null;
+
+        BiometricSubject localBiometricSubject = findMostAdequateSubjectLocally(fingerScan);
+        localBiometricSubject = validateLocalSubjectExistence(localBiometricSubject);
+
+        if (nationalBioServerClient.isServerUrlConfigured()) {
+            try {
+                nationalBiometricSubject = findMostAdequateSubjectNationally(fingerScan);
+            } catch (RuntimeException exception) {
+                LOGGER.error("Connection failure to national server.", exception);
+            }
+        }
+
+        return new FingerScanStatus(localBiometricSubject, nationalBiometricSubject);
+    }
+
+    private BiometricSubject validateLocalSubjectExistence(BiometricSubject localBiometricSubject) {
+        return localBiometricSubject == null || patientHelper.findByLocalFpId(localBiometricSubject.getSubjectId()) == null
+                ? null
+                : localBiometricSubject;
+    }
+
+    private BiometricSubject findMostAdequateSubjectLocally(M2SysCaptureResponse fingerScan) {
         BiometricMatch biometricMatch = findMostAdequateLocally(fingerScan);
         return biometricMatch == null ? null : new BiometricSubject(biometricMatch.getSubjectId());
     }
 
-    @Override
-    public BiometricSubject findMostAdequateSubjectNationally(M2SysCaptureResponse fingerScan) {
+    private BiometricSubject findMostAdequateSubjectNationally(M2SysCaptureResponse fingerScan) {
         BiometricMatch biometricMatch = findMostAdequateNationally(fingerScan);
         return biometricMatch == null ? null : new BiometricSubject(biometricMatch.getSubjectId());
     }

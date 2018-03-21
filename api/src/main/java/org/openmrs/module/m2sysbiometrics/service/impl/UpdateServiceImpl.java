@@ -46,11 +46,11 @@ public class UpdateServiceImpl implements UpdateService {
         if (!results.isUpdateSuccess()) {
             LOGGER.error("Unable to update fingerprints nationally for: " + nationalSubject.getSubjectId()
                     + ", reason: " + results.firstValue());
-            handleNationalRegistrationError(nationalSubject, fingerScan);
+            handleNationalUpdateError(nationalSubject, fingerScan);
         }
     }
 
-    private void handleNationalRegistrationError(BiometricSubject nationalSubject, M2SysCaptureResponse fingerScan) {
+    private void handleNationalUpdateError(BiometricSubject nationalSubject, M2SysCaptureResponse fingerScan) {
         NationalSynchronizationFailure nationalSynchronizationFailure =
                 new NationalSynchronizationFailure(nationalSubject.getSubjectId(), fingerScan.getTemplateData(), true);
         nationalSynchronizationFailureService.save(nationalSynchronizationFailure);

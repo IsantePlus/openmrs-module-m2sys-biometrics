@@ -13,9 +13,7 @@ import org.openmrs.module.m2sysbiometrics.model.M2SysResult;
 import org.openmrs.module.m2sysbiometrics.model.M2SysResults;
 import org.openmrs.module.m2sysbiometrics.service.RegistrationService;
 import org.openmrs.module.m2sysbiometrics.service.SearchService;
-import org.openmrs.module.m2sysbiometrics.util.NationalUuidGenerator;
 import org.openmrs.module.m2sysbiometrics.service.UpdateService;
-import org.openmrs.module.m2sysbiometrics.util.PatientHelper;
 import org.openmrs.module.m2sysbiometrics.xml.XmlResultUtil;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricMatch;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricSubject;
@@ -46,12 +44,6 @@ public class M2SysV105Client extends AbstractM2SysClient {
     private SearchService searchService;
 
     @Autowired
-    private PatientHelper patientHelper;
-
-    @Autowired
-    private NationalUuidGenerator nationalUuidGenerator;
-
-    @Autowired
     private CloudScanrCaptor cloudScanrCaptor;
 
     @Autowired
@@ -71,7 +63,7 @@ public class M2SysV105Client extends AbstractM2SysClient {
     @Override
     public EnrollmentResult enroll(BiometricSubject localSubject) {
         M2SysCaptureResponse capture = scanDoubleFingers();
-        FingerScanStatus fingerScanStatus = checkIfFingerScanExists(capture);
+        FingerScanStatus fingerScanStatus = searchService.checkIfFingerScanExists(capture);
         EnrollmentStatus enrollmentStatus = EnrollmentStatus.SUCCESS;
         BiometricSubject nationalSubject = fingerScanStatus.getNationalBiometricSubject();
 
@@ -89,9 +81,9 @@ public class M2SysV105Client extends AbstractM2SysClient {
         }
 
         if (nationalBioServerClient.isServerUrlConfigured() && !fingerScanStatus.isRegisteredNationally()) {
-            String nationalId = nationalUuidGenerator.generate();
-            registrationService.registerNationally(nationalId, capture);
-            nationalSubject = new BiometricSubject(nationalId);
+            registrationService.registerNationally(capture);
+            fingerScanStatus = searchService.checkIfFingerScanExists(capture);
+            nationalSubject = new BiometricSubject(fingerScanStatus.getNationalBiometricSubject().getSubjectId());
         }
 
         Fingers fingers = capture.getFingerData(jaxbContext);
@@ -104,7 +96,7 @@ public class M2SysV105Client extends AbstractM2SysClient {
     @Override
     public BiometricSubject update(BiometricSubject subject) {
         M2SysCaptureResponse fingerScan = scanDoubleFingers();
-        FingerScanStatus fingerScanStatus = checkIfFingerScanExists(fingerScan);
+        FingerScanStatus fingerScanStatus = searchService.checkIfFingerScanExists(fingerScan);
 
         updateService.updateLocally(subject, fingerScan);
 
@@ -113,8 +105,7 @@ public class M2SysV105Client extends AbstractM2SysClient {
                 BiometricSubject nationalSubject = fingerScanStatus.getNationalBiometricSubject();
                 updateService.updateNationally(nationalSubject, fingerScan);
             } else {
-                String nationalId = nationalUuidGenerator.generate();
-                registrationService.registerNationally(nationalId, fingerScan);
+                registrationService.registerNationally(fingerScan);
             }
         }
 
@@ -140,7 +131,7 @@ public class M2SysV105Client extends AbstractM2SysClient {
     @Override
     public List<BiometricMatch> search() {
         M2SysCaptureResponse fingerScan = scanDoubleFingers();
-        FingerScanStatus fingerScanStatus = checkIfFingerScanExists(fingerScan);
+        FingerScanStatus fingerScanStatus = searchService.checkIfFingerScanExists(fingerScan);
         List<BiometricMatch> results = new ArrayList<>();
 
         if (fingerScanStatus.isRegisteredLocally()) {
@@ -185,24 +176,6 @@ public class M2SysV105Client extends AbstractM2SysClient {
         }
     }
 
-
-    private FingerScanStatus checkIfFingerScanExists(M2SysCaptureResponse fingerScan) {
-        BiometricSubject nationalBiometricSubject = null;
-
-        BiometricSubject localBiometricSubject = searchService.findMostAdequateSubjectLocally(fingerScan);
-        localBiometricSubject = validateLocalSubjectExistence(localBiometricSubject);
-
-        if (nationalBioServerClient.isServerUrlConfigured()) {
-            try {
-                nationalBiometricSubject = searchService.findMostAdequateSubjectNationally(fingerScan);
-            } catch (RuntimeException exception) {
-                getLogger().error("Connection failure to national server.", exception);
-            }
-        }
-
-        return new FingerScanStatus(localBiometricSubject, nationalBiometricSubject);
-    }
-
     private M2SysCaptureResponse scanDoubleFingers() {
         M2SysCaptureResponse response = testEnvCaptor.scanDoubleFingers();
 
@@ -213,11 +186,5 @@ public class M2SysV105Client extends AbstractM2SysClient {
         }
 
         return response;
-    }
-
-    private BiometricSubject validateLocalSubjectExistence(BiometricSubject localBiometricSubject) {
-        return localBiometricSubject == null || patientHelper.findByLocalFpId(localBiometricSubject.getSubjectId()) == null
-                ? null
-                : localBiometricSubject;
     }
 }
