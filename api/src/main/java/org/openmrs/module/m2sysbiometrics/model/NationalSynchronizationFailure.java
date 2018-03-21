@@ -17,7 +17,7 @@ public class NationalSynchronizationFailure extends BaseOpenmrsData {
     private static final long serialVersionUID = -5146973328798332082L;
 
     @Id
-    @Column
+    @Column(name = "national_synchronization_failure_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
@@ -30,6 +30,9 @@ public class NationalSynchronizationFailure extends BaseOpenmrsData {
 
     @Column(name = "update_failure")
     private boolean update;
+
+    public NationalSynchronizationFailure() {
+    }
 
     public NationalSynchronizationFailure(String subjectId, String biometricXml, boolean update) {
         this.subjectId = subjectId;
@@ -46,6 +49,7 @@ public class NationalSynchronizationFailure extends BaseOpenmrsData {
     public void setId(Integer id) {
         this.id = id;
     }
+
     public String getSubjectId() {
         return subjectId;
     }

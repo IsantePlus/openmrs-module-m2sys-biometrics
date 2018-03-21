@@ -2,7 +2,6 @@ package org.openmrs.module.m2sysbiometrics.scheduler.impl;
 
 import org.openmrs.api.context.Context;
 import org.openmrs.api.impl.BaseOpenmrsService;
-import org.openmrs.module.m2sysbiometrics.exception.M2SysBiometricsException;
 import org.openmrs.module.m2sysbiometrics.scheduler.M2SysSchedulerService;
 import org.openmrs.module.m2sysbiometrics.scheduler.NationalSynchronizationTask;
 import org.openmrs.module.m2sysbiometrics.util.M2SysProperties;
@@ -74,7 +73,7 @@ public class M2SysSchedulerServiceImpl extends BaseOpenmrsService implements M2S
 
         try {
             Context.getSchedulerService().saveTaskDefinition(result);
-        } catch (M2SysBiometricsException e) {
+        } catch (Exception e) {
             LOGGER.error("Error during save " + name + " definition: ", e);
         }
 
