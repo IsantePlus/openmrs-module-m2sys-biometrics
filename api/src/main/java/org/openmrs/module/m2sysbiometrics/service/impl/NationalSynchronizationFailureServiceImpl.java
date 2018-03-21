@@ -22,18 +22,6 @@ public class NationalSynchronizationFailureServiceImpl extends BaseOpenmrsServic
     }
 
     @Override
-    public NationalSynchronizationFailure saveOrReplaceRegistrationFailure(
-            NationalSynchronizationFailure nationalSynchronizationFailure) {
-        if (nationalSynchronizationFailure.getBiometricXml() != null) {
-            for (NationalSynchronizationFailure failureFromDB : dao.findAllRegistrationFailuresByBiometricXml(
-                    nationalSynchronizationFailure.getBiometricXml())) {
-                dao.delete(failureFromDB);
-            }
-        }
-        return dao.save(nationalSynchronizationFailure);
-    }
-
-    @Override
     public void delete(NationalSynchronizationFailure nationalSynchronizationFailure) {
         dao.delete(nationalSynchronizationFailure);
     }

@@ -148,7 +148,7 @@ public class RegistrationServiceImpl implements RegistrationService {
     private void handleNationalRegistrationError(String nationalId, M2SysCaptureResponse fingerScan) {
         NationalSynchronizationFailure nationalSynchronizationFailure =
                 new NationalSynchronizationFailure(nationalId, fingerScan.getTemplateData(), false);
-        nationalSynchronizationFailureService.saveOrReplaceRegistrationFailure(nationalSynchronizationFailure);
+        nationalSynchronizationFailureService.save(nationalSynchronizationFailure);
     }
 
     private void attachIdToThePatient(Patient patient, String id, String identifierTypeUuid) {

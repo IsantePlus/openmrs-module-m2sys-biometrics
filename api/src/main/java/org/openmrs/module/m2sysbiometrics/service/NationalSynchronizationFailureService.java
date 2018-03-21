@@ -12,10 +12,6 @@ public interface NationalSynchronizationFailureService extends OpenmrsService {
     NationalSynchronizationFailure save(NationalSynchronizationFailure nationalSynchronizationFailure);
 
     @Transactional
-    NationalSynchronizationFailure saveOrReplaceRegistrationFailure(
-            NationalSynchronizationFailure nationalSynchronizationFailure);
-
-    @Transactional
     void delete(NationalSynchronizationFailure nationalSynchronizationFailure);
 
     @Transactional

@@ -15,8 +15,6 @@ public class M2SysNationalSynchronizationFailureDaoImpl implements M2SysNational
 
     private static final String UPDATE = "update_failure";
 
-    private static final String BIOMETRIC_XML = "biometric_xml";
-
     private static final String CREATED_DATE = "date_created";
 
     @Autowired
@@ -38,14 +36,6 @@ public class M2SysNationalSynchronizationFailureDaoImpl implements M2SysNational
         return findListByQuery(
                 "SELECT * FROM " + TABLE_NAME + " failure "
                         + "WHERE failure." + UPDATE + "=0 "
-                        + "ORDER BY " + CREATED_DATE);
-    }
-
-    @Override
-    public List<NationalSynchronizationFailure> findAllRegistrationFailuresByBiometricXml(String biometricXml) {
-        return findListByQuery(
-                "SELECT * FROM " + TABLE_NAME + " failure "
-                        + "WHERE failure." + UPDATE + "=0 AND failure." + BIOMETRIC_XML + "='" + biometricXml + "'"
                         + "ORDER BY " + CREATED_DATE);
     }
 
