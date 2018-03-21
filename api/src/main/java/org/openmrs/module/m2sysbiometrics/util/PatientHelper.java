@@ -7,4 +7,6 @@ public interface PatientHelper {
     Patient findByLocalFpId(String subjectId);
 
     Patient findByNationalFpId(String nationalSubjectId);
+
+    void changeLocalFpId(Patient patient, String newLocalSubjectId);
 }

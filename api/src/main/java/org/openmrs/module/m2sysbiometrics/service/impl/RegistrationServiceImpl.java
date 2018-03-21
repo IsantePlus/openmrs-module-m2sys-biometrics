@@ -16,6 +16,7 @@ import org.openmrs.module.m2sysbiometrics.model.M2SysResults;
 import org.openmrs.module.m2sysbiometrics.model.NationalSynchronizationFailure;
 import org.openmrs.module.m2sysbiometrics.service.NationalSynchronizationFailureService;
 import org.openmrs.module.m2sysbiometrics.service.RegistrationService;
+import org.openmrs.module.m2sysbiometrics.service.SearchService;
 import org.openmrs.module.m2sysbiometrics.util.M2SysProperties;
 import org.openmrs.module.m2sysbiometrics.util.NationalUuidGenerator;
 import org.openmrs.module.m2sysbiometrics.util.PatientHelper;
@@ -59,16 +60,19 @@ public class RegistrationServiceImpl implements RegistrationService {
     @Autowired
     private NationalSynchronizationFailureService nationalSynchronizationFailureService;
 
+    @Autowired
+    private SearchService searchService;
+
     @Override
-    public void registerLocally(BiometricSubject subject, M2SysCaptureResponse capture) {
-        String response = localBioServerClient.enroll(subject.getSubjectId(), capture.getTemplateData());
+    public void registerLocally(BiometricSubject subject, M2SysCaptureResponse fingerScan) {
+        String response = localBioServerClient.enroll(subject.getSubjectId(), fingerScan.getTemplateData());
         M2SysResults results = XmlResultUtil.parse(response);
 
         if (!results.isRegisterSuccess()) {
-            String responseValue = results.firstValue();
-            LOGGER.info("Got error response from the local server: {}. Checking if tied to patient.", responseValue);
-            Patient patient = patientHelper.findByLocalFpId(responseValue);
-            handleLocalRegistrationError(subject, responseValue, patient);
+            String existingInLocalFpSubjectId = results.firstValue();
+            LOGGER.info("Got error response from the local server: {}. Checking if tied to patient.", existingInLocalFpSubjectId);
+            Patient patient = patientHelper.findByLocalFpId(existingInLocalFpSubjectId);
+            handleLocalRegistrationError(subject, existingInLocalFpSubjectId, patient, fingerScan);
         }
     }
 
@@ -116,31 +120,68 @@ public class RegistrationServiceImpl implements RegistrationService {
         }
     }
 
-    private void handleLocalRegistrationError(BiometricSubject subject, String responseValue, Patient patient) {
-        if (patient == null) {
-            LOGGER.info("No patient matching fingerprint ID: {}", responseValue);
+    private void handleLocalRegistrationError(BiometricSubject expectedSubjectId, String existingInLocalFpSubjectId,
+            Patient patientWithLocalFpSubjectId, M2SysCaptureResponse fingerScan) {
+        if (patientWithLocalFpSubjectId == null) {
+            LOGGER.info("No patient matching fingerprint ID: {}", existingInLocalFpSubjectId);
 
-            String isRegisterResponse = localBioServerClient.isRegistered(responseValue);
+            String isRegisterResponse = localBioServerClient.isRegistered(existingInLocalFpSubjectId);
             M2SysResults isRegisterResults = XmlResultUtil.parse(isRegisterResponse);
 
             if (isRegisterResults.isLookupNotFound()) {
                 throw new M2SysBiometricsException("No success during fingerprint registration: "
-                        + responseValue);
+                        + existingInLocalFpSubjectId);
             } else {
                 LOGGER.info("Fingerprints are registered with ID {} but do not match any patient, fixing.",
-                        responseValue);
-                if (!StringUtils.equals(subject.getSubjectId(), responseValue)) {
-                    LOGGER.info("Changing existing fingerprint ID {} to {}",
-                            responseValue, subject.getSubjectId());
-
-                    localBioServerClient.changeId(responseValue, subject.getSubjectId());
-                } else {
-                    LOGGER.info("User already has the same fingerprints registered under his fingerprint ID");
-                }
+                        existingInLocalFpSubjectId);
+                fixLocalFpIdDoesNotMatchingPatient(expectedSubjectId, existingInLocalFpSubjectId, fingerScan);
             }
         } else {
             throw new M2SysBiometricsException("Fingerprints already match patient: "
-                    + patient.getPersonName().getFullName());
+                    + patientWithLocalFpSubjectId.getPersonName().getFullName());
+        }
+    }
+
+    private void fixLocalFpIdDoesNotMatchingPatient(BiometricSubject expectedSubjectId, String existingInLocalFpSubjectId,
+            M2SysCaptureResponse fingerScan) {
+        boolean success = handleLocalRegistrationErrorWithNationalFp(expectedSubjectId, fingerScan);
+        if (!success) {
+            handleLocalRegistrationErrorWithReplacingIdInLocalFp(expectedSubjectId, existingInLocalFpSubjectId);
+        }
+    }
+
+    private boolean handleLocalRegistrationErrorWithNationalFp(BiometricSubject expectedSubjectId,
+            M2SysCaptureResponse fingerScan) {
+        boolean success = false;
+        if (nationalBioServerClient.isServerUrlConfigured()) {
+            LOGGER.info("Trying to find patient on national level");
+            BiometricSubject nationalSubject = searchService.findMostAdequateSubjectNationally(fingerScan);
+            if (nationalSubject != null) {
+                LOGGER.info("Patient found on national level with national subject id {}", nationalSubject.getSubjectId());
+                Patient localPatientWithNationalId = patientHelper.findByNationalFpId(nationalSubject.getSubjectId());
+                if (localPatientWithNationalId != null) {
+                    LOGGER.info("Patient presents on national level is also available in local instance, "
+                            + "overwriting its local subject id", nationalSubject.getSubjectId());
+                    try {
+                        patientHelper.changeLocalFpId(localPatientWithNationalId, expectedSubjectId.getSubjectId());
+                        success = true;
+                    } catch (Exception ex) {
+                        success = false;
+                    }
+                }
+            }
+        }
+        return success;
+    }
+
+    private void handleLocalRegistrationErrorWithReplacingIdInLocalFp(BiometricSubject expectedSubjectId,
+            String existingInLocalFpSubjectId) {
+        if (!StringUtils.equals(expectedSubjectId.getSubjectId(), existingInLocalFpSubjectId)) {
+            LOGGER.info("Changing existing fingerprint ID {} to {}",
+                    existingInLocalFpSubjectId, expectedSubjectId.getSubjectId());
+            localBioServerClient.changeId(existingInLocalFpSubjectId, expectedSubjectId.getSubjectId());
+        } else {
+            LOGGER.info("User already has the same fingerprints registered under his fingerprint ID");
         }
     }
 

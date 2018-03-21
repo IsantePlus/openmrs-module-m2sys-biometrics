@@ -1,6 +1,8 @@
 package org.openmrs.module.m2sysbiometrics.util.impl;
 
 import org.openmrs.Patient;
+import org.openmrs.PatientIdentifier;
+import org.openmrs.PatientIdentifierType;
 import org.openmrs.api.PatientService;
 import org.openmrs.module.m2sysbiometrics.util.M2SysProperties;
 import org.openmrs.module.m2sysbiometrics.util.PatientHelper;
@@ -35,6 +37,16 @@ public class PatientHelperImpl implements PatientHelper {
     public Patient findByNationalFpId(String nationalSubjectId) {
         return findByIdType(nationalSubjectId,
                 RegistrationCoreConstants.GP_BIOMETRICS_NATIONAL_PERSON_IDENTIFIER_TYPE_UUID);
+    }
+
+    @Override
+    public void changeLocalFpId(Patient patient, String newLocalSubjectId) {
+        String identifierUuid = properties.getGlobalProperty(RegistrationCoreConstants.GP_BIOMETRICS_PERSON_IDENTIFIER_TYPE_UUID);
+        PatientIdentifierType pit = patientService.getPatientIdentifierTypeByUuid(identifierUuid);
+
+        PatientIdentifier localFpPatientIdentifier = patient.getPatientIdentifier(pit);
+        localFpPatientIdentifier.setIdentifier(newLocalSubjectId);
+        patientService.savePatientIdentifier(localFpPatientIdentifier);
     }
 
     private Patient findByIdType(String subjectId, String idTypeProp) {
