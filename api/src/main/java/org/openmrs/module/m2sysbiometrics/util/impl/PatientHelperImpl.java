@@ -1,8 +1,10 @@
 package org.openmrs.module.m2sysbiometrics.util.impl;
 
+import org.openmrs.Location;
 import org.openmrs.Patient;
 import org.openmrs.PatientIdentifier;
 import org.openmrs.PatientIdentifierType;
+import org.openmrs.api.LocationService;
 import org.openmrs.api.PatientService;
 import org.openmrs.module.m2sysbiometrics.util.M2SysProperties;
 import org.openmrs.module.m2sysbiometrics.util.PatientHelper;
@@ -27,6 +29,9 @@ public class PatientHelperImpl implements PatientHelper {
     @Autowired
     private M2SysProperties properties;
 
+    @Autowired
+    private LocationService locationService;
+
     @Override
     public Patient findByLocalFpId(String subjectId) {
         return findByIdType(subjectId,
@@ -41,12 +46,31 @@ public class PatientHelperImpl implements PatientHelper {
 
     @Override
     public void changeLocalFpId(Patient patient, String newLocalSubjectId) {
-        String identifierUuid = properties.getGlobalProperty(RegistrationCoreConstants.GP_BIOMETRICS_PERSON_IDENTIFIER_TYPE_UUID);
+        String identifierUuid = properties.getGlobalProperty(
+                RegistrationCoreConstants.GP_BIOMETRICS_PERSON_IDENTIFIER_TYPE_UUID);
         PatientIdentifierType pit = patientService.getPatientIdentifierTypeByUuid(identifierUuid);
 
         PatientIdentifier localFpPatientIdentifier = patient.getPatientIdentifier(pit);
         localFpPatientIdentifier.setIdentifier(newLocalSubjectId);
         patientService.savePatientIdentifier(localFpPatientIdentifier);
+    }
+
+    @Override
+    public void attachNationalIdToThePatient(Patient patient, String nationalId) {
+        attachIdToThePatient(patient, nationalId, properties.getNationalPatientIdentifierTypeUuid());
+    }
+
+    @Override
+    public void attachLocalIdToThePatient(Patient patient, String localId) {
+        attachIdToThePatient(patient, localId, properties.getLocalPatientIdentifierTypeUuid());
+    }
+
+    private void attachIdToThePatient(Patient patient, String id, String identifierTypeUuid) {
+        PatientIdentifierType patientIdentifierType = patientService.getPatientIdentifierTypeByUuid(identifierTypeUuid);
+        Location location = locationService.getDefaultLocation();
+        PatientIdentifier identifier = new PatientIdentifier(id, patientIdentifierType, location);
+        patient.addIdentifier(identifier);
+        patientService.savePatient(patient);
     }
 
     private Patient findByIdType(String subjectId, String idTypeProp) {

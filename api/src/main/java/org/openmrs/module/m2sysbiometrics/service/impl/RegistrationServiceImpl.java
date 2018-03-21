@@ -1,12 +1,7 @@
 package org.openmrs.module.m2sysbiometrics.service.impl;
 
 import org.apache.commons.lang3.StringUtils;
-import org.openmrs.Location;
 import org.openmrs.Patient;
-import org.openmrs.PatientIdentifier;
-import org.openmrs.PatientIdentifierType;
-import org.openmrs.api.LocationService;
-import org.openmrs.api.PatientService;
 import org.openmrs.module.m2sysbiometrics.bioplugin.LocalBioServerClient;
 import org.openmrs.module.m2sysbiometrics.bioplugin.NationalBioServerClient;
 import org.openmrs.module.m2sysbiometrics.exception.M2SysBiometricsException;
@@ -49,12 +44,6 @@ public class RegistrationServiceImpl implements RegistrationService {
     private M2SysProperties properties;
 
     @Autowired
-    private PatientService patientService;
-
-    @Autowired
-    private LocationService locationService;
-
-    @Autowired
     private NationalUuidGenerator nationalUuidGenerator;
 
     @Autowired
@@ -70,7 +59,8 @@ public class RegistrationServiceImpl implements RegistrationService {
 
         if (!results.isRegisterSuccess()) {
             String existingInLocalFpSubjectId = results.firstValue();
-            LOGGER.info("Got error response from the local server: {}. Checking if tied to patient.", existingInLocalFpSubjectId);
+            LOGGER.info("Got error response from the local server: {}. Checking if tied to patient.",
+                    existingInLocalFpSubjectId);
             Patient patient = patientHelper.findByLocalFpId(existingInLocalFpSubjectId);
             handleLocalRegistrationError(subject, existingInLocalFpSubjectId, patient, fingerScan);
         }
@@ -102,7 +92,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         }
 
         registerLocally(nationalBiometricSubject, fingerScan);
-        attachLocalIdToThePatient(patient, nationalId);
+        patientHelper.attachLocalIdToThePatient(patient, nationalId);
     }
 
     @Override
@@ -112,7 +102,7 @@ public class RegistrationServiceImpl implements RegistrationService {
             if (patientHelper.findByNationalFpId(nationalId) == null) {
                 String localId = fingerScanStatus.getLocalBiometricSubject().getSubjectId();
                 Patient patient = patientHelper.findByLocalFpId(localId);
-                attachNationalIdToThePatient(patient, nationalId);
+                patientHelper.attachNationalIdToThePatient(patient, nationalId);
             }
         } else {
             String nationalId = nationalUuidGenerator.generate();
@@ -190,21 +180,5 @@ public class RegistrationServiceImpl implements RegistrationService {
                 new NationalSynchronizationFailure(nationalId, fingerScan.getTemplateData(), false);
 
         nationalSynchronizationFailureService.save(nationalSynchronizationFailure);
-    }
-
-    private void attachIdToThePatient(Patient patient, String id, String identifierTypeUuid) {
-        PatientIdentifierType patientIdentifierType = patientService.getPatientIdentifierTypeByUuid(identifierTypeUuid);
-        Location location = locationService.getDefaultLocation();
-        PatientIdentifier identifier = new PatientIdentifier(id, patientIdentifierType, location);
-        patient.addIdentifier(identifier);
-        patientService.savePatient(patient);
-    }
-
-    private void attachNationalIdToThePatient(Patient patient, String nationalId) {
-        attachIdToThePatient(patient, nationalId, properties.getNationalPatientIdentifierTypeUuid());
-    }
-
-    private void attachLocalIdToThePatient(Patient patient, String localId) {
-        attachIdToThePatient(patient, localId, properties.getLocalPatientIdentifierTypeUuid());
     }
 }

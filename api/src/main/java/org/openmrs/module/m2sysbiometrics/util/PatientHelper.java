@@ -9,4 +9,8 @@ public interface PatientHelper {
     Patient findByNationalFpId(String nationalSubjectId);
 
     void changeLocalFpId(Patient patient, String newLocalSubjectId);
+
+    void attachNationalIdToThePatient(Patient patient, String nationalId);
+
+    void attachLocalIdToThePatient(Patient patient, String localId);
 }
