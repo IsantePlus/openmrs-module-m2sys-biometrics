@@ -1,7 +1,6 @@
 package org.openmrs.module.m2sysbiometrics.scheduler;
 
 import org.openmrs.api.context.Context;
-import org.openmrs.module.m2sysbiometrics.exception.M2SysBiometricsException;
 import org.openmrs.module.m2sysbiometrics.model.FingerScanStatus;
 import org.openmrs.module.m2sysbiometrics.model.M2SysCaptureResponse;
 import org.openmrs.module.m2sysbiometrics.model.NationalSynchronizationFailure;
@@ -59,7 +58,7 @@ public class NationalSynchronizationTask extends AbstractTask {
 
             registrationService.synchronizeFingerprints(fingerScan, fingerScanStatus);
             nationalSynchronizationFailureService.delete(failure);
-        } catch (M2SysBiometricsException e) {
+        } catch (Exception e) {
             LOGGER.error("Scheduled retry of registration failed", e);
         }
     }

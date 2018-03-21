@@ -74,7 +74,7 @@ public class M2SysSchedulerServiceImpl extends BaseOpenmrsService implements M2S
 
         try {
             Context.getSchedulerService().saveTaskDefinition(result);
-        } catch (M2SysBiometricsException e) {
+        } catch (Exception e) {
             LOGGER.error("Error during save " + name + " definition: ", e);
         }
 
