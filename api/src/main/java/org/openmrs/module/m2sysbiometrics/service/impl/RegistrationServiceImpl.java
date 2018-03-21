@@ -93,8 +93,10 @@ public class RegistrationServiceImpl implements RegistrationService {
                     "Error during fetching patient from MPI with national fingerprint ID %s", nationalId));
         }
 
-        registerLocally(nationalBiometricSubject, fingerScan);
-        patientHelper.attachLocalIdToThePatient(patient, nationalId);
+        BiometricSubject setLocalSubjectId = registerLocally(nationalBiometricSubject, fingerScan);
+        if (StringUtils.equals(setLocalSubjectId.getSubjectId(), nationalBiometricSubject.getSubjectId())) {
+            patientHelper.attachLocalIdToThePatient(patient, nationalId);
+        }
     }
 
     @Override
