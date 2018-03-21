@@ -13,9 +13,7 @@ import org.openmrs.module.m2sysbiometrics.model.M2SysResult;
 import org.openmrs.module.m2sysbiometrics.model.M2SysResults;
 import org.openmrs.module.m2sysbiometrics.service.RegistrationService;
 import org.openmrs.module.m2sysbiometrics.service.SearchService;
-import org.openmrs.module.m2sysbiometrics.util.NationalUuidGenerator;
 import org.openmrs.module.m2sysbiometrics.service.UpdateService;
-import org.openmrs.module.m2sysbiometrics.util.PatientHelper;
 import org.openmrs.module.m2sysbiometrics.xml.XmlResultUtil;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricMatch;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricSubject;
@@ -43,9 +41,6 @@ public class M2SysV105Client extends AbstractM2SysClient {
 
     @Autowired
     private SearchService searchService;
-
-    @Autowired
-    private PatientHelper patientHelper;
 
     @Autowired
     private CloudScanrCaptor cloudScanrCaptor;
@@ -86,6 +81,7 @@ public class M2SysV105Client extends AbstractM2SysClient {
 
         if (nationalBioServerClient.isServerUrlConfigured() && !fingerScanStatus.isRegisteredNationally()) {
             registrationService.registerNationally(capture);
+            fingerScanStatus = searchService.checkIfFingerScanExists(capture);
             nationalSubject = fingerScanStatus.getNationalBiometricSubject();
         }
 
@@ -185,11 +181,5 @@ public class M2SysV105Client extends AbstractM2SysClient {
         }
 
         return response;
-    }
-
-    private BiometricSubject validateLocalSubjectExistence(BiometricSubject localBiometricSubject) {
-        return localBiometricSubject == null || patientHelper.findByLocalFpId(localBiometricSubject.getSubjectId()) == null
-                ? null
-                : localBiometricSubject;
     }
 }

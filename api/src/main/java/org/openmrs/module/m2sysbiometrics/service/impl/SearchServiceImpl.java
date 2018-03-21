@@ -7,6 +7,7 @@ import org.openmrs.module.m2sysbiometrics.model.FingerScanStatus;
 import org.openmrs.module.m2sysbiometrics.model.M2SysCaptureResponse;
 import org.openmrs.module.m2sysbiometrics.model.M2SysResults;
 import org.openmrs.module.m2sysbiometrics.service.SearchService;
+import org.openmrs.module.m2sysbiometrics.util.PatientHelper;
 import org.openmrs.module.m2sysbiometrics.xml.XmlResultUtil;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricMatch;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricSubject;
@@ -28,6 +29,9 @@ public class SearchServiceImpl implements SearchService {
 
     @Autowired
     private NationalBioServerClient nationalBioServerClient;
+
+    @Autowired
+    private PatientHelper patientHelper;
 
     @Override
     public List<BiometricMatch> searchLocally(M2SysCaptureResponse fingerScan) {
@@ -72,10 +76,13 @@ public class SearchServiceImpl implements SearchService {
                 .orElse(null);
     }
 
+
     @Override
     public FingerScanStatus checkIfFingerScanExists(M2SysCaptureResponse fingerScan) {
-        BiometricSubject localBiometricSubject = findMostAdequateSubjectLocally(fingerScan);
         BiometricSubject nationalBiometricSubject = null;
+
+        BiometricSubject localBiometricSubject = findMostAdequateSubjectLocally(fingerScan);
+        localBiometricSubject = validateLocalSubjectExistence(localBiometricSubject);
 
         if (nationalBioServerClient.isServerUrlConfigured()) {
             try {
@@ -86,6 +93,12 @@ public class SearchServiceImpl implements SearchService {
         }
 
         return new FingerScanStatus(localBiometricSubject, nationalBiometricSubject);
+    }
+
+    private BiometricSubject validateLocalSubjectExistence(BiometricSubject localBiometricSubject) {
+        return localBiometricSubject == null || patientHelper.findByLocalFpId(localBiometricSubject.getSubjectId()) == null
+                ? null
+                : localBiometricSubject;
     }
 
     private BiometricSubject findMostAdequateSubjectLocally(M2SysCaptureResponse fingerScan) {
