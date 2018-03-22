@@ -30,4 +30,9 @@ public class NationalSynchronizationFailureServiceImpl extends BaseOpenmrsServic
     public List<NationalSynchronizationFailure> findAllRegistrationFailures() {
         return dao.findAllRegistrationFailures();
     }
+
+    @Override
+    public List<NationalSynchronizationFailure> findAllUpdateFailures() {
+        return dao.findAllUpdateFailures();
+    }
 }

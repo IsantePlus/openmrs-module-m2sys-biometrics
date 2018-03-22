@@ -16,4 +16,7 @@ public interface NationalSynchronizationFailureService extends OpenmrsService {
 
     @Transactional
     List<NationalSynchronizationFailure> findAllRegistrationFailures();
+
+    @Transactional
+    List<NationalSynchronizationFailure> findAllUpdateFailures();
 }

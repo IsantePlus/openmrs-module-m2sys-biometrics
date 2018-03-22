@@ -39,6 +39,14 @@ public class M2SysNationalSynchronizationFailureDaoImpl implements M2SysNational
                         + "ORDER BY " + CREATED_DATE);
     }
 
+    @Override
+    public List<NationalSynchronizationFailure> findAllUpdateFailures() {
+        return findListByQuery(
+                "SELECT * FROM " + TABLE_NAME + " failure "
+                        + "WHERE failure." + UPDATE + "=1 "
+                        + "ORDER BY " + CREATED_DATE);
+    }
+
     private List<NationalSynchronizationFailure> findListByQuery(String query) {
         return sessionFactory.getCurrentSession().createSQLQuery(query)
                 .addEntity(NationalSynchronizationFailure.class).list();
