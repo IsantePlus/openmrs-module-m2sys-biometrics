@@ -23,6 +23,8 @@ public class UpdateServiceImpl implements UpdateService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UpdateServiceImpl.class);
 
+    private static final String SUBJECT_NOT_NEEDED = "NOT_NEEDED";
+
     @Autowired
     private LocalBioServerClient localBioServerClient;
 
@@ -74,7 +76,7 @@ public class UpdateServiceImpl implements UpdateService {
 
     private void handleNationalUpdateError(M2SysCaptureResponse fingerScan) {
         NationalSynchronizationFailure nationalSynchronizationFailure =
-                new NationalSynchronizationFailure("", fingerScan.getTemplateData(), true);
+                new NationalSynchronizationFailure(SUBJECT_NOT_NEEDED, fingerScan.getTemplateData(), true);
         nationalSynchronizationFailureService.save(nationalSynchronizationFailure);
     }
 }
