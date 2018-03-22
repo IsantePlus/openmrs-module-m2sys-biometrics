@@ -68,15 +68,13 @@ public class UpdateServiceImpl implements UpdateService {
             }
         } catch (Exception e) {
             LOGGER.error("Update with the national fingerprint server failed.", e);
-            String subjectId = searchService.findMostAdequateLocally(fingerScan).getSubjectId();
-            BiometricSubject subject = new BiometricSubject(subjectId);
-            handleNationalUpdateError(subject, fingerScan);
+            handleNationalUpdateError(fingerScan);
         }
     }
 
-    private void handleNationalUpdateError(BiometricSubject subject, M2SysCaptureResponse fingerScan) {
+    private void handleNationalUpdateError(M2SysCaptureResponse fingerScan) {
         NationalSynchronizationFailure nationalSynchronizationFailure =
-                new NationalSynchronizationFailure(subject.getSubjectId(), fingerScan.getTemplateData(), true);
+                new NationalSynchronizationFailure("", fingerScan.getTemplateData(), true);
         nationalSynchronizationFailureService.save(nationalSynchronizationFailure);
     }
 }
