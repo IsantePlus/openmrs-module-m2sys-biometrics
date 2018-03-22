@@ -85,7 +85,9 @@ public class RegistrationServiceImpl implements RegistrationService {
     @Override
     public void fetchFromMpiByNationalFpId(BiometricSubject nationalBiometricSubject, M2SysCaptureResponse fingerScan) {
         String nationalId = nationalBiometricSubject.getSubjectId();
-        registrationCoreService.importMpiPatient(nationalId, properties.getNationalPatientIdentifierTypeUuid());
+        if (patientHelper.findByNationalFpId(nationalId) == null) {
+            registrationCoreService.importMpiPatient(nationalId, properties.getNationalPatientIdentifierTypeUuid());
+        }
 
         Patient patient = patientHelper.findByNationalFpId(nationalId);
         if (patient == null) {
@@ -131,12 +133,12 @@ public class RegistrationServiceImpl implements RegistrationService {
             } else {
                 LOGGER.info("Fingerprints are registered with ID {} but do not match any patient, fixing.",
                         existingInLocalFpSubjectId);
-                return fixLocalFpIdDoesNotMatchingPatient(expectedSubjectId, existingInLocalFpSubjectId, fingerScan);
+                return fixLocalFpIdDoesNotMatchPatient(expectedSubjectId, existingInLocalFpSubjectId, fingerScan);
             }
         }
     }
 
-    private BiometricSubject fixLocalFpIdDoesNotMatchingPatient(BiometricSubject expectedSubjectId,
+    private BiometricSubject fixLocalFpIdDoesNotMatchPatient(BiometricSubject expectedSubjectId,
             String existingInLocalFpSubjectId, M2SysCaptureResponse fingerScan) {
         BiometricSubject setSubjectId;
         boolean success = handleLocalRegistrationErrorWithNationalFp(existingInLocalFpSubjectId, fingerScan);
@@ -162,7 +164,7 @@ public class RegistrationServiceImpl implements RegistrationService {
                     LOGGER.info("Patient presents on national level is also available in local instance, "
                             + "overwriting its local subject id type", nationalSubject.getSubjectId());
                     try {
-                        patientHelper.changeLocalFpId(localPatientWithNationalId, existingInLocalFpSubjectId);
+                        patientHelper.attachLocalIdToThePatient(localPatientWithNationalId, existingInLocalFpSubjectId);
                         success = true;
                     } catch (Exception ex) {
                         success = false;

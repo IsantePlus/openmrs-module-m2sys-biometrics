@@ -161,7 +161,7 @@ public class M2SysV105Client extends AbstractM2SysClient {
                     }
                 }
             } catch (RuntimeException exception) {
-                getLogger().error("Connection failure to national server.", exception);
+                getLogger().error("Search failure.", exception);
             }
         }
 
