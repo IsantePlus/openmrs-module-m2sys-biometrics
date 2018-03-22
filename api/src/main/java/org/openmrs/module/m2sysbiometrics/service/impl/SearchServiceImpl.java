@@ -77,6 +77,18 @@ public class SearchServiceImpl implements SearchService {
     }
 
     @Override
+    public BiometricSubject findMostAdequateSubjectLocally(M2SysCaptureResponse fingerScan) {
+        BiometricMatch biometricMatch = findMostAdequateLocally(fingerScan);
+        return biometricMatch == null ? null : new BiometricSubject(biometricMatch.getSubjectId());
+    }
+
+    @Override
+    public BiometricSubject findMostAdequateSubjectNationally(M2SysCaptureResponse fingerScan) {
+        BiometricMatch biometricMatch = findMostAdequateNationally(fingerScan);
+        return biometricMatch == null ? null : new BiometricSubject(biometricMatch.getSubjectId());
+    }
+
+    @Override
     public FingerScanStatus checkIfFingerScanExists(M2SysCaptureResponse fingerScan) {
         BiometricSubject nationalBiometricSubject = null;
 
@@ -98,15 +110,5 @@ public class SearchServiceImpl implements SearchService {
         return localBiometricSubject == null || patientHelper.findByLocalFpId(localBiometricSubject.getSubjectId()) == null
                 ? null
                 : localBiometricSubject;
-    }
-
-    private BiometricSubject findMostAdequateSubjectLocally(M2SysCaptureResponse fingerScan) {
-        BiometricMatch biometricMatch = findMostAdequateLocally(fingerScan);
-        return biometricMatch == null ? null : new BiometricSubject(biometricMatch.getSubjectId());
-    }
-
-    private BiometricSubject findMostAdequateSubjectNationally(M2SysCaptureResponse fingerScan) {
-        BiometricMatch biometricMatch = findMostAdequateNationally(fingerScan);
-        return biometricMatch == null ? null : new BiometricSubject(biometricMatch.getSubjectId());
     }
 }
