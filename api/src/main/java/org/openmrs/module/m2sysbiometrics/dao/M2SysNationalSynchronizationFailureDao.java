@@ -11,4 +11,6 @@ public interface M2SysNationalSynchronizationFailureDao {
     void delete(NationalSynchronizationFailure nationalSynchronizationFailure);
 
     List<NationalSynchronizationFailure> findAllRegistrationFailures();
+
+    List<NationalSynchronizationFailure> findAllUpdateFailures();
 }

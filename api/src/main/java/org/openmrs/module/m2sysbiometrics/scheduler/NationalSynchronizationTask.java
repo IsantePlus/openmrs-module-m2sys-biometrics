@@ -7,6 +7,7 @@ import org.openmrs.module.m2sysbiometrics.model.NationalSynchronizationFailure;
 import org.openmrs.module.m2sysbiometrics.service.NationalSynchronizationFailureService;
 import org.openmrs.module.m2sysbiometrics.service.RegistrationService;
 import org.openmrs.module.m2sysbiometrics.service.SearchService;
+import org.openmrs.module.m2sysbiometrics.service.UpdateService;
 import org.openmrs.scheduler.tasks.AbstractTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,11 +29,14 @@ public class NationalSynchronizationTask extends AbstractTask {
 
     private SearchService searchService;
 
+    private UpdateService updateService;
+
     @Override
     public void execute() {
         LOGGER.info("Executing " + TASK_NAME  + "...");
         initializeBeans();
         retryRegistrationFailures();
+        retryUpdateFailures();
     }
 
     private void initializeBeans() {
@@ -44,10 +48,17 @@ public class NationalSynchronizationTask extends AbstractTask {
 
         searchService = Context.getRegisteredComponent(
                 "searchService", SearchService.class);
+
+        updateService = Context.getRegisteredComponent(
+                "updateService", UpdateService.class);
     }
 
     private void retryRegistrationFailures() {
         nationalSynchronizationFailureService.findAllRegistrationFailures().forEach(this::retryRegistrationFailure);
+    }
+
+    private void retryUpdateFailures() {
+        nationalSynchronizationFailureService.findAllUpdateFailures().forEach(this::retryUpdateFailure);
     }
 
     private void retryRegistrationFailure(NationalSynchronizationFailure failure) {
@@ -60,6 +71,18 @@ public class NationalSynchronizationTask extends AbstractTask {
             nationalSynchronizationFailureService.delete(failure);
         } catch (Exception e) {
             LOGGER.error("Scheduled retry of registration failed", e);
+        }
+    }
+
+    private void retryUpdateFailure(NationalSynchronizationFailure failure) {
+        try {
+            M2SysCaptureResponse fingerScan = new M2SysCaptureResponse();
+            fingerScan.setTemplateData(failure.getBiometricXml());
+
+            updateService.updateNationally(fingerScan);
+            nationalSynchronizationFailureService.delete(failure);
+        } catch (Exception e) {
+            LOGGER.error("Scheduled retry of update failed", e);
         }
     }
 }

@@ -7,5 +7,5 @@ public interface UpdateService {
 
     void updateLocally(BiometricSubject subject, M2SysCaptureResponse fingerScan);
 
-    void updateNationally(BiometricSubject nationalSubject, M2SysCaptureResponse fingerScan);
+    void updateNationally(M2SysCaptureResponse fingerScan);
 }

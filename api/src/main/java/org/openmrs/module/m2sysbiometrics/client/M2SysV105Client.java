@@ -96,17 +96,10 @@ public class M2SysV105Client extends AbstractM2SysClient {
     @Override
     public BiometricSubject update(BiometricSubject subject) {
         M2SysCaptureResponse fingerScan = scanDoubleFingers();
-        FingerScanStatus fingerScanStatus = searchService.checkIfFingerScanExists(fingerScan);
-
         updateService.updateLocally(subject, fingerScan);
 
         if (nationalBioServerClient.isServerUrlConfigured()) {
-            if (fingerScanStatus.isRegisteredNationally()) {
-                BiometricSubject nationalSubject = fingerScanStatus.getNationalBiometricSubject();
-                updateService.updateNationally(nationalSubject, fingerScan);
-            } else {
-                registrationService.registerNationally(fingerScan);
-            }
+            updateService.updateNationally(fingerScan);
         }
 
         Fingers fingers = fingerScan.getFingerData(jaxbContext);
