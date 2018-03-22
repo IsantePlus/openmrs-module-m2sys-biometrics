@@ -14,6 +14,7 @@ import org.openmrs.module.m2sysbiometrics.testdata.BiometricSubjectMother;
 import org.openmrs.module.m2sysbiometrics.testdata.M2SysCaptureResponseMother;
 import org.openmrs.module.m2sysbiometrics.testdata.PatientMother;
 import org.openmrs.module.m2sysbiometrics.service.impl.RegistrationServiceImpl;
+import org.openmrs.module.m2sysbiometrics.util.NationalUuidGenerator;
 import org.openmrs.module.m2sysbiometrics.util.PatientHelper;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricSubject;
 
@@ -39,6 +40,9 @@ public class RegistrationServiceTest {
 
     @Mock
     private PatientHelper patientHelper;
+
+    @Mock
+    private NationalUuidGenerator nationalUuidGenerator;
 
     @InjectMocks
     private RegistrationService registrationService = new RegistrationServiceImpl();
@@ -66,9 +70,10 @@ public class RegistrationServiceTest {
         //given
         String nationalId = UUID.randomUUID().toString();
         when(nationalBioServerClient.enroll(nationalId, capture.getTemplateData())).thenReturn(EXISTING_RESULT_XML);
+        when(nationalUuidGenerator.generate()).thenReturn(nationalId);
 
         //when
-        registrationService.registerNationally(nationalId, capture);
+        registrationService.registerNationally(capture);
     }
 
     @Test(expected = M2SysBiometricsException.class)
