@@ -65,7 +65,6 @@ public class M2SysV105Client extends AbstractM2SysClient {
         M2SysCaptureResponse capture = scanDoubleFingers();
         FingerScanStatus fingerScanStatus = searchService.checkIfFingerScanExists(capture);
         EnrollmentStatus enrollmentStatus = EnrollmentStatus.SUCCESS;
-        BiometricSubject nationalSubject = fingerScanStatus.getNationalBiometricSubject();
 
         if (!fingerScanStatus.isRegisteredLocally()) {
             if (fingerScanStatus.isRegisteredNationally()) {
@@ -80,10 +79,17 @@ public class M2SysV105Client extends AbstractM2SysClient {
             enrollmentStatus = EnrollmentStatus.ALREADY_REGISTERED;
         }
 
-        if (nationalBioServerClient.isServerUrlConfigured() && !fingerScanStatus.isRegisteredNationally()) {
-            registrationService.registerNationally(capture);
-            fingerScanStatus = searchService.checkIfFingerScanExists(capture);
-            nationalSubject = new BiometricSubject(fingerScanStatus.getNationalBiometricSubject().getSubjectId());
+        BiometricSubject nationalSubject = new BiometricSubject("");
+        if (fingerScanStatus.isRegisteredNationally()) {
+            nationalSubject = fingerScanStatus.getNationalBiometricSubject();
+        } else {
+            if (nationalBioServerClient.isServerUrlConfigured()) {
+                registrationService.registerNationally(capture);
+                fingerScanStatus = searchService.checkIfFingerScanExists(capture);
+                if (fingerScanStatus.isRegisteredNationally()) {
+                    nationalSubject = new BiometricSubject(fingerScanStatus.getNationalBiometricSubject().getSubjectId());
+                }
+            }
         }
 
         Fingers fingers = capture.getFingerData(jaxbContext);
