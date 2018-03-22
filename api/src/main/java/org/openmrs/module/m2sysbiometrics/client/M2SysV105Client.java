@@ -82,13 +82,11 @@ public class M2SysV105Client extends AbstractM2SysClient {
         BiometricSubject nationalSubject = new BiometricSubject("");
         if (fingerScanStatus.isRegisteredNationally()) {
             nationalSubject = fingerScanStatus.getNationalBiometricSubject();
-        } else {
-            if (nationalBioServerClient.isServerUrlConfigured()) {
-                registrationService.registerNationally(capture);
-                fingerScanStatus = searchService.checkIfFingerScanExists(capture);
-                if (fingerScanStatus.isRegisteredNationally()) {
-                    nationalSubject = new BiometricSubject(fingerScanStatus.getNationalBiometricSubject().getSubjectId());
-                }
+        } else if (nationalBioServerClient.isServerUrlConfigured()) {
+            registrationService.registerNationally(capture);
+            fingerScanStatus = searchService.checkIfFingerScanExists(capture);
+            if (fingerScanStatus.isRegisteredNationally()) {
+                nationalSubject = new BiometricSubject(fingerScanStatus.getNationalBiometricSubject().getSubjectId());
             }
         }
 
