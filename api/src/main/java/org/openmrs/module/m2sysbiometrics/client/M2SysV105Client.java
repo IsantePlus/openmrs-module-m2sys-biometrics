@@ -137,15 +137,12 @@ public class M2SysV105Client extends AbstractM2SysClient {
 
         if (nationalBioServerClient.isServerUrlConfigured()) {
             try {
+                if (fingerScanStatus.isRegisteredNationally()) {
+                    List<BiometricMatch> nationalResults = searchService.searchNationally(fingerScan);
+                    results.addAll(nationalResults);
+                }
                 if (fingerScanStatus.isRegisteredLocally()) {
                     registrationService.synchronizeFingerprints(fingerScan, fingerScanStatus);
-                } else if (fingerScanStatus.isRegisteredNationally()) {
-                    BiometricMatch nationalResult = searchService.findMostAdequateNationally(fingerScan);
-                    if (nationalResult != null) {
-                        registrationService.fetchFromMpiByNationalFpId(new BiometricSubject(nationalResult.getSubjectId()),
-                                fingerScan);
-                        results.add(nationalResult);
-                    }
                 }
             } catch (RuntimeException exception) {
                 getLogger().error("Connection failure to national server.", exception);
