@@ -77,7 +77,8 @@ public class M2SysV105Client extends AbstractM2SysClient {
                 localSubject.setSubjectId(fingerScanStatus.getNationalBiometricSubject().getSubjectId());
                 enrollmentStatus = EnrollmentStatus.ALREADY_REGISTERED;
             } else {
-                registrationService.registerLocally(localSubject, capture);
+                BiometricSubject setSubjectId = registrationService.registerLocally(localSubject, capture);
+                localSubject.setSubjectId(setSubjectId.getSubjectId());
             }
         } else {
             localSubject.setSubjectId(fingerScanStatus.getLocalBiometricSubject().getSubjectId());
@@ -155,7 +156,7 @@ public class M2SysV105Client extends AbstractM2SysClient {
                     registrationService.synchronizeFingerprints(fingerScan, fingerScanStatus);
                 }
             } catch (RuntimeException exception) {
-                getLogger().error("Connection failure to national server.", exception);
+                getLogger().error("Search failure.", exception);
             }
         }
 

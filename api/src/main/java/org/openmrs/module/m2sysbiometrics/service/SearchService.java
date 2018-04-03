@@ -5,6 +5,7 @@ import org.openmrs.module.m2sysbiometrics.model.M2SysCaptureResponse;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricMatch;
 
 import java.util.List;
+import org.openmrs.module.registrationcore.api.biometrics.model.BiometricSubject;
 
 public interface SearchService {
 
@@ -15,6 +16,10 @@ public interface SearchService {
     BiometricMatch findMostAdequateLocally(M2SysCaptureResponse fingerScan);
 
     BiometricMatch findMostAdequateNationally(M2SysCaptureResponse fingerScan);
+
+    BiometricSubject findMostAdequateSubjectLocally(M2SysCaptureResponse fingerScan);
+
+    BiometricSubject findMostAdequateSubjectNationally(M2SysCaptureResponse fingerScan);
 
     FingerScanStatus checkIfFingerScanExists(M2SysCaptureResponse fingerScan);
 }
