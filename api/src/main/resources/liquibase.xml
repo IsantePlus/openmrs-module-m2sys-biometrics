@@ -79,9 +79,6 @@
             <column name="void_reason" type="varchar(255)" />
             <column name="voided_by" type="varchar(255)"/>
         </createTable>
-        <addUniqueConstraint columnNames="biometric_id, biometric_xml"
-                             constraintName="unique_biometric_id_biometric_xml"
-                             tableName="temp_fingerprint"/>
     </changeSet>
 
 </databaseChangeLog>
