@@ -1,23 +1,17 @@
 package org.openmrs.module.m2sysbiometrics.it;
 
-import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
 import org.openmrs.api.AdministrationService;
 import org.openmrs.api.PatientService;
 import org.openmrs.module.m2sysbiometrics.M2SysBiometricSensitiveTestBase;
 import org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants;
-import org.openmrs.module.m2sysbiometrics.M2SysEngine;
-import org.openmrs.module.m2sysbiometrics.bioplugin.BioServerClient;
 import org.openmrs.module.m2sysbiometrics.bioplugin.LocalBioServerClient;
 import org.openmrs.module.m2sysbiometrics.bioplugin.NationalBioServerClient;
+import org.openmrs.module.m2sysbiometrics.client.M2SysV105Client;
 import org.openmrs.module.m2sysbiometrics.http.M2SysHttpClient;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricSubject;
 import org.springframework.beans.factory.annotation.Autowired;
-
-
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 
 public class M2SysIT extends M2SysBiometricSensitiveTestBase {
 
@@ -28,7 +22,7 @@ public class M2SysIT extends M2SysBiometricSensitiveTestBase {
     private M2SysHttpClient m2SysHttpClient;
 
     @Autowired
-    private M2SysEngine engine;
+    private M2SysV105Client client;
 
     @Autowired
     private AdministrationService adminService;
@@ -97,6 +91,6 @@ public class M2SysIT extends M2SysBiometricSensitiveTestBase {
         // local 0da5aa64-1cbf-490f-9053-ca4076609f07
         // national NFP_TEST
 
-        engine.enroll(subject);
+        client.enroll(subject);
     }
 }

@@ -11,7 +11,9 @@ public interface M2SysClient {
 
     BiometricEngineStatus getStatus();
 
-    EnrollmentResult enroll(BiometricSubject subject);
+    EnrollmentResult enroll(BiometricSubject subjectId);
+
+    EnrollmentResult enroll(BiometricSubject subjectId, String fingerprintsXmlTemplate);
 
     BiometricSubject update(BiometricSubject subject);
 

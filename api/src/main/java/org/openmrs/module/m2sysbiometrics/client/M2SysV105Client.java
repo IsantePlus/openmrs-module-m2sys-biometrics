@@ -66,21 +66,28 @@ public class M2SysV105Client extends AbstractM2SysClient {
     }
 
     @Override
-    public EnrollmentResult enroll(BiometricSubject localSubject) {
+    public EnrollmentResult enroll(BiometricSubject subjectId) {
         M2SysCaptureResponse capture = scanDoubleFingers();
+        return enroll(subjectId, capture.getTemplateData());
+    }
+
+    @Override
+    public EnrollmentResult enroll(BiometricSubject subjectId, String fingerprintXmlTemplate) {
+        M2SysCaptureResponse capture = convertXmlTemplateToCapture(fingerprintXmlTemplate);
+
         FingerScanStatus fingerScanStatus = searchService.checkIfFingerScanExists(capture);
         EnrollmentStatus enrollmentStatus = EnrollmentStatus.SUCCESS;
 
         if (!fingerScanStatus.isRegisteredLocally()) {
             if (fingerScanStatus.isRegisteredNationally()) {
                 registrationService.fetchFromMpiByNationalFpId(fingerScanStatus.getNationalBiometricSubject(), capture);
-                localSubject.setSubjectId(fingerScanStatus.getNationalBiometricSubject().getSubjectId());
+                subjectId.setSubjectId(fingerScanStatus.getNationalBiometricSubject().getSubjectId());
                 enrollmentStatus = EnrollmentStatus.ALREADY_REGISTERED;
             } else {
-                registrationService.registerLocally(localSubject, capture);
+                registrationService.registerLocally(subjectId, capture);
             }
         } else {
-            localSubject.setSubjectId(fingerScanStatus.getLocalBiometricSubject().getSubjectId());
+            subjectId.setSubjectId(fingerScanStatus.getLocalBiometricSubject().getSubjectId());
             enrollmentStatus = EnrollmentStatus.ALREADY_REGISTERED;
         }
 
@@ -96,10 +103,16 @@ public class M2SysV105Client extends AbstractM2SysClient {
         }
 
         Fingers fingers = capture.getFingerData(jaxbContext);
-        localSubject.setFingerprints(fingers.toTwoOpenMrsFingerprints());
+        subjectId.setFingerprints(fingers.toTwoOpenMrsFingerprints());
         nationalSubject.setFingerprints(fingers.toTwoOpenMrsFingerprints());
 
-        return new EnrollmentResult(localSubject, nationalSubject, enrollmentStatus);
+        return new EnrollmentResult(subjectId, nationalSubject, enrollmentStatus);
+    }
+
+    private M2SysCaptureResponse convertXmlTemplateToCapture(String fingerprintXmlTemplate) {
+        M2SysCaptureResponse capture = new M2SysCaptureResponse();
+        capture.setTemplateData(fingerprintXmlTemplate);
+        return capture;
     }
 
     @Override
