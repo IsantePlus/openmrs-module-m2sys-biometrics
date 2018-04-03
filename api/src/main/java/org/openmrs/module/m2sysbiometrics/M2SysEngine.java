@@ -1,6 +1,9 @@
 package org.openmrs.module.m2sysbiometrics;
 
+import java.util.UUID;
+import org.apache.commons.lang3.StringUtils;
 import org.openmrs.module.m2sysbiometrics.client.M2SysClient;
+import org.openmrs.module.m2sysbiometrics.exception.M2SysBiometricsException;
 import org.openmrs.module.registrationcore.api.biometrics.BiometricEngine;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricEngineStatus;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricMatch;
@@ -12,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.UUID;
 
 @Component("m2sysbiometrics.M2SysEngine")
 public class M2SysEngine implements BiometricEngine {
@@ -31,17 +33,26 @@ public class M2SysEngine implements BiometricEngine {
     }
 
     @Override
-    public EnrollmentResult enroll(BiometricSubject subject) {
-        LOGGER.info("Called getStatus enroll");
-        if (subject == null) {
-            subject = new BiometricSubject();
-        }
-        if (subject.getSubjectId() == null) {
-            subject.setSubjectId(UUID.randomUUID().toString());
-            LOGGER.debug(String.format("Generated a new SubjectId: %s", subject.getSubjectId()));
-        }
+    public EnrollmentResult enroll() {
+        LOGGER.info("Called enroll()");
+        BiometricSubject subjectId = generateSubjectId();
+        return client.enroll(subjectId);
+    }
 
-        return client.enroll(subject);
+    private BiometricSubject generateSubjectId() {
+        BiometricSubject subjectId = new BiometricSubject(UUID.randomUUID().toString());
+        LOGGER.debug(String.format("Generated a new SubjectId: %s", subjectId.getSubjectId()));
+        return subjectId;
+    }
+
+    @Override
+    public EnrollmentResult enroll(String fingerprintsXmlTemplate) {
+        LOGGER.info("Called enroll(String fingerprintsXmlTemplate)");
+        if (StringUtils.isBlank(fingerprintsXmlTemplate)) {
+            throw new M2SysBiometricsException("Fingerprints XML cannot be blank");
+        }
+        BiometricSubject subjectId = generateSubjectId();
+        return client.enroll(subjectId, fingerprintsXmlTemplate);
     }
 
     /**
@@ -68,9 +79,8 @@ public class M2SysEngine implements BiometricEngine {
     }
 
     /**
-     * Searching a biometric data using a given pattern subject.
+     * Scan fingerprints and return matching patients.
      *
-     * @param subject a pattern subject
      * @return a list of matching data from M2Sys Server
      */
     @Override
