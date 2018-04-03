@@ -21,9 +21,18 @@ public class TempFingerprintDaoImpl implements TempFingerprintDao {
     private DbSessionFactory sessionFactory;
 
     @Override
-    public TempFingerprint save(TempFingerprint tempFingerprint) {
-        sessionFactory.getCurrentSession().save(tempFingerprint);
-        return tempFingerprint;
+    public TempFingerprint saveOrUpdate(TempFingerprint tempFingerprint) {
+        TempFingerprint existing = findOneByBiometricId(tempFingerprint.getBiometricId());
+
+        if (existing == null) {
+            sessionFactory.getCurrentSession().save(tempFingerprint);
+            return tempFingerprint;
+        } else {
+            existing.setBiometricXml(tempFingerprint.getBiometricXml());
+            sessionFactory.getCurrentSession().update(existing);
+            return existing;
+        }
+
     }
 
     @Override

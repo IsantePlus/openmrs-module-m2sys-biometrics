@@ -9,7 +9,7 @@ import java.util.List;
 public interface TempFingerprintService extends OpenmrsService {
 
     @Transactional
-    TempFingerprint save(TempFingerprint tempFingerprint);
+    TempFingerprint saveOrUpdate(TempFingerprint tempFingerprint);
 
     @Transactional
     void delete(TempFingerprint tempFingerprint);
