@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface TempFingerprintDao {
 
-    TempFingerprint save(TempFingerprint tempFingerprint);
+    TempFingerprint saveOrUpdate(TempFingerprint tempFingerprint);
 
     void delete(TempFingerprint tempFingerprint);
 

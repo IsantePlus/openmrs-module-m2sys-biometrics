@@ -16,8 +16,8 @@ public class TempFingerprintServiceImpl extends BaseOpenmrsService
     private TempFingerprintDao dao;
 
     @Override
-    public TempFingerprint save(TempFingerprint tempFingerprint) {
-        return dao.save(tempFingerprint);
+    public TempFingerprint saveOrUpdate(TempFingerprint tempFingerprint) {
+        return dao.saveOrUpdate(tempFingerprint);
     }
 
     @Override

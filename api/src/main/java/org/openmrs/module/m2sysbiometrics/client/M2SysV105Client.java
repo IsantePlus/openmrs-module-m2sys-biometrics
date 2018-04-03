@@ -11,8 +11,10 @@ import org.openmrs.module.m2sysbiometrics.model.Fingers;
 import org.openmrs.module.m2sysbiometrics.model.M2SysCaptureResponse;
 import org.openmrs.module.m2sysbiometrics.model.M2SysResult;
 import org.openmrs.module.m2sysbiometrics.model.M2SysResults;
+import org.openmrs.module.m2sysbiometrics.model.TempFingerprint;
 import org.openmrs.module.m2sysbiometrics.service.RegistrationService;
 import org.openmrs.module.m2sysbiometrics.service.SearchService;
+import org.openmrs.module.m2sysbiometrics.service.TempFingerprintService;
 import org.openmrs.module.m2sysbiometrics.service.UpdateService;
 import org.openmrs.module.m2sysbiometrics.xml.XmlResultUtil;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricMatch;
@@ -51,6 +53,9 @@ public class M2SysV105Client extends AbstractM2SysClient {
 
     @Autowired
     private UpdateService updateService;
+
+    @Autowired
+    private TempFingerprintService tempFingerprintService;
 
     private JAXBContext jaxbContext;
 
@@ -139,6 +144,11 @@ public class M2SysV105Client extends AbstractM2SysClient {
             try {
                 if (fingerScanStatus.isRegisteredNationally()) {
                     List<BiometricMatch> nationalResults = searchService.searchNationally(fingerScan);
+                    String biometricXml = fingerScan.getTemplateData();
+                    nationalResults.forEach(nationalResult -> {
+                        TempFingerprint fingerprint = new TempFingerprint(nationalResult.getSubjectId(), biometricXml);
+                        tempFingerprintService.saveOrUpdate(fingerprint);
+                    });
                     results.addAll(nationalResults);
                 }
                 if (fingerScanStatus.isRegisteredLocally()) {
@@ -148,6 +158,7 @@ public class M2SysV105Client extends AbstractM2SysClient {
                 getLogger().error("Connection failure to national server.", exception);
             }
         }
+
 
         return results;
     }
