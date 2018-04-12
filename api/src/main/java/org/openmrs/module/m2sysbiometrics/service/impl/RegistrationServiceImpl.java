@@ -1,6 +1,5 @@
 package org.openmrs.module.m2sysbiometrics.service.impl;
 
-
 import org.apache.commons.lang3.StringUtils;
 import org.openmrs.Location;
 import org.openmrs.Patient;
