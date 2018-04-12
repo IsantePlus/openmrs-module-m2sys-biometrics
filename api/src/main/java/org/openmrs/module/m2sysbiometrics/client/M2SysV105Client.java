@@ -81,6 +81,7 @@ public class M2SysV105Client extends AbstractM2SysClient {
         if (!fingerScanStatus.isRegisteredLocally()) {
             if (fingerScanStatus.isRegisteredNationally()) {
                 registrationService.fetchFromMpiByNationalFpId(fingerScanStatus.getNationalBiometricSubject(), capture);
+                registrationService.importCcd(fingerScanStatus.getNationalBiometricSubject());
                 subjectId.setSubjectId(fingerScanStatus.getNationalBiometricSubject().getSubjectId());
                 enrollmentStatus = EnrollmentStatus.ALREADY_REGISTERED;
             } else {

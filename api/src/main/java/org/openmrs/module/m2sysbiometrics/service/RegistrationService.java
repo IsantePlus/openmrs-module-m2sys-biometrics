@@ -13,4 +13,6 @@ public interface RegistrationService {
     void fetchFromMpiByNationalFpId(BiometricSubject nationalBiometricSubject, M2SysCaptureResponse fingerScan);
 
     void synchronizeFingerprints(M2SysCaptureResponse fingerScan, FingerScanStatus fingerScanStatus);
+
+    void importCcd(BiometricSubject nationalBiometricSubject);
 }
