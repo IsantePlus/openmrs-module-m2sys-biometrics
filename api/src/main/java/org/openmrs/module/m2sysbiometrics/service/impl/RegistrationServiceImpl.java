@@ -120,8 +120,8 @@ public class RegistrationServiceImpl implements RegistrationService {
     @Override
     public void importCcd(BiometricSubject nationalBiometricSubject) {
         Patient patient = patientHelper.findByNationalFpId(nationalBiometricSubject.getSubjectId());
-        String ccdUuid = registrationCoreService.importCcd(patient);
-        if (ccdUuid == null) {
+        Integer ccdId = registrationCoreService.importCcd(patient);
+        if (ccdId == null) {
             LOGGER.debug("XDS CCD import failure");
         }
     }
