@@ -54,11 +54,15 @@ public class NationalSynchronizationTask extends AbstractTask {
     }
 
     private void retryRegistrationFailures() {
-        nationalSynchronizationFailureService.findAllRegistrationFailures().forEach(this::retryRegistrationFailure);
+        for (NationalSynchronizationFailure failure : nationalSynchronizationFailureService.findAllRegistrationFailures()) {
+            retryRegistrationFailure(failure);
+        }
     }
 
     private void retryUpdateFailures() {
-        nationalSynchronizationFailureService.findAllUpdateFailures().forEach(this::retryUpdateFailure);
+        for (NationalSynchronizationFailure failure : nationalSynchronizationFailureService.findAllUpdateFailures()) {
+            retryUpdateFailure(failure);
+        }
     }
 
     private void retryRegistrationFailure(NationalSynchronizationFailure failure) {
