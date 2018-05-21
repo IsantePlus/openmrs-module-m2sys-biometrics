@@ -158,10 +158,10 @@ public class M2SysV105Client extends AbstractM2SysClient {
                 if (fingerScanStatus.isRegisteredNationally()) {
                     List<BiometricMatch> nationalResults = searchService.searchNationally(fingerScan);
                     String biometricXml = fingerScan.getTemplateData();
-                    nationalResults.forEach(nationalResult -> {
+                    for (BiometricMatch nationalResult : nationalResults) {
                         TempFingerprint fingerprint = new TempFingerprint(nationalResult.getSubjectId(), biometricXml);
                         tempFingerprintService.saveOrUpdate(fingerprint);
-                    });
+                    }
                     results.addAll(nationalResults);
                 }
                 if (fingerScanStatus.isRegisteredLocally()) {
