@@ -21,6 +21,8 @@ import org.openmrs.module.registrationcore.api.biometrics.model.BiometricMatch;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricSubject;
 import org.openmrs.module.registrationcore.api.biometrics.model.EnrollmentResult;
 import org.openmrs.module.registrationcore.api.biometrics.model.EnrollmentStatus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -32,6 +34,8 @@ import java.util.List;
 
 @Component("m2sysbiometrics.M2SysV1Client")
 public class M2SysV105Client extends AbstractM2SysClient {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(M2SysV105Client.class);
 
     @Autowired
     private LocalBioServerClient localBioServerClient;
@@ -81,6 +85,11 @@ public class M2SysV105Client extends AbstractM2SysClient {
         if (!fingerScanStatus.isRegisteredLocally()) {
             if (fingerScanStatus.isRegisteredNationally()) {
                 registrationService.fetchFromMpiByNationalFpId(fingerScanStatus.getNationalBiometricSubject(), capture);
+                try {
+                    registrationService.importCcd(fingerScanStatus.getNationalBiometricSubject());
+                } catch (Exception ex) {
+                    LOGGER.error("Ccd import failure", ex);
+                }
                 subjectId.setSubjectId(fingerScanStatus.getNationalBiometricSubject().getSubjectId());
                 enrollmentStatus = EnrollmentStatus.ALREADY_REGISTERED;
             } else {

@@ -117,6 +117,15 @@ public class RegistrationServiceImpl implements RegistrationService {
         }
     }
 
+    @Override
+    public void importCcd(BiometricSubject nationalBiometricSubject) {
+        Patient patient = patientHelper.findByNationalFpId(nationalBiometricSubject.getSubjectId());
+        Integer ccdId = registrationCoreService.importCcd(patient);
+        if (ccdId == null) {
+            LOGGER.debug("XDS CCD import failure");
+        }
+    }
+
     private void handleLocalRegistrationError(BiometricSubject subject, String responseValue, Patient patient) {
         if (patient == null) {
             LOGGER.info("No patient matching fingerprint ID: {}", responseValue);
