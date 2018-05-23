@@ -161,7 +161,7 @@ public class RegistrationServiceImpl implements RegistrationService {
     }
 
     private void attachIdToThePatient(Patient patient, String id, String identifierTypeUuid) {
-        PatientIdentifierType patientIdentifierType = patientService.getPatientIdentifierTypeByUuid(identifierTypeUuid);
+        PatientIdentifierType patientIdentifierType = patientHelper.getPatientIdentifierTypeByUuid(identifierTypeUuid);
         Location location = locationService.getDefaultLocation();
         PatientIdentifier identifier = new PatientIdentifier(id, patientIdentifierType, location);
         patient.addIdentifier(identifier);
