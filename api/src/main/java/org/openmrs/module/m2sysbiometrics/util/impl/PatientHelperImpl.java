@@ -1,7 +1,9 @@
 package org.openmrs.module.m2sysbiometrics.util.impl;
 
 import org.openmrs.Patient;
+import org.openmrs.PatientIdentifierType;
 import org.openmrs.api.PatientService;
+import org.openmrs.api.context.Context;
 import org.openmrs.module.m2sysbiometrics.util.M2SysProperties;
 import org.openmrs.module.m2sysbiometrics.util.PatientHelper;
 import org.openmrs.module.registrationcore.RegistrationCoreConstants;
@@ -37,12 +39,25 @@ public class PatientHelperImpl implements PatientHelper {
                 RegistrationCoreConstants.GP_BIOMETRICS_NATIONAL_PERSON_IDENTIFIER_TYPE_UUID);
     }
 
+    @Override
+    public PatientIdentifierType getPatientIdentifierTypeByUuid(String patientIdentifierTypeUuid) {
+        PatientIdentifierType patientIdentifierType = patientService
+                .getPatientIdentifierTypeByUuid(patientIdentifierTypeUuid);
+        if (patientIdentifierType != null) {
+            Context.refreshEntity(patientIdentifierType);
+        }
+        return patientIdentifierType;
+    }
+
     private Patient findByIdType(String subjectId, String idTypeProp) {
         Patient patient = null;
         if (properties.isGlobalPropertySet(idTypeProp)) {
             String identifierUuid = properties.getGlobalProperty(idTypeProp);
             if (patientIdentifierTypeExists(identifierUuid)) {
                 patient = registrationCoreService.findByPatientIdentifier(subjectId, identifierUuid);
+                if (patient != null) {
+                    Context.refreshEntity(patient);
+                }
             } else {
                 LOGGER.warn("Identifier type defined by prop {} is missing: {}", idTypeProp, identifierUuid);
             }
@@ -51,6 +66,6 @@ public class PatientHelperImpl implements PatientHelper {
     }
 
     private boolean patientIdentifierTypeExists(String patientIdentifierTypeUuid) {
-        return patientService.getPatientIdentifierTypeByUuid(patientIdentifierTypeUuid) != null;
+        return getPatientIdentifierTypeByUuid(patientIdentifierTypeUuid) != null;
     }
 }
