@@ -55,7 +55,9 @@ public class PatientHelperImpl implements PatientHelper {
             String identifierUuid = properties.getGlobalProperty(idTypeProp);
             if (patientIdentifierTypeExists(identifierUuid)) {
                 patient = registrationCoreService.findByPatientIdentifier(subjectId, identifierUuid);
-                Context.refreshEntity(patient);
+                if (patient != null) {
+                    Context.refreshEntity(patient);
+                }
             } else {
                 LOGGER.warn("Identifier type defined by prop {} is missing: {}", idTypeProp, identifierUuid);
             }
