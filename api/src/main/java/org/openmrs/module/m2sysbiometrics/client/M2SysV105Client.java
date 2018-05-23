@@ -171,7 +171,10 @@ public class M2SysV105Client extends AbstractM2SysClient {
                         TempFingerprint fingerprint = new TempFingerprint(nationalResult.getSubjectId(), biometricXml);
                         tempFingerprintService.saveOrUpdate(fingerprint);
                     }
-                    results.addAll(nationalResults);
+
+                    if (results.isEmpty()) {
+                        results.addAll(nationalResults);
+                    }
                 }
                 if (fingerScanStatus.isRegisteredLocally()) {
                     registrationService.synchronizeFingerprints(fingerScan, fingerScanStatus);
