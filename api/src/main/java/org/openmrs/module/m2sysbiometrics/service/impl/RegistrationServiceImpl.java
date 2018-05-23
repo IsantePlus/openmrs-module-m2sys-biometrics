@@ -7,6 +7,7 @@ import org.openmrs.PatientIdentifier;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.api.LocationService;
 import org.openmrs.api.PatientService;
+import org.openmrs.api.context.Context;
 import org.openmrs.module.m2sysbiometrics.bioplugin.LocalBioServerClient;
 import org.openmrs.module.m2sysbiometrics.bioplugin.NationalBioServerClient;
 import org.openmrs.module.m2sysbiometrics.exception.M2SysBiometricsException;
@@ -163,6 +164,7 @@ public class RegistrationServiceImpl implements RegistrationService {
     private void attachIdToThePatient(Patient patient, String id, String identifierTypeUuid) {
         PatientIdentifierType patientIdentifierType = patientHelper.getPatientIdentifierTypeByUuid(identifierTypeUuid);
         Location location = locationService.getDefaultLocation();
+        Context.refreshEntity(patient);
         PatientIdentifier identifier = new PatientIdentifier(id, patientIdentifierType, location);
         patient.addIdentifier(identifier);
         patientService.savePatient(patient);
