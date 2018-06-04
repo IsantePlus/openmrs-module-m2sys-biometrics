@@ -109,6 +109,7 @@
                 <groupId>org.springframework.ws</groupId>
                 <artifactId>spring-ws-core</artifactId>
                 <version>2.4.2.RELEASE</version>
+                <scope>provided</scope>
             </dependency>
 
             <dependency>
