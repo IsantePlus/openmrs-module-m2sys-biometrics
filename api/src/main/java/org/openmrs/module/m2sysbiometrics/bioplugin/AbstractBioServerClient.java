@@ -22,6 +22,7 @@ public abstract class AbstractBioServerClient extends WebServiceGatewaySupport i
     private M2SysProperties properties;
 
     @Autowired
+    @Qualifier("m2sysbiometrics.messageFactory")
     private WebServiceMessageFactory messageFactory;
 
     @PostConstruct
