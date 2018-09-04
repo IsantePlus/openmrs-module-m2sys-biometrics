@@ -103,11 +103,10 @@
                 <configuration>
                     <schemaLanguage>WSDL</schemaLanguage>
                     <generatePackage>org.openmrs.module.m2sysbiometrics.bioplugin</generatePackage>
-                    <schemas>
-                        <schema>
-                            <url>${biopluginWsdlUrl}</url>
-                        </schema>
-                    </schemas>
+                    <schemaDirectory>${project.basedir}/src/main/resources/wsdl</schemaDirectory>
+                    <schemaIncludes>
+                        <include>*.wsdl</include>
+                    </schemaIncludes>
                 </configuration>
             </plugin>
         </plugins>
