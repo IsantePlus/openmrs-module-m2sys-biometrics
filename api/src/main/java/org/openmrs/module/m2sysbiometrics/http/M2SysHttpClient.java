@@ -15,5 +15,6 @@ public interface M2SysHttpClient {
     <T extends AbstractM2SysResponse> T postRequest(String url, M2SysData request, Token token,
                                                     Class<T> responseClass);
 
-    Token getToken(String host, String username, String password, String customerKey);
+    Token getToken(String host);
+  //  Token getToken(String host, String username, String password, String customerKey);
 }

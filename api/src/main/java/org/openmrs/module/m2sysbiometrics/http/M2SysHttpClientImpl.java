@@ -4,9 +4,9 @@ import org.apache.commons.lang.BooleanUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.openmrs.module.m2sysbiometrics.exception.M2SysBiometricsException;
 import org.openmrs.module.m2sysbiometrics.model.AbstractM2SysResponse;
-import org.openmrs.module.m2sysbiometrics.model.LoggingMixin;
+//import org.openmrs.module.m2sysbiometrics.model.LoggingMixin;
 import org.openmrs.module.m2sysbiometrics.model.M2SysData;
-import org.openmrs.module.m2sysbiometrics.model.M2SysRequest;
+//import org.openmrs.module.m2sysbiometrics.model.M2SysRequest;
 import org.openmrs.module.m2sysbiometrics.model.M2SysResponse;
 import org.openmrs.module.m2sysbiometrics.model.Token;
 import org.slf4j.Logger;
@@ -49,8 +49,8 @@ public class M2SysHttpClientImpl implements M2SysHttpClient {
     @PostConstruct
     public void init() {
         // don't log customer key
-        objectMapper.getSerializationConfig().addMixInAnnotations(M2SysRequest.class, LoggingMixin.class);
-        objectMapper.getSerializationConfig().addMixInAnnotations(M2SysResponse.class, LoggingMixin.class);
+      //  objectMapper.getSerializationConfig().addMixInAnnotations(M2SysRequest.class, LoggingMixin.class);
+    //    objectMapper.getSerializationConfig().addMixInAnnotations(M2SysResponse.class, LoggingMixin.class);
 
         configureJackson((RestTemplate) restOperations);
     }
@@ -110,7 +110,26 @@ public class M2SysHttpClientImpl implements M2SysHttpClient {
         return restOperations.exchange(url, method, new HttpEntity<>(body, headers), responseClass);
     }
 
-    @Override
+ 
+	@Override
+    public Token getToken(String host) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+        MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
+        //body.add("grant_type", "password");
+       // body.add("username", username);
+       // body.add("Password", password);
+       // body.add("scope", customerKey);
+
+        HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(body, headers);
+
+        return restOperations.exchange(host, HttpMethod.POST,entity, Token.class)
+                .getBody();
+    }
+
+    /*
+         @Override
     public Token getToken(String host, String username, String password, String customerKey) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
@@ -126,7 +145,7 @@ public class M2SysHttpClientImpl implements M2SysHttpClient {
         return restOperations.exchange(host + "/cstoken", HttpMethod.POST, entity, Token.class)
                 .getBody();
     }
-
+     */
     private void checkResponse(AbstractM2SysResponse response) {
         if (BooleanUtils.isNotTrue(response.getSuccess())) {
             String errorCode = response.getResponseCode();

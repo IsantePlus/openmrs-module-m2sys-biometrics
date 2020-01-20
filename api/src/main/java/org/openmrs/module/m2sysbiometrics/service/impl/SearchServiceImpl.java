@@ -4,7 +4,7 @@ import org.openmrs.module.m2sysbiometrics.bioplugin.LocalBioServerClient;
 import org.openmrs.module.m2sysbiometrics.bioplugin.NationalBioServerClient;
 import org.openmrs.module.m2sysbiometrics.exception.M2SysBiometricsException;
 import org.openmrs.module.m2sysbiometrics.model.FingerScanStatus;
-import org.openmrs.module.m2sysbiometrics.model.M2SysCaptureResponse;
+//import org.openmrs.module.m2sysbiometrics.model.M2SysCaptureResponse;
 import org.openmrs.module.m2sysbiometrics.model.M2SysResults;
 import org.openmrs.module.m2sysbiometrics.service.SearchService;
 import org.openmrs.module.m2sysbiometrics.util.PatientHelper;
@@ -34,8 +34,8 @@ public class SearchServiceImpl implements SearchService {
     private PatientHelper patientHelper;
 
     @Override
-    public List<BiometricMatch> searchLocally(M2SysCaptureResponse fingerScan) {
-        String response = localBioServerClient.identify(fingerScan.getTemplateData());
+    public List<BiometricMatch> searchLocally(String biometricXml) {
+        String response = localBioServerClient.identify(biometricXml);
         M2SysResults results = XmlResultUtil.parse(response);
 
         if (results.isSearchError()) {
@@ -46,9 +46,9 @@ public class SearchServiceImpl implements SearchService {
     }
 
     @Override
-    public List<BiometricMatch> searchNationally(M2SysCaptureResponse fingerScan) {
+    public List<BiometricMatch> searchNationally(String biometricXml) {
         List<BiometricMatch> biometricMatches = new ArrayList<>();
-        String response = nationalBioServerClient.identify(fingerScan.getTemplateData());
+        String response = nationalBioServerClient.identify(biometricXml);
         M2SysResults results = XmlResultUtil.parse(response);
 
         if (results.isSearchError()) {
@@ -61,31 +61,31 @@ public class SearchServiceImpl implements SearchService {
     }
 
     @Override
-    public BiometricMatch findMostAdequateLocally(M2SysCaptureResponse fingerScan) {
-        return searchLocally(fingerScan)
+    public BiometricMatch findMostAdequateLocally(String biometricXml) {
+        return searchLocally(biometricXml)
                 .stream()
                 .max(BiometricMatch::compareTo)
                 .orElse(null);
     }
 
     @Override
-    public BiometricMatch findMostAdequateNationally(M2SysCaptureResponse fingerScan) {
-        return searchNationally(fingerScan)
+    public BiometricMatch findMostAdequateNationally(String biometricXml) {
+        return searchNationally(biometricXml)
                 .stream()
                 .max(BiometricMatch::compareTo)
                 .orElse(null);
     }
 
     @Override
-    public FingerScanStatus checkIfFingerScanExists(M2SysCaptureResponse fingerScan) {
+    public FingerScanStatus checkIfFingerScanExists(String biometricXml) {
         BiometricSubject nationalBiometricSubject = null;
 
-        BiometricSubject localBiometricSubject = findMostAdequateSubjectLocally(fingerScan);
+        BiometricSubject localBiometricSubject = findMostAdequateSubjectLocally(biometricXml);
         localBiometricSubject = validateLocalSubjectExistence(localBiometricSubject);
 
         if (nationalBioServerClient.isServerUrlConfigured()) {
             try {
-                nationalBiometricSubject = findMostAdequateSubjectNationally(fingerScan);
+                nationalBiometricSubject = findMostAdequateSubjectNationally(biometricXml);
             } catch (RuntimeException exception) {
                 LOGGER.error("Connection failure to national server.", exception);
             }
@@ -100,13 +100,13 @@ public class SearchServiceImpl implements SearchService {
                 : localBiometricSubject;
     }
 
-    private BiometricSubject findMostAdequateSubjectLocally(M2SysCaptureResponse fingerScan) {
-        BiometricMatch biometricMatch = findMostAdequateLocally(fingerScan);
+    private BiometricSubject findMostAdequateSubjectLocally(String biometricXml) {
+        BiometricMatch biometricMatch = findMostAdequateLocally(biometricXml);
         return biometricMatch == null ? null : new BiometricSubject(biometricMatch.getSubjectId());
     }
 
-    private BiometricSubject findMostAdequateSubjectNationally(M2SysCaptureResponse fingerScan) {
-        BiometricMatch biometricMatch = findMostAdequateNationally(fingerScan);
+    private BiometricSubject findMostAdequateSubjectNationally(String biometricXml) {
+        BiometricMatch biometricMatch = findMostAdequateNationally(biometricXml);
         return biometricMatch == null ? null : new BiometricSubject(biometricMatch.getSubjectId());
     }
 }

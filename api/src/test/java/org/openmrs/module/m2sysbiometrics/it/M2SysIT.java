@@ -49,11 +49,11 @@ public class M2SysIT extends M2SysBiometricSensitiveTestBase {
         String nationalServiceUsername = System.getenv("m2sys.biometrics.national-service.username");
         String nationalServicePassword = System.getenv("m2sys.biometrics.national-service.password");
 
-        adminService.setGlobalProperty(M2SysBiometricsConstants.M2SYS_CUSTOMER_KEY, custKey);
-        adminService.setGlobalProperty(M2SysBiometricsConstants.M2SYS_CLOUD_SCANR_PASSWORD, password);
-        adminService.setGlobalProperty(M2SysBiometricsConstants.M2SYS_CLOUD_SCANR_USERNAME, username);
+        //adminService.setGlobalProperty(M2SysBiometricsConstants.M2SYS_CUSTOMER_KEY, custKey);
+       // adminService.setGlobalProperty(M2SysBiometricsConstants.M2SYS_CLOUD_SCANR_PASSWORD, password);
+        //adminService.setGlobalProperty(M2SysBiometricsConstants.M2SYS_CLOUD_SCANR_USERNAME, username);
         adminService.setGlobalProperty(M2SysBiometricsConstants.M2SYS_CLOUD_SCANR_URL, apiUrl);
-        adminService.setGlobalProperty(M2SysBiometricsConstants.M2SYS_ACCESS_POINT_ID, accessPointId);
+       // adminService.setGlobalProperty(M2SysBiometricsConstants.M2SYS_ACCESS_POINT_ID, accessPointId);
         adminService.setGlobalProperty(M2SysBiometricsConstants.M2SYS_CAPTURE_TIMEOUT,
                 String.valueOf(CAPTURE_TIMEOUT));
         adminService.setGlobalProperty(M2SysBiometricsConstants.M2SYS_LOCATION_ID,

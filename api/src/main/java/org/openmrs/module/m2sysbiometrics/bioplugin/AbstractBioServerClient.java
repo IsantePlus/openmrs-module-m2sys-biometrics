@@ -39,9 +39,13 @@ public abstract class AbstractBioServerClient extends WebServiceGatewaySupport i
         register.setID(subjectId);
 
         register.setBiometricXml(biometricXml);
-
-        RegisterResponse response = (RegisterResponse) getResponse(register);
-
+        RegisterResponse response;
+        try {
+            response = (RegisterResponse) getResponse(register);
+        }
+        catch (Exception ex) {
+        	return ex.getMessage();
+            }
         return response.getRegisterResult();
     }
 

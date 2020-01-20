@@ -30,6 +30,7 @@ public class M2SysProperties {
         return getGlobalProperty(M2SysBiometricsConstants.M2SYS_CLOUD_SCANR_URL);
     }
 
+    /*
     public String getCloudScanrUsername() {
         return getGlobalProperty(M2SysBiometricsConstants.M2SYS_CLOUD_SCANR_USERNAME);
     }
@@ -41,15 +42,15 @@ public class M2SysProperties {
     public String getCustomerKey() {
         return getGlobalProperty(M2SysBiometricsConstants.M2SYS_CUSTOMER_KEY);
     }
-
+*/
     public float getCaptureTimeOut() {
         return Float.parseFloat(getGlobalProperty(M2SysBiometricsConstants.M2SYS_CAPTURE_TIMEOUT));
     }
-
+/*
     public String getAccessPointId() {
         return getGlobalProperty(M2SysBiometricsConstants.M2SYS_ACCESS_POINT_ID);
     }
-
+*/
     public String getNationalPatientIdentifierTypeUuid() {
         return getGlobalProperty(RegistrationCoreConstants.GP_BIOMETRICS_NATIONAL_PERSON_IDENTIFIER_TYPE_UUID);
     }

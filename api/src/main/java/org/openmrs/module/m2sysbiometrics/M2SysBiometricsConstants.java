@@ -7,9 +7,9 @@ public final class M2SysBiometricsConstants {
 
     public static final String M2SYS_CLOUD_SCANR_URL = "m2sys-biometrics.server.url";
 
-    public static final String M2SYS_CLOUD_SCANR_USERNAME = "m2sys-biometrics.server.user";
+   // public static final String M2SYS_CLOUD_SCANR_USERNAME = "m2sys-biometrics.server.user";
 
-    public static final String M2SYS_CLOUD_SCANR_PASSWORD = "m2sys-biometrics.server.password";
+   // public static final String M2SYS_CLOUD_SCANR_PASSWORD = "m2sys-biometrics.server.password";
 
     public static final String M2SYS_LOCAL_SERVICE_URL = "m2sys-biometrics.local-service.url";
 
@@ -21,11 +21,11 @@ public final class M2SysBiometricsConstants {
 
     public static final String M2SYS_LOCATION_ID = "m2sys-biometrics.locationID";
 
-    public static final String M2SYS_CUSTOMER_KEY = "m2sys-biometrics.customKey";
+   // public static final String M2SYS_CUSTOMER_KEY = "m2sys-biometrics.customKey";
 
-    public static final String M2SYS_ACCESS_POINT_ID = "m2sys-biometrics.accessPointID";
+  //  public static final String M2SYS_ACCESS_POINT_ID = "m2sys-biometrics.accessPointID";
 
-    public static final String M2SYS_ACCESS_POINT_MAP = "m2sys-biometrics.accessPointMap";
+ //   public static final String M2SYS_ACCESS_POINT_MAP = "m2sys-biometrics.accessPointMap";
 
     public static final String M2SYS_CAPTURE_TIMEOUT = "m2sys-biometrics.captureTimeout";
 

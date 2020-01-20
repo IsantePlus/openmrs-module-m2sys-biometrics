@@ -1,7 +1,13 @@
 package org.openmrs.module.m2sysbiometrics.service.impl;
 
+import java.util.List;
+
 import org.apache.commons.lang3.StringUtils;
 import org.openmrs.Location;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import org.openmrs.Patient;
 import org.openmrs.PatientIdentifier;
 import org.openmrs.PatientIdentifierType;
@@ -23,6 +29,7 @@ import org.openmrs.module.m2sysbiometrics.util.PatientHelper;
 import org.openmrs.module.m2sysbiometrics.xml.XmlResultUtil;
 import org.openmrs.module.registrationcore.api.RegistrationCoreService;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricSubject;
+import org.openmrs.module.registrationcore.api.biometrics.model.Fingerprint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +39,7 @@ import org.springframework.stereotype.Service;
 public class RegistrationServiceImpl implements RegistrationService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RegistrationServiceImpl.class);
+    private final Log log = LogFactory.getLog(RegistrationServiceImpl.class);
 
     @Autowired
     private PatientHelper patientHelper;
@@ -60,6 +68,7 @@ public class RegistrationServiceImpl implements RegistrationService {
     @Autowired
     private NationalSynchronizationFailureService nationalSynchronizationFailureService;
 
+/*
     @Override
     public void registerLocally(BiometricSubject subject, M2SysCaptureResponse capture) {
         String response = localBioServerClient.enroll(subject.getSubjectId(), capture.getTemplateData());
@@ -72,6 +81,24 @@ public class RegistrationServiceImpl implements RegistrationService {
             handleLocalRegistrationError(subject, responseValue, patient);
         }
     }
+*/	
+	@Override
+    public void registerLocally(BiometricSubject subject) {
+		log.error("before enroll.....");
+		List<Fingerprint> fingerList=subject.getFingerprints();
+        Fingerprint finger=fingerList.get(0);	
+        log.error("before enroll :"+finger.getTemplate());
+        String response = localBioServerClient.enroll(subject.getSubjectId(), finger.getTemplate());        
+        log.error("after enroll :"+response);
+        M2SysResults results = XmlResultUtil.parse(response);
+        log.error("after enroll :"+results.toString());
+        if (!results.isRegisterSuccess()) {
+            String responseValue = results.firstValue();
+            LOGGER.info("Got error response from the local server: {}. Checking if tied to patient.", responseValue);
+            Patient patient = patientHelper.findByLocalFpId(responseValue);
+            handleLocalRegistrationError(subject, responseValue, patient);
+        }
+    }	
 
     @Override
     public void registerNationally(M2SysCaptureResponse capture) {
@@ -100,7 +127,7 @@ public class RegistrationServiceImpl implements RegistrationService {
                     "Error during fetching patient from MPI with national fingerprint ID %s", nationalId));
         }
 
-        registerLocally(nationalBiometricSubject, fingerScan);
+        //registerLocally(nationalBiometricSubject, fingerScan);
         attachLocalIdToThePatient(patient, nationalId);
     }
 
