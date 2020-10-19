@@ -1,9 +1,9 @@
 package org.openmrs.module.m2sysbiometrics.scheduler;
 
 import org.openmrs.api.context.Context;
-import org.openmrs.module.m2sysbiometrics.model.FingerScanStatus;
-import org.openmrs.module.m2sysbiometrics.model.M2SysCaptureResponse;
-import org.openmrs.module.m2sysbiometrics.model.NationalSynchronizationFailure;
+//import org.openmrs.module.m2sysbiometrics.model.FingerScanStatus;
+//import org.openmrs.module.m2sysbiometrics.model.M2SysCaptureResponse;
+//import org.openmrs.module.m2sysbiometrics.model.NationalSynchronizationFailure;
 import org.openmrs.module.m2sysbiometrics.service.NationalSynchronizationFailureService;
 import org.openmrs.module.m2sysbiometrics.service.RegistrationService;
 import org.openmrs.module.m2sysbiometrics.service.SearchService;
@@ -23,36 +23,28 @@ public class NationalSynchronizationTask extends AbstractTask {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(NationalSynchronizationTask.class);
 
-    private NationalSynchronizationFailureService nationalSynchronizationFailureService;
-
-    private RegistrationService registrationService;
-
-    private SearchService searchService;
-
-    private UpdateService updateService;
-
     @Override
     public void execute() {
         LOGGER.info("Executing " + TASK_NAME  + "...");
         initializeBeans();
-        retryRegistrationFailures();
-        retryUpdateFailures();
+       // retryRegistrationFailures();
+    //    retryUpdateFailures();
     }
 
     private void initializeBeans() {
-        nationalSynchronizationFailureService = Context.getRegisteredComponent(
+        Context.getRegisteredComponent(
                 "nationalSynchronizationFailureService", NationalSynchronizationFailureService.class);
 
-        registrationService = Context.getRegisteredComponent(
+        Context.getRegisteredComponent(
                 "registrationService", RegistrationService.class);
 
-        searchService = Context.getRegisteredComponent(
+        Context.getRegisteredComponent(
                 "searchService", SearchService.class);
 
-        updateService = Context.getRegisteredComponent(
+        Context.getRegisteredComponent(
                 "updateService", UpdateService.class);
     }
-
+    /*
     private void retryRegistrationFailures() {
         for (NationalSynchronizationFailure failure : nationalSynchronizationFailureService.findAllRegistrationFailures()) {
             retryRegistrationFailure(failure);
@@ -78,6 +70,7 @@ public class NationalSynchronizationTask extends AbstractTask {
         }
     }
 
+  
     private void retryUpdateFailure(NationalSynchronizationFailure failure) {
         try {
             M2SysCaptureResponse fingerScan = new M2SysCaptureResponse();
@@ -89,4 +82,5 @@ public class NationalSynchronizationTask extends AbstractTask {
             LOGGER.error("Scheduled retry of update failed", e);
         }
     }
+ */   
 }

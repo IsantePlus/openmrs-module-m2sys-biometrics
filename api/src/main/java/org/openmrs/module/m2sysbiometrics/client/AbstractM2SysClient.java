@@ -58,12 +58,13 @@ public abstract class AbstractM2SysClient implements M2SysClient {
     }
 
     protected Token getToken() {
-        String username = properties.getCloudScanrUsername();
-        String password = properties.getCloudScanrPassword();
-        String customerKey = properties.getCustomerKey();
+      //  String username = properties.getCloudScanrUsername();
+     //   String password = properties.getCloudScanrPassword();
+     //   String customerKey = properties.getCustomerKey();
         String cloudScanUrl = properties.getCloudScanrUrl();
 
-        return httpClient.getToken(cloudScanUrl, username, password, customerKey);
+        return httpClient.getToken(cloudScanUrl);
+       // return httpClient.getToken(cloudScanUrl, username, password, customerKey);
     }
 
     protected boolean isSuccessfulStatus(HttpStatus httpStatus) {

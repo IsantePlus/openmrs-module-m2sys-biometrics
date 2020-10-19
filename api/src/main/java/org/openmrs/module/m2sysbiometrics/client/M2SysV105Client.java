@@ -1,5 +1,7 @@
 package org.openmrs.module.m2sysbiometrics.client;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.openmrs.module.m2sysbiometrics.bioplugin.LocalBioServerClient;
 import org.openmrs.module.m2sysbiometrics.bioplugin.NationalBioServerClient;
 import org.openmrs.module.m2sysbiometrics.capture.impl.CloudScanrCaptor;
@@ -36,6 +38,7 @@ import java.util.List;
 public class M2SysV105Client extends AbstractM2SysClient {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(M2SysV105Client.class);
+    private final Log log = LogFactory.getLog(M2SysV105Client.class);
 
     @Autowired
     private LocalBioServerClient localBioServerClient;
@@ -79,12 +82,14 @@ public class M2SysV105Client extends AbstractM2SysClient {
     public EnrollmentResult enroll(BiometricSubject subjectId, String fingerprintXmlTemplate) {
         M2SysCaptureResponse capture = convertXmlTemplateToCapture(fingerprintXmlTemplate);
 
-        FingerScanStatus fingerScanStatus = searchService.checkIfFingerScanExists(capture);
+        FingerScanStatus fingerScanStatus = searchService.checkIfFingerScanExists(capture.getTemplateData());
         EnrollmentStatus enrollmentStatus = EnrollmentStatus.SUCCESS;
+        log.error("EnrollmentStatus : "+EnrollmentStatus.SUCCESS);
 
         if (!fingerScanStatus.isRegisteredLocally()) {
             if (fingerScanStatus.isRegisteredNationally()) {
                 registrationService.fetchFromMpiByNationalFpId(fingerScanStatus.getNationalBiometricSubject(), capture);
+                log.error("National : "+EnrollmentStatus.SUCCESS);
                 try {
                     registrationService.importCcd(fingerScanStatus.getNationalBiometricSubject());
                 } catch (Exception ex) {
@@ -93,7 +98,8 @@ public class M2SysV105Client extends AbstractM2SysClient {
                 subjectId.setSubjectId(fingerScanStatus.getNationalBiometricSubject().getSubjectId());
                 enrollmentStatus = EnrollmentStatus.ALREADY_REGISTERED;
             } else {
-                registrationService.registerLocally(subjectId, capture);
+            	LOGGER.error("Ccd  not import");
+               // registrationService.registerLocally(subjectId, capture);
             }
         } else {
             subjectId.setSubjectId(fingerScanStatus.getLocalBiometricSubject().getSubjectId());
@@ -105,7 +111,7 @@ public class M2SysV105Client extends AbstractM2SysClient {
             nationalSubject = fingerScanStatus.getNationalBiometricSubject();
         } else if (nationalBioServerClient.isServerUrlConfigured()) {
             registrationService.registerNationally(capture);
-            fingerScanStatus = searchService.checkIfFingerScanExists(capture);
+            fingerScanStatus = searchService.checkIfFingerScanExists(capture.getTemplateData());
             if (fingerScanStatus.isRegisteredNationally()) {
                 nationalSubject = new BiometricSubject(fingerScanStatus.getNationalBiometricSubject().getSubjectId());
             }
@@ -127,12 +133,12 @@ public class M2SysV105Client extends AbstractM2SysClient {
     @Override
     public BiometricSubject update(BiometricSubject subject) {
         M2SysCaptureResponse fingerScan = scanDoubleFingers();
-        updateService.updateLocally(subject, fingerScan);
+        updateService.updateLocally(subject);
 
-        if (nationalBioServerClient.isServerUrlConfigured()) {
+     /*   if (nationalBioServerClient.isServerUrlConfigured()) {
             updateService.updateNationally(fingerScan);
         }
-
+*/
         Fingers fingers = fingerScan.getFingerData(jaxbContext);
         subject.setFingerprints(fingers.toTwoOpenMrsFingerprints());
 
@@ -155,17 +161,17 @@ public class M2SysV105Client extends AbstractM2SysClient {
     @Override
     public List<BiometricMatch> search() {
         M2SysCaptureResponse fingerScan = scanDoubleFingers();
-        FingerScanStatus fingerScanStatus = searchService.checkIfFingerScanExists(fingerScan);
+        FingerScanStatus fingerScanStatus = searchService.checkIfFingerScanExists(fingerScan.getTemplateData());
         List<BiometricMatch> results = new ArrayList<>();
 
         if (fingerScanStatus.isRegisteredLocally()) {
-            results = searchService.searchLocally(fingerScan);
+            results = searchService.searchLocally(fingerScan.getTemplateData());
         }
 
         if (nationalBioServerClient.isServerUrlConfigured()) {
             try {
                 if (fingerScanStatus.isRegisteredNationally()) {
-                    List<BiometricMatch> nationalResults = searchService.searchNationally(fingerScan);
+                    List<BiometricMatch> nationalResults = searchService.searchNationally(fingerScan.getTemplateData());
                     String biometricXml = fingerScan.getTemplateData();
                     for (BiometricMatch nationalResult : nationalResults) {
                         TempFingerprint fingerprint = new TempFingerprint(nationalResult.getSubjectId(), biometricXml);

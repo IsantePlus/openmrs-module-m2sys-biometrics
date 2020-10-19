@@ -29,8 +29,8 @@ public class M2SysResponse extends AbstractM2SysResponse {
     @JsonProperty("TransactionID")
     private String transactionId;
 
-    @JsonProperty("AccessPointID")
-    private String accessPointId;
+ //   @JsonProperty("AccessPointID")
+ //   private String accessPointId;
 
     @JsonProperty("DeviceName")
     private String deviceName;
@@ -53,8 +53,8 @@ public class M2SysResponse extends AbstractM2SysResponse {
     @JsonProperty("MatchingResult")
     private String matchingResult;
 
-    @JsonProperty("CustomerKey")
-    private String customerKey;
+ //   @JsonProperty("CustomerKey")
+  //  private String customerKey;
 
     @JsonProperty("LocationID")
     private Integer locationId;
@@ -113,7 +113,7 @@ public class M2SysResponse extends AbstractM2SysResponse {
     public void setTransactionId(String transactionId) {
         this.transactionId = transactionId;
     }
-
+/*
     public String getAccessPointId() {
         return accessPointId;
     }
@@ -121,7 +121,7 @@ public class M2SysResponse extends AbstractM2SysResponse {
     public void setAccessPointId(String accessPointId) {
         this.accessPointId = accessPointId;
     }
-
+*/
     public String getDeviceName() {
         return deviceName;
     }
@@ -177,7 +177,7 @@ public class M2SysResponse extends AbstractM2SysResponse {
     public void setMatchingResult(String matchingResult) {
         this.matchingResult = matchingResult;
     }
-
+/*
     public String getCustomerKey() {
         return customerKey;
     }
@@ -185,7 +185,7 @@ public class M2SysResponse extends AbstractM2SysResponse {
     public void setCustomerKey(String customerKey) {
         this.customerKey = customerKey;
     }
-
+*/
     public Integer getLocationId() {
         return locationId;
     }

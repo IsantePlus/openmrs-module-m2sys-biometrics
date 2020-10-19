@@ -6,15 +6,15 @@ public class AbstractM2SysRequest extends M2SysData {
 
     private static final long serialVersionUID = -8902210266672985893L;
 
-    @JsonProperty("CustomerKey")
-    private String customerKey;
+  //  @JsonProperty("CustomerKey")
+  //  private String customerKey;
 
-    @JsonProperty("AccessPointID")
-    private String accessPointId;
+ //   @JsonProperty("AccessPointID")
+ //   private String accessPointId;
 
     @JsonProperty("CaptureTimeOut")
     private Float captureTimeout;
-
+/*
     public String getCustomerKey() {
         return customerKey;
     }
@@ -30,7 +30,7 @@ public class AbstractM2SysRequest extends M2SysData {
     public void setAccessPointId(String accessPointId) {
         this.accessPointId = accessPointId;
     }
-
+*/
     public Float getCaptureTimeout() {
         return captureTimeout;
     }

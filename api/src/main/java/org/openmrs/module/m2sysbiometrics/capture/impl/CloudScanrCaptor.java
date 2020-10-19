@@ -7,7 +7,7 @@ import org.openmrs.module.m2sysbiometrics.model.AbstractM2SysRequest;
 import org.openmrs.module.m2sysbiometrics.model.M2SysCaptureRequest;
 import org.openmrs.module.m2sysbiometrics.model.M2SysCaptureResponse;
 import org.openmrs.module.m2sysbiometrics.model.Token;
-import org.openmrs.module.m2sysbiometrics.util.AccessPointIdResolver;
+//import org.openmrs.module.m2sysbiometrics.util.AccessPointIdResolver;
 import org.openmrs.module.m2sysbiometrics.util.M2SysProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -21,8 +21,8 @@ public class CloudScanrCaptor implements M2SysFingerCaptor {
     @Autowired
     private M2SysHttpClient httpClient;
 
-    @Autowired
-    private AccessPointIdResolver apIdResolver;
+  //  @Autowired
+ //   private AccessPointIdResolver apIdResolver;
 
     @Override
     public M2SysCaptureResponse scanDoubleFingers() {
@@ -39,17 +39,20 @@ public class CloudScanrCaptor implements M2SysFingerCaptor {
     }
 
     private Token getToken() {
-        String username = properties.getCloudScanrUsername();
-        String password = properties.getCloudScanrPassword();
-        String customerKey = properties.getCustomerKey();
+        //String username = properties.getCloudScanrUsername();
+       // String password = properties.getCloudScanrPassword();
+       // String customerKey = properties.getCustomerKey();
         String cloudScanrUrl = properties.getCloudScanrUrl();
 
-        return httpClient.getToken(cloudScanrUrl, username, password, customerKey);
+        return httpClient.getToken(cloudScanrUrl);
+        //return httpClient.getToken(cloudScanrUrl, username, password, customerKey);
     }
 
+    
     private void addRequiredValues(AbstractM2SysRequest request) {
-        request.setAccessPointId(apIdResolver.getAccessPointId());
+        //request.setAccessPointId(apIdResolver.getAccessPointId());
         request.setCaptureTimeout(properties.getCaptureTimeOut());
-        request.setCustomerKey(properties.getCustomerKey());
+        //request.setCustomerKey(properties.getCustomerKey());
     }
+    
 }
