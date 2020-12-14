@@ -9,7 +9,7 @@
 
     <groupId>org.openmrs.module</groupId>
     <artifactId>m2sys-biometrics</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>m2sys Biometrics Module</name>
     <description>Module for iSantePlus m2sys Biometrics</description>
@@ -30,7 +30,7 @@
         <javaCompilerVersion>1.8</javaCompilerVersion>
 
         <mockitoVersion>1.9.5</mockitoVersion>
-        <registrationCoreVersion>1.7.2-SNAPSHOT</registrationCoreVersion>
+        <registrationCoreVersion>1.7.2</registrationCoreVersion>
         <idgenVersion>4.3</idgenVersion>
         <eventVersion>2.3</eventVersion>
 
@@ -175,7 +175,7 @@
         <repository>
             <id>openmrs-repo</id>
             <name>OpenMRS Nexus Repository</name>
-            <url>http://mavenrepo.openmrs.org/nexus/content/repositories/public</url>
+            <url>https://mavenrepo.openmrs.org/nexus/content/repositories/public</url>
             <snapshots>
                 <enabled>false</enabled>
             </snapshots>
@@ -184,7 +184,7 @@
             <id>central</id>
             <name>Maven Repository Switchboard</name>
             <layout>default</layout>
-            <url>http://repo1.maven.org/maven2</url>
+            <url>https://repo1.maven.org/maven2</url>
         </repository>
     </repositories>
 
@@ -192,7 +192,7 @@
         <pluginRepository>
             <id>openmrs-repo</id>
             <name>OpenMRS Nexus Repository</name>
-            <url>http://mavenrepo.openmrs.org/nexus/content/repositories/public</url>
+            <url>https://mavenrepo.openmrs.org/nexus/content/repositories/public</url>
             <snapshots>
                 <enabled>false</enabled>
             </snapshots>
@@ -244,9 +244,9 @@
                             <configLocation>checkstyle.xml</configLocation>
                             <encoding>UTF-8</encoding>
                             <consoleOutput>true</consoleOutput>
-                            <logViolationsToConsole>true</logViolationsToConsole>
-                            <failOnViolation>true</failOnViolation>
-                            <failsOnError>true</failsOnError>
+                            <logViolationsToConsole>false</logViolationsToConsole>
+                            <failOnViolation>false</failOnViolation>
+                            <failsOnError>false</failsOnError>
                             <includeTestSourceDirectory>false</includeTestSourceDirectory>
                         </configuration>
                         <goals>
@@ -258,7 +258,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>findbugs-maven-plugin</artifactId>
-                <version>3.0.2</version>
+                <version>3.0.5</version>
                 <configuration>
                     <effort>Max</effort>
                     <threshold>Low</threshold>
@@ -321,4 +321,57 @@
             </plugin>
         </plugins>
     </reporting>
+    <profiles>
+        <profile>
+            <!-- Github Packages Integration -->
+            <id>github-packages</id>
+            <distributionManagement>
+                <!-- Deploy to Github Packages -->
+                <repository>
+                    <id>github-packages</id>
+                    <name>Github iSantePlus Packages</name>
+                    <url>https://maven.pkg.github.com/isanteplus/isanteplus-packages</url>
+                    <uniqueVersion>false</uniqueVersion>
+                </repository>
+                <snapshotRepository>
+                    <id>github-packages</id>
+                    <name>Github iSantePlus Packages</name>
+                    <url>https://maven.pkg.github.com/isanteplus/isanteplus-packages</url>
+                    <uniqueVersion>true</uniqueVersion>
+                </snapshotRepository>
+            </distributionManagement>
+            <repositories>
+                <!-- Use the Github Packages Repo first when looking up dependencies -->
+                <repository>
+                    <id>github-packages</id>
+                    <name>Github iSantePlus Packages</name>
+                    <url>https://maven.pkg.github.com/isanteplus/isanteplus-packages</url>
+                </repository>
+            </repositories>
+            <build>
+                <plugins>
+                    <!-- Disable possible test jar generation -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-jar-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <phase>none</phase>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-pmd-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>validate</id>
+                                <phase>none</phase>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
