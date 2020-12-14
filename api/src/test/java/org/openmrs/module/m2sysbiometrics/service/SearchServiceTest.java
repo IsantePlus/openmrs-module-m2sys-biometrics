@@ -53,7 +53,7 @@ public class SearchServiceTest {
                 .thenReturn(EXISTING_RESULT_XML);
 
         //when
-        List<BiometricMatch> results = searchService.searchLocally(goodFingerScan);
+        List<BiometricMatch> results = searchService.searchLocally(goodFingerScan.toString());
 
         //then
         Assert.assertEquals(EXISTING_SUBJECT_ID, results.get(0).getSubjectId());
@@ -66,7 +66,7 @@ public class SearchServiceTest {
                 .thenReturn(ERROR_RESULT_XML);
 
         //when
-        searchService.searchLocally(badFingerScan);
+        searchService.searchLocally(badFingerScan.toString());
     }
 
     @Test
@@ -76,7 +76,7 @@ public class SearchServiceTest {
                 .thenReturn(EXISTING_RESULT_XML);
 
         //when
-        List<BiometricMatch> results = searchService.searchNationally(goodFingerScan);
+        List<BiometricMatch> results = searchService.searchNationally(goodFingerScan.toString());
 
         //then
         Assert.assertEquals(results.size(), 1);
@@ -90,7 +90,7 @@ public class SearchServiceTest {
                 .thenReturn(ERROR_RESULT_XML);
 
         //when
-        List<BiometricMatch> results = searchService.searchNationally(badFingerScan);
+        List<BiometricMatch> results = searchService.searchNationally(badFingerScan.toString());
 
         //then
         Assert.assertTrue(results.isEmpty());
@@ -103,7 +103,7 @@ public class SearchServiceTest {
                 .thenReturn(NOT_FOUND_RESULT_XML);
 
         //when
-        List<BiometricMatch> results = searchService.searchLocally(notExistingFingerScan);
+        List<BiometricMatch> results = searchService.searchLocally(notExistingFingerScan.toString());
 
         //then
         Assert.assertTrue(results.isEmpty());
@@ -116,7 +116,7 @@ public class SearchServiceTest {
                 .thenReturn(NOT_FOUND_RESULT_XML);
 
         //when
-        List<BiometricMatch> results = searchService.searchNationally(notExistingFingerScan);
+        List<BiometricMatch> results = searchService.searchNationally(notExistingFingerScan.toString());
 
         //then
         Assert.assertTrue(results.isEmpty());

@@ -59,7 +59,7 @@ public class RegistrationServiceTest {
         when(localBioServerClient.enroll(subject.getSubjectId(), capture.getTemplateData())).thenReturn(EXISTING_RESULT_XML);
 
         //when
-        registrationService.registerLocally(subject, capture);
+        registrationService.registerLocally(subject);
 
         //then
         verify(patientHelper, times(0)).findByLocalFpId(any());
@@ -83,7 +83,7 @@ public class RegistrationServiceTest {
         when(localBioServerClient.enroll(subject.getSubjectId(), capture.getTemplateData())).thenReturn(EMPTY_RESULT_XML);
 
         //when
-        registrationService.registerLocally(subject, capture);
+        registrationService.registerLocally(subject);
 
         //then
         verify(patientHelper, times(1)).findByNationalFpId(any());
