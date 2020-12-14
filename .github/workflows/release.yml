@@ -29,8 +29,8 @@ jobs:
             }]
           githubServer: false
       - name: Build
-        run: mvn -P github-packages -DskipTests -Dfindbugs.skip=true -Dpmd.skip=true -Dcpd.skip=true -B package
+        run: mvn -P github-packages -rl '!build-tools' -DskipTests -Dfindbugs.skip=true -Dpmd.skip=true -Dcpd.skip=true -B package
       - name: Publish package
-        run: mvn -P github-packages -DskipTests -Dfindbugs.skip=true -Dpmd.skip=true -Dcpd.skip=true -B deploy
+        run: mvn -P github-packages -rl '!build-tools' -DskipTests -Dfindbugs.skip=true -Dpmd.skip=true -Dcpd.skip=true -B deploy
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
