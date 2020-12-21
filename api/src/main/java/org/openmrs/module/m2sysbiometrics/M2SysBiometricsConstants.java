@@ -32,7 +32,7 @@ public final class M2SysBiometricsConstants {
     public static final String M2SYS_NATIONAL_REGISTRATIONS_TASK_INTERVAL = "m2sys-biometrics"
             + ".nationalRegistrationTaskInterval";
 
-    public static final String M2SYS_LOOKUP_ENDPOINT = "/api/Biometric/IsRegister";
+    public static final String M2SYS_LOOKUP_ENDPOINT = "/api/Biometric/IsRegistered";
 
     public static final String M2SYS_SEARCH_ENDPOINT = "/api/Biometric/Identify";
 
@@ -44,12 +44,20 @@ public final class M2SysBiometricsConstants {
 
     public static final String M2SYS_CHANGE_ID_ENDPOINT = "/api/Biometric/ChangeID";
 
-    public static final String M2SYS_CAPTURE_ENDPOINT = "/api/CloudScanr/Capture";
+    public static final String M2SYS_CAPTURE_ENDPOINT = "/api/CloudScanr/FPCapture";
 
     public static final String ERROR_CODE_OF_SUBJECT_NOT_EXIST = "CS004";
 
     // if this system var is set, always returns the value as the template, skipping scanning
     public static final String CONST_TEST_TEMPLATE = "m2sys-biometrics.server.constTestTemplate";
+
+    public static final String M2SYS_CLOUDABIS_APP_KEY = "m2sys-biometrics.cloudabis.app.key";
+    public static final String M2SYS_CLOUDABIS_SECRET_KEY = "m2sys-biometrics.cloudabis.secret.key";
+    public static final String M2SYS_CLOUDABIS_GRANT_TYPE = "m2sys-biometrics.cloudabis.grant.type";
+    public static final String M2SYS_CLOUDABIS_API_URL = "m2sys-biometrics.cloudabis.api.url";
+    public static final String M2SYS_CLOUDABIS_CUSTOMER_KEY = "m2sys-biometrics.cloudabis.customer.key";
+    public static final String M2SYS_CLOUDABIS_ENGINE_NAME = "m2sys-biometrics.cloudabis.engine.name";
+    public static final String M2SYS_CLOUDABIS_TEMPLATE_FORMAT = "m2sys-biometrics.cloudabis.template.format";
 
     public static String getErrorMessage(String errorCode) {
         return ResourceBundle.getBundle("MessageBundle").getString("m2sys.response.error." + errorCode);

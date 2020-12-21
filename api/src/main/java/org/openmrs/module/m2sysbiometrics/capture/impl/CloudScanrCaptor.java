@@ -30,23 +30,24 @@ public class CloudScanrCaptor implements M2SysFingerCaptor {
         M2SysCaptureRequest request = new M2SysCaptureRequest();
         addRequiredValues(request);
         request.setCaptureType(1);
+        request.setDeviceName("DigitalPersona");
 
-        Token token = getToken();
+//        Token token = getToken();
 
         return httpClient.postRequest(
                 properties.getCloudScanrUrl() + M2SysBiometricsConstants.M2SYS_CAPTURE_ENDPOINT,
-                request, token, M2SysCaptureResponse.class);
+                request, null, M2SysCaptureResponse.class);
     }
 
-    private Token getToken() {
-        //String username = properties.getCloudScanrUsername();
-       // String password = properties.getCloudScanrPassword();
-       // String customerKey = properties.getCustomerKey();
-        String cloudScanrUrl = properties.getCloudScanrUrl();
-
-        return httpClient.getToken(cloudScanrUrl);
-        //return httpClient.getToken(cloudScanrUrl, username, password, customerKey);
-    }
+//    private Token getToken() {
+//        //String username = properties.getCloudScanrUsername();
+//       // String password = properties.getCloudScanrPassword();
+//       // String customerKey = properties.getCustomerKey();
+//        String cloudScanrUrl = properties.getCloudScanrUrl();
+//
+//        return httpClient.getToken(cloudScanrUrl);
+//        //return httpClient.getToken(cloudScanrUrl, username, password, customerKey);
+//    }
 
     
     private void addRequiredValues(AbstractM2SysRequest request) {

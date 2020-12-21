@@ -29,6 +29,9 @@ public class M2SysCaptureRequest extends AbstractM2SysRequest {
     @JsonProperty("FaceImage")
     private Integer faceImage;
 
+    @JsonProperty("DeviceName")
+    private String deviceName;
+
     public Integer getCaptureType() {
         return captureType;
     }
@@ -91,5 +94,13 @@ public class M2SysCaptureRequest extends AbstractM2SysRequest {
 
     public void setFaceImage(Integer faceImage) {
         this.faceImage = faceImage;
+    }
+
+    public void setDeviceName(String deviceName) {
+        this.deviceName = deviceName;
+    }
+
+    public String getDeviceName() {
+        return deviceName;
     }
 }

@@ -16,5 +16,6 @@ public interface M2SysHttpClient {
                                                     Class<T> responseClass);
 
     Token getToken(String host);
-  //  Token getToken(String host, String username, String password, String customerKey);
+
+    Token getToken(String host, String appKey, String secretKey, String grantType);
 }
