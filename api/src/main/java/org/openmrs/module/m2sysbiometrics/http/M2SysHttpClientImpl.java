@@ -1,6 +1,7 @@
 package org.openmrs.module.m2sysbiometrics.http;
 
 import org.apache.commons.lang.BooleanUtils;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.openmrs.module.m2sysbiometrics.exception.M2SysBiometricsException;
 import org.openmrs.module.m2sysbiometrics.model.AbstractM2SysResponse;
@@ -88,7 +89,7 @@ public class M2SysHttpClientImpl implements M2SysHttpClient {
             ResponseEntity<T> responseEntity = exchange(new URI(url), HttpMethod.POST, request, headers,
                     responseClass, token);
             T response = responseEntity.getBody();
-            checkResponse(response);
+//            checkResponse(response);
             return response;
         } catch (HttpStatusCodeException e) {
             throw new M2SysBiometricsException("Error response, status: " + e.getStatusCode() + ""
@@ -105,7 +106,9 @@ public class M2SysHttpClientImpl implements M2SysHttpClient {
     private <T> ResponseEntity<T> exchange(URI url, HttpMethod method, Object body,
                                            HttpHeaders headers, Class<T> responseClass, Token token) {
 
-        headers.add("Authorization", token.getTokenType() + " " + token.getAccessToken());
+        if(token!=null){
+            headers.add("Authorization", token.getTokenType() + " " + token.getAccessToken());
+        }
 
         return restOperations.exchange(url, method, new HttpEntity<>(body, headers), responseClass);
     }
@@ -128,6 +131,22 @@ public class M2SysHttpClientImpl implements M2SysHttpClient {
                 .getBody();
     }
 
+    @Override
+    public Token getToken(String host, String appKey, String secretKey, String grantType) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+        MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
+        body.add("grant_type", grantType);
+        body.add("username", appKey);
+        body.add("password", secretKey);
+
+        HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(body, headers);
+
+        return restOperations.exchange(host + "/token", HttpMethod.POST, entity, Token.class)
+                .getBody();
+    }
+
     /*
          @Override
     public Token getToken(String host, String username, String password, String customerKey) {
@@ -146,12 +165,12 @@ public class M2SysHttpClientImpl implements M2SysHttpClient {
                 .getBody();
     }
      */
-    private void checkResponse(AbstractM2SysResponse response) {
-        if (BooleanUtils.isNotTrue(response.getSuccess())) {
-            String errorCode = response.getResponseCode();
-            throw new M2SysBiometricsException("Failure response: " + errorCode + " - " + getErrorMessage(errorCode));
-        }
-    }
+//    private void checkResponse(AbstractM2SysResponse response) {
+//        if (BooleanUtils.isNotTrue(response.getSuccess())) {
+//            String errorCode = response.getResponseCode();
+//            throw new M2SysBiometricsException("Failure response: " + errorCode + " - " + getErrorMessage(errorCode));
+//        }
+//    }
 
     private void debugRequest(String url, Object request) {
         if (LOGGER.isDebugEnabled()) {
