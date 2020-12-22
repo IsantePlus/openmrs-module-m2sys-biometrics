@@ -11,8 +11,13 @@ import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 import org.springframework.ws.WebServiceException;
 import org.springframework.ws.WebServiceMessageFactory;
 import org.springframework.ws.client.core.support.WebServiceGatewaySupport;
+import org.springframework.ws.soap.SoapMessageFactory;
+import org.springframework.ws.soap.SoapVersion;
+import org.springframework.ws.soap.saaj.SaajSoapMessageFactory;
 
 import javax.annotation.PostConstruct;
+import javax.xml.soap.MessageFactory;
+import javax.xml.soap.SOAPException;
 
 public abstract class AbstractBioServerClient extends WebServiceGatewaySupport implements BioServerClient {
 
@@ -26,9 +31,9 @@ public abstract class AbstractBioServerClient extends WebServiceGatewaySupport i
     @Autowired
     private M2SysProperties properties;
 
-    @Autowired
-    @Qualifier("m2sysbiometrics.messageFactory")
-    private WebServiceMessageFactory messageFactory;
+//    @Autowired
+//    @Qualifier("m2sysbiometrics.messageFactory")
+//    private WebServiceMessageFactory messageFactory;
 
     @Autowired
     private ApplicationContext context;
@@ -37,7 +42,15 @@ public abstract class AbstractBioServerClient extends WebServiceGatewaySupport i
     public void init() {
         setMarshaller(marshaller);
         setUnmarshaller(marshaller);
-        setMessageFactory(messageFactory);
+//        setMessageFactory(messageFactory);
+        SoapMessageFactory saajSoapMessageFactory = null;
+        try {
+            saajSoapMessageFactory = new SaajSoapMessageFactory(MessageFactory.newInstance());
+            saajSoapMessageFactory.setSoapVersion(SoapVersion.SOAP_12);
+            setMessageFactory(saajSoapMessageFactory);
+        } catch (SOAPException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
