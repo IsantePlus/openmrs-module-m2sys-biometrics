@@ -46,6 +46,7 @@ m2sys-biometrics.customKey - The m2sys server CustomKey<br/>
 m2sys-biometrics.locationID - The m2sys server location ID<br/>
 m2sys-biometrics.server.password - The m2sys server password<br/>
 m2sys-biometrics.server.url - The m2sys server url<br/>
+m2sys-biometrics.device.name - The m2sys fingerprint scanning device name<br/>
 m2sys-biometrics.server.user - The m2sys server username<br/>
 m2sys-biometrics.local-service.url - The URL to the SOAP service of the local (local to the clinic) M2Sys BioPlugin Server.
 
