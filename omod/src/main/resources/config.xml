@@ -164,7 +164,7 @@
     </globalProperty>
 
     <globalProperty>
-        <property>${project.parent.artifactId}.constTestTemplate</property>
+        <property>${project.parent.artifactId}.server.constTestTemplate</property>
         <defaultValue></defaultValue>
         <description>
             A default test fingerprint template for instances when the fingerprint scanner is not available.
