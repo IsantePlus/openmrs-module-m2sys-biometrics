@@ -164,6 +164,14 @@
     </globalProperty>
 
     <globalProperty>
+        <property>${project.parent.artifactId}.constTestTemplate</property>
+        <defaultValue></defaultValue>
+        <description>
+            A default test fingerprint template for instances when the fingerprint scanner is not available.
+        </description>
+    </globalProperty>
+
+    <globalProperty>
         <property>${project.parent.artifactId}.accessPointMap</property>
         <defaultValue></defaultValue>
         <description>
