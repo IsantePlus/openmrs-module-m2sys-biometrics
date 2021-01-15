@@ -140,6 +140,14 @@
     </globalProperty>
 
     <globalProperty>
+        <property>${project.parent.artifactId}.device.name</property>
+        <defaultValue>DigitalPersona</defaultValue>
+        <description>
+            The m2sys fingerprint scanning device name.
+        </description>
+    </globalProperty>
+
+    <globalProperty>
         <property>${project.parent.artifactId}.local-service.url</property>
         <defaultValue></defaultValue>
         <description>
