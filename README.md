@@ -37,6 +37,11 @@ Currently the module uses the **V8** version of the service.
 
 ## Configuration variables
 
+### Template if no scanner exists
+
+If no fingerprint scanner exists, simulations may be performed using a pre-loaded fingerprint template to be stored as a global property:
+m2sys-biometrics.server.constTestTemplate - String representation of the fingerprint template
+
 ### Local variables
 m2sys-biometrics.accessPointID - The m2sys server AccessPointID<br/>
 m2sys-biometrics.accessPointMap - A map of IP addresses to Access Point IDs. Has format of IP1:AccessPointID1;IP2:AccessPointID2;...
