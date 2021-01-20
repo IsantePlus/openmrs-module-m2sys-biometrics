@@ -23,8 +23,6 @@ import org.openmrs.module.registrationcore.api.biometrics.model.BiometricMatch;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricSubject;
 import org.openmrs.module.registrationcore.api.biometrics.model.EnrollmentResult;
 import org.openmrs.module.registrationcore.api.biometrics.model.EnrollmentStatus;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -37,7 +35,6 @@ import java.util.List;
 @Component("m2sysbiometrics.M2SysV1Client")
 public class M2SysV105Client extends AbstractM2SysClient {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(M2SysV105Client.class);
     private final Log log = LogFactory.getLog(M2SysV105Client.class);
 
     @Autowired
@@ -97,7 +94,7 @@ public class M2SysV105Client extends AbstractM2SysClient {
                     log.error("Local EnrollmentStatus : "+EnrollmentStatus.SUCCESS);
                 }else{
                     log.error("Local Enrollment Aborted: Status - Local Server not configured!");
-                    subjectId = new BiometricSubject("");;
+                    subjectId = new BiometricSubject("");
                 }
             } else {
 //                register locally and nationally
@@ -107,7 +104,7 @@ public class M2SysV105Client extends AbstractM2SysClient {
                     log.error("Local EnrollmentStatus : "+EnrollmentStatus.SUCCESS);
                 }else{
                     log.error("Local Enrollment Aborted: Status - Local Server not configured!");
-                    subjectId = new BiometricSubject("");;
+                    subjectId = new BiometricSubject("");
                 }
 
                 if(nationalBioServerClient.isServerUrlConfigured()){
