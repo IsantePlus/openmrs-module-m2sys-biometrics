@@ -170,6 +170,55 @@
             A default test fingerprint template for instances when the fingerprint scanner is not available.
         </description>
     </globalProperty>
+    <globalProperty>
+        <property>${project.parent.artifactId}.cloudabis.app.key</property>
+        <defaultValue></defaultValue>
+        <description>
+            Client assigned CLOUDABIS APP KEY for access to the cloud fingerprint matching engine API endpoints.
+        </description>
+    </globalProperty>
+    <globalProperty>
+        <property>${project.parent.artifactId}.cloudabis.secret.key</property>
+        <defaultValue></defaultValue>
+        <description>
+            Client assigned SECRET KEY for access to the cloud fingerprint matching engine API endpoints.
+        </description>
+    </globalProperty>
+    <globalProperty>
+        <property>${project.parent.artifactId}.cloudabis.grant.type</property>
+        <defaultValue></defaultValue>
+        <description>
+            Client preferred grant type for access to the cloud fingerprint matching engine API endpoints.
+        </description>
+    </globalProperty>
+    <globalProperty>
+        <property>${project.parent.artifactId}.cloudabis.api.url</property>
+        <defaultValue></defaultValue>
+        <description>
+            Base URL to the cloud fingerprint matching engine API endpoints.
+        </description>
+    </globalProperty>
+    <globalProperty>
+        <property>${project.parent.artifactId}.cloudabis.customer.key</property>
+        <defaultValue></defaultValue>
+        <description>
+            User assigned customer key for grouping different CLOUDABIS Apps.
+        </description>
+    </globalProperty>
+    <globalProperty>
+        <property>${project.parent.artifactId}.cloudabis.engine.name</property>
+        <defaultValue></defaultValue>
+        <description>
+            User preffered engine for processing CLOUDABIS requests.
+        </description>
+    </globalProperty>
+    <globalProperty>
+        <property>${project.parent.artifactId}.cloudabis.template.format</property>
+        <defaultValue>ISO</defaultValue>
+        <description>
+            Preferred template format - Usually tied to the capabilities of the user-procured fingerprint scanner.
+        </description>
+    </globalProperty>
 
     <globalProperty>
         <property>${project.parent.artifactId}.accessPointMap</property>
