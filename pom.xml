@@ -9,7 +9,7 @@
 
     <groupId>org.openmrs.module</groupId>
     <artifactId>m2sys-biometrics</artifactId>
-    <version>1.0.2-SNAPSHOT</version>
+    <version>1.0.2</version>
     <packaging>pom</packaging>
     <name>m2sys Biometrics Module</name>
     <description>Module for iSantePlus m2sys Biometrics</description>
@@ -30,7 +30,7 @@
         <javaCompilerVersion>1.8</javaCompilerVersion>
 
         <mockitoVersion>1.9.5</mockitoVersion>
-        <registrationCoreVersion>2.0.0-SNAPSHOT</registrationCoreVersion>
+        <registrationCoreVersion>2.0.0</registrationCoreVersion>
         <idgenVersion>4.3</idgenVersion>
         <eventVersion>2.3</eventVersion>
 
