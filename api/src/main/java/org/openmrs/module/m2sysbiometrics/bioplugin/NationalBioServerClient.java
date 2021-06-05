@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.client.RestTemplate;
@@ -82,10 +83,17 @@ public class NationalBioServerClient extends AbstractBioServerClient {
     }
 
     protected Object getResponse(Object requestPayload, String apiEndpoint) {
-        String authHeader = generateBearerAuthorizationHeader(getToken().getAccessToken());
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Authorization", authHeader);
-        return httpClient.postRequest(getServiceUrl() + apiEndpoint, (M2SysData) requestPayload,getToken(), CloudAbisResult.class);
+        Token token = getToken();
+        if(httpClient.getServerStatus(getServiceUrl(),token).getStatusCode().equals(HttpStatus.OK)){
+            String authHeader = generateBearerAuthorizationHeader(token.getAccessToken());
+            HttpHeaders headers = new HttpHeaders();
+            headers.add("Authorization", authHeader);
+            return httpClient.postRequest(getServiceUrl() + apiEndpoint, (M2SysData) requestPayload, token, CloudAbisResult.class);
+        }else{
+//            Queue for later push to the national server
+
+            return null;
+        }
     }
 
 
