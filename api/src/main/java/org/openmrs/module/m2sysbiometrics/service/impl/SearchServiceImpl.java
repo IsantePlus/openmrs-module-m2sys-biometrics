@@ -95,6 +95,8 @@ public class SearchServiceImpl implements SearchService {
 
         if (localBioServerClient.isServerUrlConfigured()) {
             try {
+
+//                TODO - Ping the local fingerprint server to see if there is a connection over and above the configurations
                 localBiometricSubject = findMostAdequateSubjectLocally(biometricXml);
                 localBiometricSubject = validateLocalSubjectExistence(localBiometricSubject);
             } catch (RuntimeException exception) {
