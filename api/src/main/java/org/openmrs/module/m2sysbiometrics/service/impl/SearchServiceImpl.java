@@ -49,10 +49,14 @@ public class SearchServiceImpl implements SearchService {
 
     @Override
     public List<BiometricMatch> searchNationally(String biometricXml) {
-        List<BiometricMatch> biometricMatches;
-        CloudAbisResult response = nationalBioServerClient.identifyAbis(biometricXml);
-        biometricMatches = toOpenMrsMatchList(response);
-        return biometricMatches;
+        String response = nationalBioServerClient.identify(biometricXml);
+        M2SysResults results = XmlResultUtil.parse(response);
+
+        if (results.isSearchError()) {
+            throw new M2SysBiometricsException("Error occurred during national fingerprint search: " + results.firstValue());
+        }
+
+        return results.toOpenMrsMatchList();
     }
 
     public List<BiometricMatch> toOpenMrsMatchList(CloudAbisResult result) {
@@ -95,7 +99,6 @@ public class SearchServiceImpl implements SearchService {
 
         if (localBioServerClient.isServerUrlConfigured()) {
             try {
-
 //                TODO - Ping the local fingerprint server to see if there is a connection over and above the configurations
                 localBiometricSubject = findMostAdequateSubjectLocally(biometricXml);
                 localBiometricSubject = validateLocalSubjectExistence(localBiometricSubject);

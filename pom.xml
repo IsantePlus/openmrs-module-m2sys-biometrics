@@ -30,7 +30,7 @@
         <javaCompilerVersion>1.8</javaCompilerVersion>
 
         <mockitoVersion>1.9.5</mockitoVersion>
-        <registrationCoreVersion>2.1.0</registrationCoreVersion>
+        <registrationCoreVersion>2.2.0-SNAPSHOT</registrationCoreVersion>
         <idgenVersion>4.3</idgenVersion>
         <eventVersion>2.3</eventVersion>
 

@@ -7,17 +7,8 @@ import org.openmrs.module.m2sysbiometrics.bioplugin.NationalBioServerClient;
 import org.openmrs.module.m2sysbiometrics.capture.impl.CloudScanrCaptor;
 import org.openmrs.module.m2sysbiometrics.capture.impl.TestEnvCaptor;
 import org.openmrs.module.m2sysbiometrics.exception.M2SysBiometricsException;
-import org.openmrs.module.m2sysbiometrics.model.Finger;
-import org.openmrs.module.m2sysbiometrics.model.FingerScanStatus;
-import org.openmrs.module.m2sysbiometrics.model.Fingers;
-import org.openmrs.module.m2sysbiometrics.model.M2SysCaptureResponse;
-import org.openmrs.module.m2sysbiometrics.model.M2SysResult;
-import org.openmrs.module.m2sysbiometrics.model.M2SysResults;
-import org.openmrs.module.m2sysbiometrics.model.TempFingerprint;
-import org.openmrs.module.m2sysbiometrics.service.RegistrationService;
-import org.openmrs.module.m2sysbiometrics.service.SearchService;
-import org.openmrs.module.m2sysbiometrics.service.TempFingerprintService;
-import org.openmrs.module.m2sysbiometrics.service.UpdateService;
+import org.openmrs.module.m2sysbiometrics.model.*;
+import org.openmrs.module.m2sysbiometrics.service.*;
 import org.openmrs.module.m2sysbiometrics.xml.XmlResultUtil;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricMatch;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricSubject;
@@ -60,6 +51,8 @@ public class M2SysV105Client extends AbstractM2SysClient {
 
     @Autowired
     private TempFingerprintService tempFingerprintService;
+    @Autowired
+    private SyncFingerprintService syncFingerprintService;
 
     private JAXBContext jaxbContext;
 
@@ -119,6 +112,10 @@ public class M2SysV105Client extends AbstractM2SysClient {
                 fingerScanStatus = searchService.checkIfFingerScanExists(capture.getTemplateData());
                 if (fingerScanStatus.isRegisteredNationally()) {
                     nationalSubject = fingerScanStatus.getNationalBiometricSubject();
+                }else{
+//                    National registration did not happen - queue for later sync
+                    SyncFingerprint syncFingerprint = new SyncFingerprint(subjectId.getSubjectId(), fingerprintXmlTemplate);
+                    syncFingerprintService.saveOrUpdate(syncFingerprint);
                 }
 
             }
@@ -131,6 +128,10 @@ public class M2SysV105Client extends AbstractM2SysClient {
                 fingerScanStatus = searchService.checkIfFingerScanExists(capture.getTemplateData());
                 if (fingerScanStatus.isRegisteredNationally()) {
                     nationalSubject = fingerScanStatus.getNationalBiometricSubject();
+                }else{
+//                    National registration did not happen - queue for later sync
+                    SyncFingerprint syncFingerprint = new SyncFingerprint(subjectId.getSubjectId(), fingerprintXmlTemplate);
+                    syncFingerprintService.saveOrUpdate(syncFingerprint);
                 }
 
             }else{
