@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.ApplicationContext;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 import org.springframework.ws.WebServiceException;
 import org.springframework.ws.WebServiceMessageFactory;
@@ -27,13 +28,17 @@ public abstract class AbstractBioServerClient extends WebServiceGatewaySupport i
     private M2SysProperties properties;
 
     @Autowired
-//    @Qualifier("m2sysbiometrics.messageFactory")
-    private SaajSoapMessageFactory messageFactory;
+    @Qualifier("m2sysbiometrics.messageFactory")
+    private WebServiceMessageFactory messageFactory;
+
+//    @Autowired
+//    private ApplicationContext context;
 
     @PostConstruct
     public void init() {
         setMarshaller(marshaller);
         setUnmarshaller(marshaller);
+//        setMessageFactory(context.getBean("m2sysbiometrics.messageFactory", SaajSoapMessageFactory.class));
         setMessageFactory(messageFactory);
     }
 

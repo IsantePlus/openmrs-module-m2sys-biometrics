@@ -101,7 +101,8 @@ public class SearchServiceImpl implements SearchService {
             try {
 //                TODO - Ping the local fingerprint server to see if there is a connection over and above the configurations
                 localBiometricSubject = findMostAdequateSubjectLocally(biometricXml);
-                localBiometricSubject = validateLocalSubjectExistence(localBiometricSubject);
+                LOGGER.error("Local search response(if any) ==> ", localBiometricSubject.getSubjectId());
+//                localBiometricSubject = validateLocalSubjectExistence(localBiometricSubject);
             } catch (RuntimeException exception) {
                 LOGGER.error("Connection failure to local server.", exception);
             }
@@ -119,11 +120,11 @@ public class SearchServiceImpl implements SearchService {
         return new FingerScanStatus(localBiometricSubject, nationalBiometricSubject);
     }
 
-    private BiometricSubject validateLocalSubjectExistence(BiometricSubject localBiometricSubject) {
-        return localBiometricSubject == null || patientHelper.findByLocalFpId(localBiometricSubject.getSubjectId()) == null
-                ? null
-                : localBiometricSubject;
-    }
+//    private BiometricSubject validateLocalSubjectExistence(BiometricSubject localBiometricSubject) {
+//        return localBiometricSubject == null || patientHelper.findByLocalFpId(localBiometricSubject.getSubjectId()) == null
+//                ? null
+//                : localBiometricSubject;
+//    }
 
     private BiometricSubject findMostAdequateSubjectLocally(String biometricXml) {
         BiometricMatch biometricMatch = findMostAdequateLocally(biometricXml);

@@ -39,7 +39,7 @@ public class NationalSynchronizationTask extends AbstractTask {
     public void execute() {
         LOGGER.info("Executing " + TASK_NAME + "...");
         initializeBeans();
-        syncRegistrationFailures();
+//        syncRegistrationFailures();
         //    retryUpdateFailures();
     }
 
@@ -95,23 +95,23 @@ public class NationalSynchronizationTask extends AbstractTask {
         }
     }
  */
-
-    private void syncRegistrationFailures() {
-
-        List<SyncFingerprint> syncList = syncFingerprintService.findAll();
-        for (SyncFingerprint fingerprint : syncList) {
-            try {
-                M2SysCaptureResponse fingerScan = new M2SysCaptureResponse();
-                fingerScan.setTemplateData(fingerprint.getBiometricXml());
-                registrationService.registerNationally(fingerScan);
-                FingerScanStatus fingerScanStatus = searchService.checkIfFingerScanExists(fingerScan.getTemplateData());
-                if (fingerScanStatus.isRegisteredNationally()) {
-                    syncFingerprintService.delete(fingerprint);
-                }
-            } catch (Exception e) {
-                LOGGER.error("Scheduled retry of Fingerprint Sync failed", e);
-            }
-        }
-
-    }
+//
+//    private void syncRegistrationFailures() {
+//
+//        List<SyncFingerprint> syncList = syncFingerprintService.findAll();
+//        for (SyncFingerprint fingerprint : syncList) {
+//            try {
+//                M2SysCaptureResponse fingerScan = new M2SysCaptureResponse();
+//                fingerScan.setTemplateData(fingerprint.getBiometricXml());
+//                registrationService.registerNationally(fingerScan);
+//                FingerScanStatus fingerScanStatus = searchService.checkIfFingerScanExists(fingerScan.getTemplateData());
+//                if (fingerScanStatus.isRegisteredNationally()) {
+//                    syncFingerprintService.delete(fingerprint);
+//                }
+//            } catch (Exception e) {
+//                LOGGER.error("Scheduled retry of Fingerprint Sync failed", e);
+//            }
+//        }
+//
+//    }
 }
