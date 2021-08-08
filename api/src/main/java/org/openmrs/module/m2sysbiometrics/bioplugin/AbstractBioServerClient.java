@@ -2,7 +2,6 @@ package org.openmrs.module.m2sysbiometrics.bioplugin;
 
 import org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants;
 import org.openmrs.module.m2sysbiometrics.util.M2SysProperties;
-import org.openmrs.module.registrationcore.api.biometrics.model.BiometricSubject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,8 +11,6 @@ import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 import org.springframework.ws.WebServiceException;
 import org.springframework.ws.WebServiceMessageFactory;
 import org.springframework.ws.client.core.support.WebServiceGatewaySupport;
-import org.springframework.ws.soap.saaj.SaajSoapMessageFactory;
-
 import javax.annotation.PostConstruct;
 
 public abstract class AbstractBioServerClient extends WebServiceGatewaySupport implements BioServerClient {
@@ -31,9 +28,6 @@ public abstract class AbstractBioServerClient extends WebServiceGatewaySupport i
 //    @Autowired
 //    @Qualifier("m2sysbiometrics.messageFactory")
 //    private WebServiceMessageFactory messageFactory;
-
-    @Autowired
-    private ApplicationContext context;
 
     @PostConstruct
     public void init() {
