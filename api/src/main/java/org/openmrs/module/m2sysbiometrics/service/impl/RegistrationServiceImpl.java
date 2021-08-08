@@ -33,6 +33,8 @@ import org.openmrs.module.registrationcore.api.biometrics.model.Fingerprint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 import org.springframework.stereotype.Service;
 
 @Service(value = "registrationService")
@@ -66,22 +68,42 @@ public class RegistrationServiceImpl implements RegistrationService {
     private NationalUuidGenerator nationalUuidGenerator;
 
     @Autowired
+    @Qualifier("m2sysbiometrics.jax2b")
+    private Jaxb2Marshaller marshaller;
+
+    @Autowired
     private NationalSynchronizationFailureService nationalSynchronizationFailureService;
 
 
-	@Override
-    public void registerLocally(BiometricSubject subject) {
-		List<Fingerprint> fingerList=subject.getFingerprints();
-        Fingerprint finger=fingerList.get(0);	
-        String response = localBioServerClient.enroll(subject.getSubjectId(), finger.getTemplate());
-        M2SysResults results = XmlResultUtil.parse(response);
-        if (!results.isRegisterSuccess()) {
-            String responseValue = results.firstValue();
-            LOGGER.error("Got error response from the local server: {}. Checking if tied to patient.", responseValue);
-            Patient patient = patientHelper.findByLocalFpId(responseValue);
-            handleLocalRegistrationError(subject, responseValue, patient);
+        @Override
+        public void registerLocally(BiometricSubject subject, M2SysCaptureResponse capture) {
+            String response = localBioServerClient.enroll(subject.getSubjectId(), capture.getTemplateData());
+            M2SysResults results = XmlResultUtil.parse(response);
+            if (!results.isRegisterSuccess()) {
+                String responseValue = results.firstValue();
+                LOGGER.info("Got error response from the local server: {}. Checking if tied to patient.", responseValue);
+                Patient patient = patientHelper.findByLocalFpId(responseValue);
+                handleLocalRegistrationError(subject, responseValue, patient);
+            }
         }
-    }
+
+//    @Override
+//    public void registerLocally(BiometricSubject subject) {
+//        log.error("before enroll.....");
+//        List<Fingerprint> fingerList=subject.getFingerprints();
+//        Fingerprint finger=fingerList.get(0);
+//        log.error("before enroll :"+finger.getTemplate());
+//        String response = localBioServerClient.enroll(subject);
+//        log.error("after enroll :"+response);
+//        M2SysResults results = XmlResultUtil.parse(response);
+//        log.error("after enroll :"+results.toString());
+//        if (!results.isRegisterSuccess()) {
+//            String responseValue = results.firstValue();
+//            LOGGER.info("Got error response from the local server: {}. Checking if tied to patient.", responseValue);
+//            Patient patient = patientHelper.findByLocalFpId(responseValue);
+//            handleLocalRegistrationError(subject, responseValue, patient);
+//        }
+//    }
 
     @Override
     public void registerNationally(M2SysCaptureResponse capture) {
@@ -89,10 +111,9 @@ public class RegistrationServiceImpl implements RegistrationService {
         try {
             nationalId = nationalUuidGenerator.generate();
             String response = nationalBioServerClient.enroll(nationalId, capture.getTemplateData());
-            if (!"SUCCESS".equals(response)) {
-                throw new M2SysBiometricsException("National registration failed with response: "+ response );
-            }else {
-                LOGGER.info("Registration with the national fingerprint server status: "+response);
+            M2SysResults results = XmlResultUtil.parse(response);
+            if (!results.isRegisterSuccess()) {
+                throw new M2SysBiometricsException("National registration failed");
             }
         } catch (Exception e) {
             LOGGER.error("Registration with the national fingerprint server failed.", e);

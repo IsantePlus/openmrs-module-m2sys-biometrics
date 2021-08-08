@@ -18,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.ws.WebServiceMessageFactory;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -32,6 +33,11 @@ import java.net.URL;
 public class NationalBioServerClient extends AbstractBioServerClient {
 
     private final Log log = LogFactory.getLog(NationalBioServerClient.class);
+
+    @Autowired
+    public NationalBioServerClient(WebServiceMessageFactory messageFactory){
+        setMessageFactory(messageFactory);
+    }
 
     @Override
     protected String getServerUrlPropertyName() {

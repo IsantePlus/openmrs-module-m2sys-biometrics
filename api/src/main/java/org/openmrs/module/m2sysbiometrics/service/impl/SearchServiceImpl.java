@@ -101,7 +101,6 @@ public class SearchServiceImpl implements SearchService {
             try {
 //                TODO - Ping the local fingerprint server to see if there is a connection over and above the configurations
                 localBiometricSubject = findMostAdequateSubjectLocally(biometricXml);
-                LOGGER.error("Local search response(if any) ==> ", localBiometricSubject.getSubjectId());
 //                localBiometricSubject = validateLocalSubjectExistence(localBiometricSubject);
             } catch (RuntimeException exception) {
                 LOGGER.error("Connection failure to local server.", exception);

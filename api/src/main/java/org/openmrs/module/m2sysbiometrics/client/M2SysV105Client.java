@@ -8,7 +8,10 @@ import org.openmrs.module.m2sysbiometrics.capture.impl.CloudScanrCaptor;
 import org.openmrs.module.m2sysbiometrics.capture.impl.TestEnvCaptor;
 import org.openmrs.module.m2sysbiometrics.exception.M2SysBiometricsException;
 import org.openmrs.module.m2sysbiometrics.model.*;
-import org.openmrs.module.m2sysbiometrics.service.*;
+import org.openmrs.module.m2sysbiometrics.service.RegistrationService;
+import org.openmrs.module.m2sysbiometrics.service.SearchService;
+import org.openmrs.module.m2sysbiometrics.service.TempFingerprintService;
+import org.openmrs.module.m2sysbiometrics.service.UpdateService;
 import org.openmrs.module.m2sysbiometrics.xml.XmlResultUtil;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricMatch;
 import org.openmrs.module.registrationcore.api.biometrics.model.BiometricSubject;
@@ -51,8 +54,6 @@ public class M2SysV105Client extends AbstractM2SysClient {
 
     @Autowired
     private TempFingerprintService tempFingerprintService;
-    @Autowired
-    private SyncFingerprintService syncFingerprintService;
 
     private JAXBContext jaxbContext;
 
@@ -65,6 +66,7 @@ public class M2SysV105Client extends AbstractM2SysClient {
     @Override
     public EnrollmentResult enroll(BiometricSubject subjectId) {
         M2SysCaptureResponse capture = scanDoubleFingers();
+        log.info("M2SysV105Client.enroll======================================>  : "+capture.getTemplateData());
         return enroll(subjectId, capture.getTemplateData());
     }
 
@@ -73,7 +75,7 @@ public class M2SysV105Client extends AbstractM2SysClient {
         BiometricSubject nationalSubject = new BiometricSubject("");
         M2SysCaptureResponse capture = convertXmlTemplateToCapture(fingerprintXmlTemplate);
         FingerScanStatus fingerScanStatus = searchService.checkIfFingerScanExists(capture.getTemplateData());
-        log.error("Fingerscan response =>>>>>>>>>>>>>: Local ==> "+ fingerScanStatus.isRegisteredLocally() + ", National ==> " + fingerScanStatus.isRegisteredNationally());
+        log.info("Fingerscan response =>>>>>>>>>>>>>: Local ==> "+ fingerScanStatus.isRegisteredLocally() + ", National ==> " + fingerScanStatus.isRegisteredNationally());
         EnrollmentStatus enrollmentStatus = EnrollmentStatus.SUCCESS;
         Fingers fingers = capture.getFingerData(jaxbContext);
         subjectId.setFingerprints(fingers.toTwoOpenMrsFingerprints());
@@ -108,7 +110,7 @@ public class M2SysV105Client extends AbstractM2SysClient {
                 enrollmentStatus = EnrollmentStatus.ALREADY_REGISTERED;
 //                Enroll Locally
                 if (localBioServerClient.isServerUrlConfigured()) {
-                    registrationService.registerLocally(subjectId);
+                    registrationService.registerLocally(subjectId,capture);
                     fingerScanStatus = searchService.checkIfFingerScanExists(capture.getTemplateData());
                     if (fingerScanStatus.isRegisteredLocally()) {
                         subjectId = fingerScanStatus.getLocalBiometricSubject();
@@ -125,12 +127,12 @@ public class M2SysV105Client extends AbstractM2SysClient {
         else {
             //                register locally and nationally
             if (localBioServerClient.isServerUrlConfigured()) {
-                registrationService.registerLocally(subjectId);
-                log.error("Local EnrollmentStatus : " + EnrollmentStatus.SUCCESS);
+                registrationService.registerLocally(subjectId,capture);
+                log.info("Local EnrollmentStatus : " + EnrollmentStatus.SUCCESS);
             }
             if (nationalBioServerClient.isServerUrlConfigured()) {
                 registrationService.registerNationally(capture);
-                log.error("National EnrollmentStatus : " + EnrollmentStatus.SUCCESS);
+                log.info("National EnrollmentStatus : " + EnrollmentStatus.SUCCESS);
             }
 //                retrieve the registered biometrics
             fingerScanStatus = searchService.checkIfFingerScanExists(capture.getTemplateData());
@@ -212,7 +214,7 @@ public class M2SysV105Client extends AbstractM2SysClient {
 
         if (!results.isChangeIdSuccess()) {
             throw new M2SysBiometricsException("Unable to change ID from " + oldId
-                + " to " + newId);
+                    + " to " + newId);
         }
 
         return new BiometricSubject(newId);
