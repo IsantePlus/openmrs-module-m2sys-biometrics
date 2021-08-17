@@ -11,6 +11,8 @@ import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 import org.springframework.ws.WebServiceException;
 import org.springframework.ws.WebServiceMessageFactory;
 import org.springframework.ws.client.core.support.WebServiceGatewaySupport;
+import org.springframework.ws.soap.saaj.SaajSoapMessageFactory;
+
 import javax.annotation.PostConstruct;
 
 public abstract class AbstractBioServerClient extends WebServiceGatewaySupport implements BioServerClient {
@@ -28,6 +30,9 @@ public abstract class AbstractBioServerClient extends WebServiceGatewaySupport i
 //    @Autowired
 //    @Qualifier("m2sysbiometrics.messageFactory")
 //    private WebServiceMessageFactory messageFactory;
+
+    @Autowired
+    private ApplicationContext context;
 
     @PostConstruct
     public void init() {

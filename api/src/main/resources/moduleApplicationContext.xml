@@ -29,7 +29,7 @@
         <property name="contextPath" value="org.openmrs.module.m2sysbiometrics.bioplugin"/>
     </bean>
 
-    <bean id="m2sysbiometrics.messageFactory" class="org.springframework.ws.soap.saaj.SaajSoapMessageFactory" autowire="byType">
+    <bean id="m2sysbiometrics.messageFactory" class="org.springframework.ws.soap.saaj.SaajSoapMessageFactory">
         <property name="soapVersion">
             <util:constant static-field="org.springframework.ws.soap.SoapVersion.SOAP_12"/>
         </property>

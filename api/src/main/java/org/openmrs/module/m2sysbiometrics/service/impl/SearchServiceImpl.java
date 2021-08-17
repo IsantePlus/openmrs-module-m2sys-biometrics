@@ -38,6 +38,7 @@ public class SearchServiceImpl implements SearchService {
     @Override
     public List<BiometricMatch> searchLocally(String biometricXml) {
         String response = localBioServerClient.identify(biometricXml);
+        LOGGER.error("Identify Results   <><><><><><><><><> : "+response);
         M2SysResults results = XmlResultUtil.parse(response);
 
         if (results.isSearchError()) {
@@ -94,6 +95,7 @@ public class SearchServiceImpl implements SearchService {
 
     @Override
     public FingerScanStatus checkIfFingerScanExists(String biometricXml) {
+        LOGGER.error("SearchServiceImpl.checkIfFingerScanExists() ==================>>>>>>>>>>>>>>>" + biometricXml);
         BiometricSubject nationalBiometricSubject = null;
         BiometricSubject localBiometricSubject = null;
 
@@ -116,6 +118,7 @@ public class SearchServiceImpl implements SearchService {
             }
         }
 
+        LOGGER.error("SearchServiceImpl.checkIfFingerScanExists() Results ==================Local: >>>>>>>>>>>>>>>" + localBiometricSubject + "National: >>>>>>>>>>>>>>>" + nationalBiometricSubject);
         return new FingerScanStatus(localBiometricSubject, nationalBiometricSubject);
     }
 
