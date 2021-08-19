@@ -20,7 +20,7 @@ public class NationalUuidGenerator {
     public String generate() {
         boolean isRegistered;
         String uuid;
-        LOGGER.error("About to fetch UUID");
+        LOGGER.info("About to fetch UUID");
         do {
             // unlikely it will repeat, but we must guard against it
             uuid = UUID.randomUUID().toString();

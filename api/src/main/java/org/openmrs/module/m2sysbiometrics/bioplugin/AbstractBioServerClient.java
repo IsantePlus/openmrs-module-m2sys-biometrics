@@ -6,10 +6,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.ApplicationContext;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 import org.springframework.ws.WebServiceException;
 import org.springframework.ws.WebServiceMessageFactory;
 import org.springframework.ws.client.core.support.WebServiceGatewaySupport;
+import org.springframework.ws.soap.saaj.SaajSoapMessageFactory;
+
 import javax.annotation.PostConstruct;
 
 public abstract class AbstractBioServerClient extends WebServiceGatewaySupport implements BioServerClient {
@@ -24,15 +27,19 @@ public abstract class AbstractBioServerClient extends WebServiceGatewaySupport i
     @Autowired
     private M2SysProperties properties;
 
+//    @Autowired
+//    @Qualifier("m2sysbiometrics.messageFactory")
+//    private WebServiceMessageFactory messageFactory;
+
     @Autowired
-    @Qualifier("m2sysbiometrics.messageFactory")
-    private WebServiceMessageFactory messageFactory;
+    private ApplicationContext context;
 
     @PostConstruct
     public void init() {
         setMarshaller(marshaller);
         setUnmarshaller(marshaller);
-        setMessageFactory(messageFactory);
+//        setMessageFactory(context.getBean("m2sysbiometrics.messageFactory", SaajSoapMessageFactory.class));
+//        setMessageFactory(messageFactory);
     }
 
     @Override
@@ -51,6 +58,22 @@ public abstract class AbstractBioServerClient extends WebServiceGatewaySupport i
         }
         return response.getRegisterResult();
     }
+//    @Override
+//    public String enroll(BiometricSubject biometricSubject) {
+//        Register register = new Register();
+//        register.setLocationID(getLocationId());
+//        register.setID(biometricSubject.getSubjectId());
+//
+//        register.setBiometricXml(marshaller.marshal(biometricSubject.));
+//        RegisterResponse response;
+//        try {
+//            response = (RegisterResponse) getResponse(register);
+//        }catch (Exception ex) {
+//            logger.error(ex.getMessage());
+//        	return null;
+//        }
+//        return response.getRegisterResult();
+//    }
 
     @Override
     public String isRegistered(String subjectId) {

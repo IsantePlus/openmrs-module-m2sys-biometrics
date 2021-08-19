@@ -39,12 +39,6 @@ public class M2SysEngine implements BiometricEngine {
         return client.enroll(subjectId);
     }
 
-    private BiometricSubject generateSubjectId() {
-        BiometricSubject subjectId = new BiometricSubject(UUID.randomUUID().toString());
-        LOGGER.debug(String.format("Generated a new SubjectId: %s", subjectId.getSubjectId()));
-        return subjectId;
-    }
-
     @Override
     public EnrollmentResult enroll(String fingerprintsXmlTemplate) {
         LOGGER.info("Called enroll(String fingerprintsXmlTemplate)");
@@ -53,6 +47,12 @@ public class M2SysEngine implements BiometricEngine {
         }
         BiometricSubject subjectId = generateSubjectId();
         return client.enroll(subjectId, fingerprintsXmlTemplate);
+    }
+
+    private BiometricSubject generateSubjectId() {
+        BiometricSubject subjectId = new BiometricSubject(UUID.randomUUID().toString());
+        LOGGER.debug(String.format("Generated a new SubjectId: %s", subjectId.getSubjectId()));
+        return subjectId;
     }
 
     /**

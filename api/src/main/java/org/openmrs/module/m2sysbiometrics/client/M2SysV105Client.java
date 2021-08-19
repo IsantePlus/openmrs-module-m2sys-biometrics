@@ -7,13 +7,7 @@ import org.openmrs.module.m2sysbiometrics.bioplugin.NationalBioServerClient;
 import org.openmrs.module.m2sysbiometrics.capture.impl.CloudScanrCaptor;
 import org.openmrs.module.m2sysbiometrics.capture.impl.TestEnvCaptor;
 import org.openmrs.module.m2sysbiometrics.exception.M2SysBiometricsException;
-import org.openmrs.module.m2sysbiometrics.model.Finger;
-import org.openmrs.module.m2sysbiometrics.model.FingerScanStatus;
-import org.openmrs.module.m2sysbiometrics.model.Fingers;
-import org.openmrs.module.m2sysbiometrics.model.M2SysCaptureResponse;
-import org.openmrs.module.m2sysbiometrics.model.M2SysResult;
-import org.openmrs.module.m2sysbiometrics.model.M2SysResults;
-import org.openmrs.module.m2sysbiometrics.model.TempFingerprint;
+import org.openmrs.module.m2sysbiometrics.model.*;
 import org.openmrs.module.m2sysbiometrics.service.RegistrationService;
 import org.openmrs.module.m2sysbiometrics.service.SearchService;
 import org.openmrs.module.m2sysbiometrics.service.TempFingerprintService;
@@ -72,6 +66,7 @@ public class M2SysV105Client extends AbstractM2SysClient {
     @Override
     public EnrollmentResult enroll(BiometricSubject subjectId) {
         M2SysCaptureResponse capture = scanDoubleFingers();
+        log.info("M2SysV105Client.enroll======================================>  : "+capture.getTemplateData());
         return enroll(subjectId, capture.getTemplateData());
     }
 
@@ -80,63 +75,118 @@ public class M2SysV105Client extends AbstractM2SysClient {
         BiometricSubject nationalSubject = new BiometricSubject("");
         M2SysCaptureResponse capture = convertXmlTemplateToCapture(fingerprintXmlTemplate);
         FingerScanStatus fingerScanStatus = searchService.checkIfFingerScanExists(capture.getTemplateData());
-        EnrollmentStatus enrollmentStatus = EnrollmentStatus.SUCCESS;
+        log.error("Fingerscan response =>>>>>>>>>>>>>: Local ==> "+ fingerScanStatus.isRegisteredLocally() + ", National ==> " + fingerScanStatus.isRegisteredNationally());
+        EnrollmentStatus enrollmentStatus;
         Fingers fingers = capture.getFingerData(jaxbContext);
         subjectId.setFingerprints(fingers.toTwoOpenMrsFingerprints());
         nationalSubject.setFingerprints(fingers.toTwoOpenMrsFingerprints());
 
-        if (!fingerScanStatus.isRegisteredLocally()) {
-            if (fingerScanStatus.isRegisteredNationally()) {
-                nationalSubject = fingerScanStatus.getNationalBiometricSubject();
-                enrollmentStatus = EnrollmentStatus.ALREADY_REGISTERED;
-                if(localBioServerClient.isServerUrlConfigured()){
-                    registrationService.registerLocally(subjectId);
-                    log.error("Local EnrollmentStatus : "+EnrollmentStatus.SUCCESS);
-                }else{
-                    log.error("Local Enrollment Aborted: Status - Local Server not configured!");
-                    subjectId = new BiometricSubject("");
-                }
-            } else {
-//                register locally and nationally
-                if(localBioServerClient.isServerUrlConfigured()){
-                    registrationService.registerLocally(subjectId);
-                    enrollmentStatus = EnrollmentStatus.SUCCESS;
-                    log.error("Local EnrollmentStatus : "+EnrollmentStatus.SUCCESS);
-                }else{
-                    log.error("Local Enrollment Aborted: Status - Local Server not configured!");
-                    subjectId = new BiometricSubject("");
-                }
-
-                if(nationalBioServerClient.isServerUrlConfigured()){
-                    registrationService.registerNationally(capture);
-                    enrollmentStatus = EnrollmentStatus.SUCCESS;
-                    log.error("National EnrollmentStatus : "+EnrollmentStatus.SUCCESS);
-                }else{
-                    log.error("National Enrollment Aborted: Status - National Server not configured!");
-                }
-
-//                retrieve the registered biometrics
-                fingerScanStatus = searchService.checkIfFingerScanExists(capture.getTemplateData());
-                if (fingerScanStatus.isRegisteredNationally()) {
-                    nationalSubject = fingerScanStatus.getNationalBiometricSubject();
-                }
-
-            }
-        } else {
+//        1. If registered both locally and nationally, return the IDs
+        if(fingerScanStatus.isRegisteredLocally() && fingerScanStatus.isRegisteredNationally()){
             subjectId = fingerScanStatus.getLocalBiometricSubject();
+            nationalSubject = fingerScanStatus.getNationalBiometricSubject();
             enrollmentStatus = EnrollmentStatus.ALREADY_REGISTERED;
-            if (!fingerScanStatus.isRegisteredNationally()) {
+        }else if (fingerScanStatus.isRegisteredLocally() || fingerScanStatus.isRegisteredNationally()) {
+//        2. If registered locally but not nationally, try register nationally. If successful, return both IDs, if not, return local ID and queue for later national registration
+//        3. If registered nationally but not locally, try register locally. If successful, return both IDs, if not, return national ID and queue for later local registration - should be very rare
+            enrollmentStatus = EnrollmentStatus.ALREADY_REGISTERED;
+            if (fingerScanStatus.isRegisteredLocally()) {
+                log.error("Processing the Local Match");
+                subjectId = fingerScanStatus.getLocalBiometricSubject();
 //                Enroll nationally
-                registrationService.registerNationally(capture);
-                fingerScanStatus = searchService.checkIfFingerScanExists(capture.getTemplateData());
-                if (fingerScanStatus.isRegisteredNationally()) {
-                    nationalSubject = fingerScanStatus.getNationalBiometricSubject();
+                if (nationalBioServerClient.isServerUrlConfigured()) {
+                    registrationService.registerNationally(capture);
+                    fingerScanStatus = searchService.checkIfFingerScanExists(capture.getTemplateData());
+                    if (fingerScanStatus.isRegisteredNationally()) {
+                        nationalSubject = fingerScanStatus.getNationalBiometricSubject();
+                    } else {
+//                    National registration did not happen - queue for later sync
+//                        SyncFingerprint syncFingerprint = new SyncFingerprint(subjectId.getSubjectId(), fingerprintXmlTemplate);
+//                    syncFingerprintService.saveOrUpdate(syncFingerprint);
+                        nationalSubject = null;
+                    }
                 }
 
-            }else{
+            } else {
+                log.error("Processing the National Match");
                 nationalSubject = fingerScanStatus.getNationalBiometricSubject();
+//                Enroll Locally
+                if (localBioServerClient.isServerUrlConfigured()) {
+                    registrationService.registerLocally(subjectId,capture);
+                    fingerScanStatus = searchService.checkIfFingerScanExists(capture.getTemplateData());
+                    if (fingerScanStatus.isRegisteredLocally()) {
+                        subjectId = fingerScanStatus.getLocalBiometricSubject();
+                    } else {
+//                    Local registration did not happen - queue for later sync
+//                        SyncFingerprint syncFingerprint = new SyncFingerprint(nationalSubject.getSubjectId(), fingerprintXmlTemplate);
+//                    syncFingerprintService.saveOrUpdate(syncFingerprint);
+                        subjectId = null;
+                    }
+                }
             }
         }
+        else {
+            log.error("No match found on both local and national servers =========================>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+//        4. Not registered locally and nationally - register - register locally and nationally
+            if (localBioServerClient.isServerUrlConfigured()) {
+                registrationService.registerLocally(subjectId,capture);
+                log.error("Local EnrollmentStatus : " + EnrollmentStatus.SUCCESS);
+            }
+            if (nationalBioServerClient.isServerUrlConfigured()) {
+                registrationService.registerNationally(capture);
+                log.error("National EnrollmentStatus : " + EnrollmentStatus.SUCCESS);
+            }
+//                retrieve the registered biometrics
+            fingerScanStatus = searchService.checkIfFingerScanExists(capture.getTemplateData());
+            if (fingerScanStatus.isRegisteredNationally() || fingerScanStatus.isRegisteredLocally()) {
+                enrollmentStatus = EnrollmentStatus.SUCCESS;
+            }else{
+                enrollmentStatus = EnrollmentStatus.ERROR;
+            }
+
+//            if (!fingerScanStatus.isRegisteredNationally() || !fingerScanStatus.isRegisteredLocally()) {
+//                   Registration did not happen - queue for later sync
+//                SyncFingerprint syncFingerprint = new SyncFingerprint(subjectId.getSubjectId(), fingerprintXmlTemplate);
+//                    syncFingerprintService.saveOrUpdate(syncFingerprint);
+//            }
+            subjectId = fingerScanStatus.getLocalBiometricSubject();
+            nationalSubject = fingerScanStatus.getNationalBiometricSubject();
+        }
+
+//        if (!fingerScanStatus.isRegisteredLocally()) {
+//            if (fingerScanStatus.isRegisteredNationally()) {
+//                nationalSubject = fingerScanStatus.getNationalBiometricSubject();
+//                enrollmentStatus = EnrollmentStatus.ALREADY_REGISTERED;
+//                if(localBioServerClient.isServerUrlConfigured()){
+//                    registrationService.registerLocally(subjectId);
+//                    log.error("Local EnrollmentStatus : "+EnrollmentStatus.SUCCESS);
+//                }else{
+//                    log.error("Local Enrollment Aborted: Status - Local Server not configured!");
+//                    subjectId = new BiometricSubject("");
+//                }
+//            } else {
+//
+//
+//            }
+//        } else {
+//            subjectId = fingerScanStatus.getLocalBiometricSubject();
+//            enrollmentStatus = EnrollmentStatus.ALREADY_REGISTERED;
+//            if (!fingerScanStatus.isRegisteredNationally()) {
+////                Enroll nationally
+//                registrationService.registerNationally(capture);
+//                fingerScanStatus = searchService.checkIfFingerScanExists(capture.getTemplateData());
+//                if (fingerScanStatus.isRegisteredNationally()) {
+//                    nationalSubject = fingerScanStatus.getNationalBiometricSubject();
+//                }else{
+////                    National registration did not happen - queue for later sync
+//                    SyncFingerprint syncFingerprint = new SyncFingerprint(subjectId.getSubjectId(), fingerprintXmlTemplate);
+////                    syncFingerprintService.saveOrUpdate(syncFingerprint);
+//                }
+//
+//            }else{
+//                nationalSubject = fingerScanStatus.getNationalBiometricSubject();
+//            }
+//        }
         return new EnrollmentResult(subjectId, nationalSubject, enrollmentStatus);
     }
 
@@ -168,7 +218,7 @@ public class M2SysV105Client extends AbstractM2SysClient {
 
         if (!results.isChangeIdSuccess()) {
             throw new M2SysBiometricsException("Unable to change ID from " + oldId
-                + " to " + newId);
+                    + " to " + newId);
         }
 
         return new BiometricSubject(newId);

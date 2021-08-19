@@ -38,6 +38,7 @@ public class SearchServiceImpl implements SearchService {
     @Override
     public List<BiometricMatch> searchLocally(String biometricXml) {
         String response = localBioServerClient.identify(biometricXml);
+        LOGGER.error("Identify Results   <><><><><><><><><> : "+response);
         M2SysResults results = XmlResultUtil.parse(response);
 
         if (results.isSearchError()) {
@@ -49,10 +50,14 @@ public class SearchServiceImpl implements SearchService {
 
     @Override
     public List<BiometricMatch> searchNationally(String biometricXml) {
-        List<BiometricMatch> biometricMatches;
-        CloudAbisResult response = nationalBioServerClient.identifyAbis(biometricXml);
-        biometricMatches = toOpenMrsMatchList(response);
-        return biometricMatches;
+        String response = nationalBioServerClient.identify(biometricXml);
+        M2SysResults results = XmlResultUtil.parse(response);
+
+        if (results.isSearchError()) {
+            throw new M2SysBiometricsException("Error occurred during national fingerprint search: " + results.firstValue());
+        }
+
+        return results.toOpenMrsMatchList();
     }
 
     public List<BiometricMatch> toOpenMrsMatchList(CloudAbisResult result) {
@@ -90,15 +95,15 @@ public class SearchServiceImpl implements SearchService {
 
     @Override
     public FingerScanStatus checkIfFingerScanExists(String biometricXml) {
+        LOGGER.error("SearchServiceImpl.checkIfFingerScanExists() ==================>>>>>>>>>>>>>>>" + biometricXml);
         BiometricSubject nationalBiometricSubject = null;
         BiometricSubject localBiometricSubject = null;
 
         if (localBioServerClient.isServerUrlConfigured()) {
             try {
-
 //                TODO - Ping the local fingerprint server to see if there is a connection over and above the configurations
                 localBiometricSubject = findMostAdequateSubjectLocally(biometricXml);
-                localBiometricSubject = validateLocalSubjectExistence(localBiometricSubject);
+//                localBiometricSubject = validateLocalSubjectExistence(localBiometricSubject);
             } catch (RuntimeException exception) {
                 LOGGER.error("Connection failure to local server.", exception);
             }
@@ -113,14 +118,15 @@ public class SearchServiceImpl implements SearchService {
             }
         }
 
+        LOGGER.error("SearchServiceImpl.checkIfFingerScanExists() Results ==================Local: >>>>>>>>>>>>>>>" + localBiometricSubject + "National: >>>>>>>>>>>>>>>" + nationalBiometricSubject);
         return new FingerScanStatus(localBiometricSubject, nationalBiometricSubject);
     }
 
-    private BiometricSubject validateLocalSubjectExistence(BiometricSubject localBiometricSubject) {
-        return localBiometricSubject == null || patientHelper.findByLocalFpId(localBiometricSubject.getSubjectId()) == null
-                ? null
-                : localBiometricSubject;
-    }
+//    private BiometricSubject validateLocalSubjectExistence(BiometricSubject localBiometricSubject) {
+//        return localBiometricSubject == null || patientHelper.findByLocalFpId(localBiometricSubject.getSubjectId()) == null
+//                ? null
+//                : localBiometricSubject;
+//    }
 
     private BiometricSubject findMostAdequateSubjectLocally(String biometricXml) {
         BiometricMatch biometricMatch = findMostAdequateLocally(biometricXml);

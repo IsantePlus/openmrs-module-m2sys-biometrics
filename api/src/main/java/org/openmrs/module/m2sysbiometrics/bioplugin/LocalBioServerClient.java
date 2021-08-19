@@ -3,12 +3,20 @@ package org.openmrs.module.m2sysbiometrics.bioplugin;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.module.m2sysbiometrics.M2SysBiometricsConstants;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
+import org.springframework.ws.WebServiceMessageFactory;
 
 @Component
 public class LocalBioServerClient extends AbstractBioServerClient {
 
 	private final Log log = LogFactory.getLog(LocalBioServerClient.class);
+
+	@Autowired
+	public LocalBioServerClient(@Qualifier("m2sysbiometrics.messageFactory") WebServiceMessageFactory messageFactory){
+	    setMessageFactory(messageFactory);
+    }
 	
     @Override
     protected String getServerUrlPropertyName() {
