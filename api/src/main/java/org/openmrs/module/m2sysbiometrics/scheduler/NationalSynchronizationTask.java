@@ -15,6 +15,9 @@ import org.openmrs.module.m2sysbiometrics.service.UpdateService;
 import org.openmrs.scheduler.tasks.AbstractTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.List;
 
 public class NationalSynchronizationTask extends AbstractTask {
 
@@ -23,7 +26,7 @@ public class NationalSynchronizationTask extends AbstractTask {
     public static final String TASK_DESCRIPTION = "M2Sys Biometrics task for retry of the national synchronization "
             + "failures.";
 
-    public static final long DEFAULT_INTERVAL_SECONDS = 3600;
+    public static final long DEFAULT_INTERVAL_SECONDS = 7200;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(NationalSynchronizationTask.class);
 
