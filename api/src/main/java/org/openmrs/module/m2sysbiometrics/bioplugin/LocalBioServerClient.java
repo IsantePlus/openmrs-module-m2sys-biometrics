@@ -13,11 +13,6 @@ public class LocalBioServerClient extends AbstractBioServerClient {
 
 	private final Log log = LogFactory.getLog(LocalBioServerClient.class);
 
-	@Autowired
-	public LocalBioServerClient(@Qualifier("m2sysbiometrics.messageFactory") WebServiceMessageFactory messageFactory){
-	    setMessageFactory(messageFactory);
-    }
-	
     @Override
     protected String getServerUrlPropertyName() {
         return M2SysBiometricsConstants.M2SYS_LOCAL_SERVICE_URL;
