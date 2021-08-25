@@ -38,7 +38,7 @@ public abstract class AbstractBioServerClient extends WebServiceGatewaySupport i
     public void init() {
         setMarshaller(marshaller);
         setUnmarshaller(marshaller);
-//        setMessageFactory(context.getBean("m2sysbiometrics.messageFactory", SaajSoapMessageFactory.class));
+        setMessageFactory(context.getBean("m2sysbiometrics.messageFactory", SaajSoapMessageFactory.class));
 //        setMessageFactory(messageFactory);
     }
 
