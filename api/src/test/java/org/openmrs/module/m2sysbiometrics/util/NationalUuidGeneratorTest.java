@@ -54,6 +54,6 @@ public class NationalUuidGeneratorTest {
         String uuid = nationalUuidGenerator.generate();
 
         assertNotNull(uuid);
-        verify(nationalBioServerClient, times(2)).isRegistered(anyString());
+        verify(nationalBioServerClient, times(1)).isRegistered(anyString());
     }
 }
