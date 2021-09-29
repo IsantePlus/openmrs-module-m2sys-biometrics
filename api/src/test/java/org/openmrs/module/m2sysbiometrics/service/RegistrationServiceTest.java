@@ -1,5 +1,6 @@
 package org.openmrs.module.m2sysbiometrics.service;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
