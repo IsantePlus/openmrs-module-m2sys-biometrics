@@ -32,7 +32,7 @@ public abstract class AbstractBioServerClient extends WebServiceGatewaySupport i
 //    private WebServiceMessageFactory messageFactory;
 
     @Autowired
-    private ApplicationContext context;
+    protected ApplicationContext context;
 
     @PostConstruct
     public void init() {
