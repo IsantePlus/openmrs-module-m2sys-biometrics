@@ -13,6 +13,7 @@ import org.openmrs.module.m2sysbiometrics.util.M2SysProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
@@ -36,7 +37,7 @@ public class NationalBioServerClient extends AbstractBioServerClient {
     private final Log log = LogFactory.getLog(NationalBioServerClient.class);
 
     public NationalBioServerClient() {
-        setMessageFactory(context.getBean("m2sysbiometrics.messageFactory", SaajSoapMessageFactory.class));
+        setMessageFactory(messageFactory);
     }
 
     @Override
