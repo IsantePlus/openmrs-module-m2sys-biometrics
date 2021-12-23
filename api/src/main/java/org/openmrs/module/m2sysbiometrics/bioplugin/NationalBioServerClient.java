@@ -19,7 +19,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.ws.WebServiceMessageFactory;
-import org.springframework.ws.soap.saaj.SaajSoapMessageFactory;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -36,7 +35,7 @@ public class NationalBioServerClient extends AbstractBioServerClient {
     private final Log log = LogFactory.getLog(NationalBioServerClient.class);
 
     public NationalBioServerClient() {
-        setMessageFactory(context.getBean("m2sysbiometrics.messageFactory", SaajSoapMessageFactory.class));
+        setMessageFactory(messageFactory);
     }
 
     @Override
