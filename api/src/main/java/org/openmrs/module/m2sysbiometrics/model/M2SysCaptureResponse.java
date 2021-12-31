@@ -1,66 +1,68 @@
 package org.openmrs.module.m2sysbiometrics.model;
 
-import org.codehaus.jackson.annotate.JsonIgnore;
-import org.codehaus.jackson.annotate.JsonProperty;
-import org.openmrs.module.m2sysbiometrics.exception.M2SysBiometricsException;
-import org.xml.sax.InputSource;
-
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import java.io.StringReader;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
+import org.codehaus.jackson.annotate.JsonProperty;
+import org.openmrs.module.m2sysbiometrics.exception.M2SysBiometricsException;
+import org.xml.sax.InputSource;
+
 public class M2SysCaptureResponse extends AbstractM2SysResponse {
-    private static final long serialVersionUID = -3527335270475362208L;
 
-    @JsonProperty("TemplateData")
-    private String templateData;
+	private static final long serialVersionUID = -3527335270475362208L;
 
-    @JsonProperty("BioImageData")
-    private String bioImageData;
+	@JsonProperty("TemplateData")
+	private String templateData;
 
-    @JsonProperty("FaceImageData")
-    private String faceImageData;
+	@JsonProperty("BioImageData")
+	private String bioImageData;
 
-    public String getTemplateData() {
-        return templateData;
-    }
+	@JsonProperty("FaceImageData")
+	private String faceImageData;
 
-    public void setTemplateData(String templateData) {
-        this.templateData = templateData;
-    }
+	public String getTemplateData() {
+		return templateData;
+	}
 
-    public String getBioImageData() {
-        return bioImageData;
-    }
+	public void setTemplateData(String templateData) {
+		this.templateData = templateData;
+	}
 
-    public void setBioImageData(String bioImageData) {
-        this.bioImageData = bioImageData;
-    }
+	public String getBioImageData() {
+		return bioImageData;
+	}
 
-    public String getFaceImageData() {
-        return faceImageData;
-    }
+	public void setBioImageData(String bioImageData) {
+		this.bioImageData = bioImageData;
+	}
 
-    public void setFaceImageData(String faceImageData) {
-        this.faceImageData = faceImageData;
-    }
+	public String getFaceImageData() {
+		return faceImageData;
+	}
 
-    @JsonIgnore
-    public Fingers getFingerData(JAXBContext jaxbContext) {
-        try {
-            Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+	public void setFaceImageData(String faceImageData) {
+		this.faceImageData = faceImageData;
+	}
 
-            InputSource inputSource = new InputSource(new StringReader(templateData));
+	@JsonIgnore
+	public Fingers getFingerData(JAXBContext jaxbContext) {
+		try {
+			Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
 
-            Fingers fingers =  (Fingers) unmarshaller.unmarshal(inputSource);
+			InputSource inputSource = new InputSource(new StringReader(templateData));
 
-            fingers.trimData();
+			Fingers fingers = (Fingers) unmarshaller.unmarshal(inputSource);
 
-            return fingers;
-        } catch (JAXBException e) {
-            throw new M2SysBiometricsException("Unable to parse template data in capture response: "
-                + templateData, e);
-        }
-    }
+			fingers.trimData();
+
+			return fingers;
+		}
+		catch (JAXBException e) {
+			throw new M2SysBiometricsException("Unable to parse template data in capture response: "
+					+ templateData, e);
+		}
+	}
 }

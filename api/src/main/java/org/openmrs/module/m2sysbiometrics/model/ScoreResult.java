@@ -2,38 +2,40 @@ package org.openmrs.module.m2sysbiometrics.model;
 
 import org.codehaus.jackson.annotate.JsonProperty;
 
-public class ScoreResult extends M2SysData{
-    private static final long serialVersionUID = 2642478741112327810L;
-    @JsonProperty("Score")
-    private Integer score;
+public class ScoreResult extends M2SysData {
 
-    @JsonProperty("ID")
-    private String matchId;
+	private static final long serialVersionUID = 2642478741112327810L;
 
-    @JsonProperty("FingerPosition")
-    private Integer fingerPosition;
+	@JsonProperty("Score")
+	private Integer score;
 
-    public Integer getScore() {
-        return score;
-    }
+	@JsonProperty("ID")
+	private String matchId;
 
-    public void setScore(Integer score) {
-        this.score = score;
-    }
+	@JsonProperty("FingerPosition")
+	private Integer fingerPosition;
 
-    public Integer getFingerPosition() {
-        return fingerPosition;
-    }
+	public Integer getScore() {
+		return score;
+	}
 
-    public void setFingerPosition(Integer fingerPosition) {
-        this.fingerPosition = fingerPosition;
-    }
+	public void setScore(Integer score) {
+		this.score = score;
+	}
 
-    public String getMatchId() {
-        return matchId;
-    }
+	public Integer getFingerPosition() {
+		return fingerPosition;
+	}
 
-    public void setMatchId(String matchId) {
-        this.matchId = matchId;
-    }
+	public void setFingerPosition(Integer fingerPosition) {
+		this.fingerPosition = fingerPosition;
+	}
+
+	public String getMatchId() {
+		return matchId;
+	}
+
+	public void setMatchId(String matchId) {
+		this.matchId = matchId;
+	}
 }

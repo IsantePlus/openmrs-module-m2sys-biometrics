@@ -4,38 +4,39 @@ import org.codehaus.jackson.annotate.JsonProperty;
 
 public class AbstractM2SysRequest extends M2SysData {
 
-    private static final long serialVersionUID = -8902210266672985893L;
+	private static final long serialVersionUID = -8902210266672985893L;
 
-  //  @JsonProperty("CustomerKey")
-  //  private String customerKey;
+	//  @JsonProperty("CustomerKey")
+	//  private String customerKey;
 
- //   @JsonProperty("AccessPointID")
- //   private String accessPointId;
+	//   @JsonProperty("AccessPointID")
+	//   private String accessPointId;
 
-    @JsonProperty("CaptureTimeOut")
-    private Float captureTimeout;
-/*
-    public String getCustomerKey() {
-        return customerKey;
-    }
+	@JsonProperty("CaptureTimeOut")
+	private Float captureTimeout;
 
-    public void setCustomerKey(String customerKey) {
-        this.customerKey = customerKey;
-    }
+	/*
+		public String getCustomerKey() {
+			return customerKey;
+		}
 
-    public String getAccessPointId() {
-        return accessPointId;
-    }
+		public void setCustomerKey(String customerKey) {
+			this.customerKey = customerKey;
+		}
 
-    public void setAccessPointId(String accessPointId) {
-        this.accessPointId = accessPointId;
-    }
-*/
-    public Float getCaptureTimeout() {
-        return captureTimeout;
-    }
+		public String getAccessPointId() {
+			return accessPointId;
+		}
 
-    public void setCaptureTimeout(Float captureTimeout) {
-        this.captureTimeout = captureTimeout;
-    }
+		public void setAccessPointId(String accessPointId) {
+			this.accessPointId = accessPointId;
+		}
+	*/
+	public Float getCaptureTimeout() {
+		return captureTimeout;
+	}
+
+	public void setCaptureTimeout(Float captureTimeout) {
+		this.captureTimeout = captureTimeout;
+	}
 }

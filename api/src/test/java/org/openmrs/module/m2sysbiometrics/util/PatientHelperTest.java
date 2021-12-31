@@ -1,23 +1,5 @@
 package org.openmrs.module.m2sysbiometrics.util;
 
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.openmrs.Patient;
-import org.openmrs.PatientIdentifier;
-import org.openmrs.PatientIdentifierType;
-import org.openmrs.api.PatientService;
-import org.openmrs.api.context.Context;
-import org.openmrs.module.m2sysbiometrics.util.impl.PatientHelperImpl;
-import org.openmrs.module.registrationcore.api.RegistrationCoreService;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
-
-import java.util.Collections;
-import java.util.UUID;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.any;
@@ -30,139 +12,157 @@ import static org.openmrs.module.registrationcore.RegistrationCoreConstants.GP_B
 import static org.openmrs.module.registrationcore.RegistrationCoreConstants.GP_BIOMETRICS_PERSON_IDENTIFIER_TYPE_UUID;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
+import java.util.Collections;
+import java.util.UUID;
+
+import org.junit.Ignore;
+import org.junit.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.openmrs.Patient;
+import org.openmrs.PatientIdentifier;
+import org.openmrs.PatientIdentifierType;
+import org.openmrs.api.PatientService;
+import org.openmrs.api.context.Context;
+import org.openmrs.module.m2sysbiometrics.util.impl.PatientHelperImpl;
+import org.openmrs.module.registrationcore.api.RegistrationCoreService;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+
 @Ignore("Skipping failing tests for now. See https://github.com/IsantePlus/openmrs-module-m2sys-biometrics/issues/56")
 // @RunWith(PowerMockRunner.class)
-@PrepareForTest({Context.class})
+@PrepareForTest({ Context.class })
 public class PatientHelperTest {
 
-    private static final String LOCAL_ID_TYPE_UUID = UUID.randomUUID().toString();
-    private static final String NATIONAL_ID_TYPE_UUID = UUID.randomUUID().toString();
-    private static final String SUBJECT_ID = "xxxx-234";
+	private static final String LOCAL_ID_TYPE_UUID = UUID.randomUUID().toString();
 
-    @InjectMocks
-    private PatientHelper patientHelper = new PatientHelperImpl();
+	private static final String NATIONAL_ID_TYPE_UUID = UUID.randomUUID().toString();
 
-    @Mock
-    private PatientService patientService;
+	private static final String SUBJECT_ID = "xxxx-234";
 
-    @Mock
-    private RegistrationCoreService registrationCoreService;
+	@InjectMocks
+	private PatientHelper patientHelper = new PatientHelperImpl();
 
-    @Mock
-    private M2SysProperties properties;
+	@Mock
+	private PatientService patientService;
 
-    @Mock
-    private PatientIdentifierType idType;
+	@Mock
+	private RegistrationCoreService registrationCoreService;
 
-    @Mock
-    private Patient patient;
+	@Mock
+	private M2SysProperties properties;
 
-    @Test
-    public void shouldReturnNullIfLocalFpIdNotDefined() {
-        // given
-        when(properties.getGlobalProperty(GP_BIOMETRICS_PERSON_IDENTIFIER_TYPE_UUID))
-                .thenReturn(null);
+	@Mock
+	private PatientIdentifierType idType;
 
-        // when
-        Patient result = patientHelper.findByLocalFpId(SUBJECT_ID);
+	@Mock
+	private Patient patient;
 
-        // then
-        assertNull(result);
-        verify(patientService, never()).getPatients(anyString(), anyString(), any(), anyBoolean());
-    }
+	@Test
+	public void shouldReturnNullIfLocalFpIdNotDefined() {
+		// given
+		when(properties.getGlobalProperty(GP_BIOMETRICS_PERSON_IDENTIFIER_TYPE_UUID))
+				.thenReturn(null);
 
-    @Test
-    public void shouldReturnNullIfLocalIdTypeMissing() {
-        // given
-        when(properties.getGlobalProperty(GP_BIOMETRICS_PERSON_IDENTIFIER_TYPE_UUID))
-                .thenReturn(LOCAL_ID_TYPE_UUID);
-        when(patientService.getPatientIdentifierTypeByUuid(LOCAL_ID_TYPE_UUID)).thenReturn(null);
+		// when
+		Patient result = patientHelper.findByLocalFpId(SUBJECT_ID);
 
-        // when
-        Patient result = patientHelper.findByLocalFpId(SUBJECT_ID);
+		// then
+		assertNull(result);
+		verify(patientService, never()).getPatients(anyString(), anyString(), any(), anyBoolean());
+	}
 
-        // then
-        assertNull(result);
-        verify(patientService, never()).getPatients(anyString(), anyString(), any(), anyBoolean());
-    }
+	@Test
+	public void shouldReturnNullIfLocalIdTypeMissing() {
+		// given
+		when(properties.getGlobalProperty(GP_BIOMETRICS_PERSON_IDENTIFIER_TYPE_UUID))
+				.thenReturn(LOCAL_ID_TYPE_UUID);
+		when(patientService.getPatientIdentifierTypeByUuid(LOCAL_ID_TYPE_UUID)).thenReturn(null);
 
-    @Test
-    public void shouldFindPatientByLocalId() {
-        // given
-        when(properties.isGlobalPropertySet(GP_BIOMETRICS_PERSON_IDENTIFIER_TYPE_UUID))
-                .thenReturn(true);
-        when(properties.getGlobalProperty(GP_BIOMETRICS_PERSON_IDENTIFIER_TYPE_UUID))
-                .thenReturn(LOCAL_ID_TYPE_UUID);
+		// when
+		Patient result = patientHelper.findByLocalFpId(SUBJECT_ID);
 
-        when(registrationCoreService.findByPatientIdentifier(SUBJECT_ID, LOCAL_ID_TYPE_UUID))
-                .thenReturn(patient);
-        when(patientService.getPatientIdentifierTypeByUuid(LOCAL_ID_TYPE_UUID)).thenReturn(idType);
+		// then
+		assertNull(result);
+		verify(patientService, never()).getPatients(anyString(), anyString(), any(), anyBoolean());
+	}
 
-        PatientIdentifier pi = new PatientIdentifier();
-        pi.setIdentifierType(idType);
-        when(patient.getIdentifiers()).thenReturn(Collections.singleton(pi));
+	@Test
+	public void shouldFindPatientByLocalId() {
+		// given
+		when(properties.isGlobalPropertySet(GP_BIOMETRICS_PERSON_IDENTIFIER_TYPE_UUID))
+				.thenReturn(true);
+		when(properties.getGlobalProperty(GP_BIOMETRICS_PERSON_IDENTIFIER_TYPE_UUID))
+				.thenReturn(LOCAL_ID_TYPE_UUID);
 
-        mockStatic(Context.class);
+		when(registrationCoreService.findByPatientIdentifier(SUBJECT_ID, LOCAL_ID_TYPE_UUID))
+				.thenReturn(patient);
+		when(patientService.getPatientIdentifierTypeByUuid(LOCAL_ID_TYPE_UUID)).thenReturn(idType);
 
-        // when
-        Patient result = patientHelper.findByLocalFpId(SUBJECT_ID);
+		PatientIdentifier pi = new PatientIdentifier();
+		pi.setIdentifierType(idType);
+		when(patient.getIdentifiers()).thenReturn(Collections.singleton(pi));
 
-        // then
-        assertEquals(patient, result);
-    }
+		mockStatic(Context.class);
 
-    @Test
-    public void shouldReturnNullIfNationalFpIdNotDefined() {
-        // given
-        when(properties.getGlobalProperty(GP_BIOMETRICS_NATIONAL_PERSON_IDENTIFIER_TYPE_UUID))
-                .thenReturn(null);
+		// when
+		Patient result = patientHelper.findByLocalFpId(SUBJECT_ID);
 
-        // when
-        Patient result = patientHelper.findByNationalFpId(SUBJECT_ID);
+		// then
+		assertEquals(patient, result);
+	}
 
-        // then
-        assertNull(result);
-        verify(patientService, never()).getPatients(anyString(), anyString(), any(), anyBoolean());
-    }
+	@Test
+	public void shouldReturnNullIfNationalFpIdNotDefined() {
+		// given
+		when(properties.getGlobalProperty(GP_BIOMETRICS_NATIONAL_PERSON_IDENTIFIER_TYPE_UUID))
+				.thenReturn(null);
 
-    @Test
-    public void shouldReturnNullIfNationalIdTypeMissing() {
-        // given
-        when(properties.getGlobalProperty(GP_BIOMETRICS_NATIONAL_PERSON_IDENTIFIER_TYPE_UUID))
-                .thenReturn(NATIONAL_ID_TYPE_UUID);
-        when(patientService.getPatientIdentifierTypeByUuid(NATIONAL_ID_TYPE_UUID)).thenReturn(null);
+		// when
+		Patient result = patientHelper.findByNationalFpId(SUBJECT_ID);
 
-        // when
-        Patient result = patientHelper.findByNationalFpId(SUBJECT_ID);
+		// then
+		assertNull(result);
+		verify(patientService, never()).getPatients(anyString(), anyString(), any(), anyBoolean());
+	}
 
-        // then
-        assertNull(result);
-        verify(patientService, never()).getPatients(anyString(), anyString(), any(), anyBoolean());
-    }
+	@Test
+	public void shouldReturnNullIfNationalIdTypeMissing() {
+		// given
+		when(properties.getGlobalProperty(GP_BIOMETRICS_NATIONAL_PERSON_IDENTIFIER_TYPE_UUID))
+				.thenReturn(NATIONAL_ID_TYPE_UUID);
+		when(patientService.getPatientIdentifierTypeByUuid(NATIONAL_ID_TYPE_UUID)).thenReturn(null);
 
-    @Test
-    public void shouldFindPatientByNationalId() {
+		// when
+		Patient result = patientHelper.findByNationalFpId(SUBJECT_ID);
 
-        // given
-        when(properties.isGlobalPropertySet(GP_BIOMETRICS_NATIONAL_PERSON_IDENTIFIER_TYPE_UUID))
-                .thenReturn(true);
-        when(properties.getGlobalProperty(GP_BIOMETRICS_NATIONAL_PERSON_IDENTIFIER_TYPE_UUID))
-                .thenReturn(NATIONAL_ID_TYPE_UUID);
+		// then
+		assertNull(result);
+		verify(patientService, never()).getPatients(anyString(), anyString(), any(), anyBoolean());
+	}
 
-        when(patientService.getPatientIdentifierTypeByUuid(NATIONAL_ID_TYPE_UUID)).thenReturn(idType);
-        when(registrationCoreService.findByPatientIdentifier(SUBJECT_ID, NATIONAL_ID_TYPE_UUID))
-                .thenReturn(patient);
+	@Test
+	public void shouldFindPatientByNationalId() {
 
-        PatientIdentifier pi = new PatientIdentifier();
-        pi.setIdentifierType(idType);
-        when(patient.getIdentifiers()).thenReturn(Collections.singleton(pi));
+		// given
+		when(properties.isGlobalPropertySet(GP_BIOMETRICS_NATIONAL_PERSON_IDENTIFIER_TYPE_UUID))
+				.thenReturn(true);
+		when(properties.getGlobalProperty(GP_BIOMETRICS_NATIONAL_PERSON_IDENTIFIER_TYPE_UUID))
+				.thenReturn(NATIONAL_ID_TYPE_UUID);
 
-        mockStatic(Context.class);
+		when(patientService.getPatientIdentifierTypeByUuid(NATIONAL_ID_TYPE_UUID)).thenReturn(idType);
+		when(registrationCoreService.findByPatientIdentifier(SUBJECT_ID, NATIONAL_ID_TYPE_UUID))
+				.thenReturn(patient);
 
-        // when
-        Patient result = patientHelper.findByNationalFpId(SUBJECT_ID);
+		PatientIdentifier pi = new PatientIdentifier();
+		pi.setIdentifierType(idType);
+		when(patient.getIdentifiers()).thenReturn(Collections.singleton(pi));
 
-        // then
-        assertEquals(patient, result);
-    }
+		mockStatic(Context.class);
+
+		// when
+		Patient result = patientHelper.findByNationalFpId(SUBJECT_ID);
+
+		// then
+		assertEquals(patient, result);
+	}
 }

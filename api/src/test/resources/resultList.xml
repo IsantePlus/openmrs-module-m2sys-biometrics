@@ -1,5 +1,5 @@
 <Results>
-    <result score="22" value="10000X" Instance="1"/>
-    <result score="1" value="10001X" Instance="2"/>
-    <result score="102" value="10002X" Instance="3"/>
+  <result score="22" value="10000X" Instance="1"/>
+  <result score="1" value="10001X" Instance="2"/>
+  <result score="102" value="10002X" Instance="3"/>
 </Results>
