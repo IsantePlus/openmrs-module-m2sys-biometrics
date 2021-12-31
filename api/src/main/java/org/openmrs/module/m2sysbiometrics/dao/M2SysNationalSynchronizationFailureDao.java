@@ -1,16 +1,16 @@
 package org.openmrs.module.m2sysbiometrics.dao;
 
-import org.openmrs.module.m2sysbiometrics.model.NationalSynchronizationFailure;
-
 import java.util.List;
+
+import org.openmrs.module.m2sysbiometrics.model.NationalSynchronizationFailure;
 
 public interface M2SysNationalSynchronizationFailureDao {
 
-    NationalSynchronizationFailure save(NationalSynchronizationFailure nationalSynchronizationFailure);
+	NationalSynchronizationFailure save(NationalSynchronizationFailure nationalSynchronizationFailure);
 
-    void delete(NationalSynchronizationFailure nationalSynchronizationFailure);
+	void delete(NationalSynchronizationFailure nationalSynchronizationFailure);
 
-    List<NationalSynchronizationFailure> findAllRegistrationFailures();
+	List<NationalSynchronizationFailure> findAllRegistrationFailures();
 
-    List<NationalSynchronizationFailure> findAllUpdateFailures();
+	List<NationalSynchronizationFailure> findAllUpdateFailures();
 }

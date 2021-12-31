@@ -1,5 +1,10 @@
 package org.openmrs.module.m2sysbiometrics.util;
 
+import static org.junit.Assert.assertNotNull;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -10,50 +15,46 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
 import org.openmrs.module.m2sysbiometrics.bioplugin.NationalBioServerClient;
 
-import static org.junit.Assert.assertNotNull;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-
 @RunWith(MockitoJUnitRunner.class)
 public class NationalUuidGeneratorTest {
 
-    @InjectMocks
-    private NationalUuidGenerator nationalUuidGenerator;
+	@InjectMocks
+	private NationalUuidGenerator nationalUuidGenerator;
 
-    @Mock
-    private NationalBioServerClient nationalBioServerClient;
+	@Mock
+	private NationalBioServerClient nationalBioServerClient;
 
-    @Test
-    public void shouldGenerateUuid() {
-        String response = "<Results><result value='-1'/></Results>";
-        Mockito.when(nationalBioServerClient.isRegistered(anyString())).thenReturn(response);
+	@Test
+	public void shouldGenerateUuid() {
+		String response = "<Results><result value='-1'/></Results>";
+		Mockito.when(nationalBioServerClient.isRegistered(anyString())).thenReturn(response);
 
-        String uuid = nationalUuidGenerator.generate();
+		String uuid = nationalUuidGenerator.generate();
 
-        assertNotNull(uuid);
-        verify(nationalBioServerClient).isRegistered(uuid);
-    }
+		assertNotNull(uuid);
+		verify(nationalBioServerClient).isRegistered(uuid);
+	}
 
-    @Test
-    public void shouldKeepGeneratingUuidIfAlreadyRegistered() {
-        Mockito.when(nationalBioServerClient.isRegistered(anyString())).thenAnswer(new Answer<String>() {
-            private int i = 0;
+	@Test
+	public void shouldKeepGeneratingUuidIfAlreadyRegistered() {
+		Mockito.when(nationalBioServerClient.isRegistered(anyString())).thenAnswer(new Answer<String>() {
 
-            @Override
-            public String answer(InvocationOnMock invocationOnMock) throws Throwable {
-                if (i == 0) {
-                    i++;
-                    return "<Results><result value='REGISTERED_ID'/></Results>";
-                } else {
-                    return "<Results><result value='-1'/></Results>";
-                }
-            }
-        });
+			private int i = 0;
 
-        String uuid = nationalUuidGenerator.generate();
+			@Override
+			public String answer(InvocationOnMock invocationOnMock) throws Throwable {
+				if (i == 0) {
+					i++;
+					return "<Results><result value='REGISTERED_ID'/></Results>";
+				} else {
+					return "<Results><result value='-1'/></Results>";
+				}
+			}
+		});
 
-        assertNotNull(uuid);
-        verify(nationalBioServerClient, times(1)).isRegistered(anyString());
-    }
+		String uuid = nationalUuidGenerator.generate();
+
+		assertNotNull(uuid);
+		verify(nationalBioServerClient, times(1)).isRegistered(anyString());
+	}
 }

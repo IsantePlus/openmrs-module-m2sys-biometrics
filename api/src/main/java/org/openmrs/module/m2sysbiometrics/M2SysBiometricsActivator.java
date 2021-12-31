@@ -24,17 +24,17 @@ import org.slf4j.LoggerFactory;
  */
 public class M2SysBiometricsActivator extends BaseModuleActivator {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(M2SysBiometricsActivator.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(M2SysBiometricsActivator.class);
 
-    @Override
-    public void started() {
-        LOGGER.info("Starting m2sys Biometrics Module");
-        Context.getRegisteredComponents(M2SysSchedulerServiceImpl.class).get(0).runM2SysScheduler();
-    }
+	@Override
+	public void started() {
+		LOGGER.info("Starting m2sys Biometrics Module");
+		Context.getRegisteredComponents(M2SysSchedulerServiceImpl.class).get(0).runM2SysScheduler();
+	}
 
-    @Override
-    public void stopped() {
-        LOGGER.info("Shutting down m2sys Biometrics Module");
-    }
+	@Override
+	public void stopped() {
+		LOGGER.info("Shutting down m2sys Biometrics Module");
+	}
 
 }

@@ -4,73 +4,71 @@ import org.codehaus.jackson.annotate.JsonProperty;
 
 public class CloudScanrStatus extends M2SysData {
 
-    private static final long serialVersionUID = 5297535433389093032L;
+	private static final long serialVersionUID = 5297535433389093032L;
 
-    @JsonProperty("Success")
-    private Boolean success;
+	@JsonProperty("Success")
+	private Boolean success;
 
-    @JsonProperty("Message")
-    private String message;
+	@JsonProperty("Message")
+	private String message;
 
-    @JsonProperty("ResponseCode")
-    private String responseCode;
+	@JsonProperty("ResponseCode")
+	private String responseCode;
 
-    @JsonProperty("CloudScanrAPIVersion")
-    private String cloudScanrAPIVersion;
+	@JsonProperty("CloudScanrAPIVersion")
+	private String cloudScanrAPIVersion;
 
-    @JsonProperty("CloudABISAPIVersion")
-    private String cloudABISAPIVersion;
+	@JsonProperty("CloudABISAPIVersion")
+	private String cloudABISAPIVersion;
 
-    @JsonProperty("ElapsedTimeInSeconds")
-    private String elapsedTimeInSeconds;
+	@JsonProperty("ElapsedTimeInSeconds")
+	private String elapsedTimeInSeconds;
 
+	public Boolean getSuccess() {
+		return success;
+	}
 
+	public void setSuccess(Boolean success) {
+		this.success = success;
+	}
 
-    public Boolean getSuccess() {
-        return success;
-    }
+	public String getMessage() {
+		return message;
+	}
 
-    public void setSuccess(Boolean success) {
-        this.success = success;
-    }
+	public void setMessage(String message) {
+		this.message = message;
+	}
 
-    public String getMessage() {
-        return message;
-    }
+	public String getResponseCode() {
+		return responseCode;
+	}
 
-    public void setMessage(String message) {
-        this.message = message;
-    }
+	public void setResponseCode(String responseCode) {
+		this.responseCode = responseCode;
+	}
 
-    public String getResponseCode() {
-        return responseCode;
-    }
+	public String getCloudScanrAPIVersion() {
+		return cloudScanrAPIVersion;
+	}
 
-    public void setResponseCode(String responseCode) {
-        this.responseCode = responseCode;
-    }
+	public void setCloudScanrAPIVersion(String cloudScanrAPIVersion) {
+		this.cloudScanrAPIVersion = cloudScanrAPIVersion;
+	}
 
-    public String getCloudScanrAPIVersion() {
-        return cloudScanrAPIVersion;
-    }
+	public String getCloudABISAPIVersion() {
+		return cloudABISAPIVersion;
+	}
 
-    public void setCloudScanrAPIVersion(String cloudScanrAPIVersion) {
-        this.cloudScanrAPIVersion = cloudScanrAPIVersion;
-    }
+	public void setCloudABISAPIVersion(String cloudABISAPIVersion) {
+		this.cloudABISAPIVersion = cloudABISAPIVersion;
+	}
 
-    public String getCloudABISAPIVersion() {
-        return cloudABISAPIVersion;
-    }
+	public String getElapsedTimeInSeconds() {
+		return elapsedTimeInSeconds;
+	}
 
-    public void setCloudABISAPIVersion(String cloudABISAPIVersion) {
-        this.cloudABISAPIVersion = cloudABISAPIVersion;
-    }
-
-    public String getElapsedTimeInSeconds() {
-        return elapsedTimeInSeconds;
-    }
-
-    public void setElapsedTimeInSeconds(String elapsedTimeInSeconds) {
-        this.elapsedTimeInSeconds = elapsedTimeInSeconds;
-    }
+	public void setElapsedTimeInSeconds(String elapsedTimeInSeconds) {
+		this.elapsedTimeInSeconds = elapsedTimeInSeconds;
+	}
 }

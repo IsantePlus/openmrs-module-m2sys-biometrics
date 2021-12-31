@@ -3,104 +3,105 @@ package org.openmrs.module.m2sysbiometrics.model;
 import org.codehaus.jackson.annotate.JsonProperty;
 
 public class M2SysCaptureRequest extends AbstractM2SysRequest {
-    private static final long serialVersionUID = 1996985652532947266L;
 
-    @JsonProperty("CaptureType")
-    private Integer captureType;
+	private static final long serialVersionUID = 1996985652532947266L;
 
-    @JsonProperty("CaptureMode")
-    private Integer captureMode;
+	@JsonProperty("CaptureType")
+	private Integer captureType;
 
-    @JsonProperty("SingleCaptureMode")
-    private Integer singleCaptureMode;
+	@JsonProperty("CaptureMode")
+	private Integer captureMode;
 
-    @JsonProperty("QuickScan")
-    private Integer quickScan;
+	@JsonProperty("SingleCaptureMode")
+	private Integer singleCaptureMode;
 
-    @JsonProperty("TemplateFormat")
-    private Integer templateFormat;
+	@JsonProperty("QuickScan")
+	private Integer quickScan;
 
-    @JsonProperty("BioMetricImageFormat")
-    private Integer biometricImageFormat;
+	@JsonProperty("TemplateFormat")
+	private Integer templateFormat;
 
-    @JsonProperty("CaptureOperationName")
-    private Integer captureOperationName;
+	@JsonProperty("BioMetricImageFormat")
+	private Integer biometricImageFormat;
 
-    @JsonProperty("FaceImage")
-    private Integer faceImage;
+	@JsonProperty("CaptureOperationName")
+	private Integer captureOperationName;
 
-    @JsonProperty("DeviceName")
-    private String deviceName;
+	@JsonProperty("FaceImage")
+	private Integer faceImage;
 
-    public Integer getCaptureType() {
-        return captureType;
-    }
+	@JsonProperty("DeviceName")
+	private String deviceName;
 
-    public void setCaptureType(Integer captureType) {
-        this.captureType = captureType;
-    }
+	public Integer getCaptureType() {
+		return captureType;
+	}
 
-    public Integer getCaptureMode() {
-        return captureMode;
-    }
+	public void setCaptureType(Integer captureType) {
+		this.captureType = captureType;
+	}
 
-    public void setCaptureMode(Integer captureMode) {
-        this.captureMode = captureMode;
-    }
+	public Integer getCaptureMode() {
+		return captureMode;
+	}
 
-    public Integer getSingleCaptureMode() {
-        return singleCaptureMode;
-    }
+	public void setCaptureMode(Integer captureMode) {
+		this.captureMode = captureMode;
+	}
 
-    public void setSingleCaptureMode(Integer singleCaptureMode) {
-        this.singleCaptureMode = singleCaptureMode;
-    }
+	public Integer getSingleCaptureMode() {
+		return singleCaptureMode;
+	}
 
-    public Integer getQuickScan() {
-        return quickScan;
-    }
+	public void setSingleCaptureMode(Integer singleCaptureMode) {
+		this.singleCaptureMode = singleCaptureMode;
+	}
 
-    public void setQuickScan(Integer quickScan) {
-        this.quickScan = quickScan;
-    }
+	public Integer getQuickScan() {
+		return quickScan;
+	}
 
-    public Integer getTemplateFormat() {
-        return templateFormat;
-    }
+	public void setQuickScan(Integer quickScan) {
+		this.quickScan = quickScan;
+	}
 
-    public void setTemplateFormat(Integer templateFormat) {
-        this.templateFormat = templateFormat;
-    }
+	public Integer getTemplateFormat() {
+		return templateFormat;
+	}
 
-    public Integer getBiometricImageFormat() {
-        return biometricImageFormat;
-    }
+	public void setTemplateFormat(Integer templateFormat) {
+		this.templateFormat = templateFormat;
+	}
 
-    public void setBiometricImageFormat(Integer biometricImageFormat) {
-        this.biometricImageFormat = biometricImageFormat;
-    }
+	public Integer getBiometricImageFormat() {
+		return biometricImageFormat;
+	}
 
-    public Integer getCaptureOperationName() {
-        return captureOperationName;
-    }
+	public void setBiometricImageFormat(Integer biometricImageFormat) {
+		this.biometricImageFormat = biometricImageFormat;
+	}
 
-    public void setCaptureOperationName(Integer captureOperationName) {
-        this.captureOperationName = captureOperationName;
-    }
+	public Integer getCaptureOperationName() {
+		return captureOperationName;
+	}
 
-    public Integer getFaceImage() {
-        return faceImage;
-    }
+	public void setCaptureOperationName(Integer captureOperationName) {
+		this.captureOperationName = captureOperationName;
+	}
 
-    public void setFaceImage(Integer faceImage) {
-        this.faceImage = faceImage;
-    }
+	public Integer getFaceImage() {
+		return faceImage;
+	}
 
-    public void setDeviceName(String deviceName) {
-        this.deviceName = deviceName;
-    }
+	public void setFaceImage(Integer faceImage) {
+		this.faceImage = faceImage;
+	}
 
-    public String getDeviceName() {
-        return deviceName;
-    }
+	public String getDeviceName() {
+		return deviceName;
+	}
+
+	public void setDeviceName(String deviceName) {
+		this.deviceName = deviceName;
+	}
 }

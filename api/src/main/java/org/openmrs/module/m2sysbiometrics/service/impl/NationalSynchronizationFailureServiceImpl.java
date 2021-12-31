@@ -1,5 +1,7 @@
 package org.openmrs.module.m2sysbiometrics.service.impl;
 
+import java.util.List;
+
 import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.m2sysbiometrics.dao.M2SysNationalSynchronizationFailureDao;
 import org.openmrs.module.m2sysbiometrics.model.NationalSynchronizationFailure;
@@ -7,32 +9,30 @@ import org.openmrs.module.m2sysbiometrics.service.NationalSynchronizationFailure
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 @Service(value = "nationalSynchronizationFailureService")
 public class NationalSynchronizationFailureServiceImpl extends BaseOpenmrsService
-        implements NationalSynchronizationFailureService {
+		implements NationalSynchronizationFailureService {
 
-    @Autowired
-    private M2SysNationalSynchronizationFailureDao dao;
+	@Autowired
+	private M2SysNationalSynchronizationFailureDao dao;
 
-    @Override
-    public NationalSynchronizationFailure save(NationalSynchronizationFailure nationalSynchronizationFailure) {
-        return dao.save(nationalSynchronizationFailure);
-    }
+	@Override
+	public NationalSynchronizationFailure save(NationalSynchronizationFailure nationalSynchronizationFailure) {
+		return dao.save(nationalSynchronizationFailure);
+	}
 
-    @Override
-    public void delete(NationalSynchronizationFailure nationalSynchronizationFailure) {
-        dao.delete(nationalSynchronizationFailure);
-    }
+	@Override
+	public void delete(NationalSynchronizationFailure nationalSynchronizationFailure) {
+		dao.delete(nationalSynchronizationFailure);
+	}
 
-    @Override
-    public List<NationalSynchronizationFailure> findAllRegistrationFailures() {
-        return dao.findAllRegistrationFailures();
-    }
+	@Override
+	public List<NationalSynchronizationFailure> findAllRegistrationFailures() {
+		return dao.findAllRegistrationFailures();
+	}
 
-    @Override
-    public List<NationalSynchronizationFailure> findAllUpdateFailures() {
-        return dao.findAllUpdateFailures();
-    }
+	@Override
+	public List<NationalSynchronizationFailure> findAllUpdateFailures() {
+		return dao.findAllUpdateFailures();
+	}
 }
