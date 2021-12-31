@@ -1,18 +1,18 @@
 package org.openmrs.module.m2sysbiometrics.dao;
 
-import org.openmrs.module.m2sysbiometrics.model.SyncFingerprint;
-
 import java.util.List;
+
+import org.openmrs.module.m2sysbiometrics.model.SyncFingerprint;
 
 public interface SyncFingerprintDao {
 
-    SyncFingerprint saveOrUpdate(SyncFingerprint syncFingerprint);
+	SyncFingerprint saveOrUpdate(SyncFingerprint syncFingerprint);
 
-    void delete(SyncFingerprint syncFingerprint);
+	void delete(SyncFingerprint syncFingerprint);
 
-    SyncFingerprint findOneByBiometricId(String biometricId);
+	SyncFingerprint findOneByBiometricId(String biometricId);
 
-    List<SyncFingerprint> findAllByBiometricXml(String biometricXml);
+	List<SyncFingerprint> findAllByBiometricXml(String biometricXml);
 
-    List<SyncFingerprint> findAll();
+	List<SyncFingerprint> findAll();
 }

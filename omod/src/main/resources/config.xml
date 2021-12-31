@@ -2,285 +2,285 @@
 
 <module configVersion="1.2">
 
-    <!-- Base Module Properties -->
-    <id>${project.parent.artifactId}</id>
-    <name>${project.parent.name}</name>
-    <version>${project.parent.version}</version>
-    <package>${project.parent.groupId}.${project.parent.artifactId}</package>
-    <author>SolDevelo</author>
-    <description>${project.parent.description}</description>
-    <activator>org.openmrs.module.m2sysbiometrics.M2SysBiometricsActivator</activator>
-    <!-- <updateURL>https://modules.openmrs.org/modules/download/@MODULE_ID@/update.rdf</updateURL> -->
-    <!-- /Base Module Properties -->
+  <!-- Base Module Properties -->
+  <id>${project.parent.artifactId}</id>
+  <name>${project.parent.name}</name>
+  <version>${project.parent.version}</version>
+  <package>${project.parent.groupId}.${project.parent.artifactId}</package>
+  <author>SolDevelo</author>
+  <description>${project.parent.description}</description>
+  <activator>org.openmrs.module.m2sysbiometrics.M2SysBiometricsActivator</activator>
+  <!-- <updateURL>https://modules.openmrs.org/modules/download/@MODULE_ID@/update.rdf</updateURL> -->
+  <!-- /Base Module Properties -->
 
-    <require_version>${openmrsPlatformVersion}</require_version>
+  <require_version>${openmrsPlatformVersion}</require_version>
 
-    <!-- Extensions -->
-    <extension>
-        <point>org.openmrs.admin.list</point>
-    </extension>
+  <!-- Extensions -->
+  <extension>
+    <point>org.openmrs.admin.list</point>
+  </extension>
 
-    <require_modules>
-        <require_module>
-            org.openmrs.module.registrationcore
-        </require_module>
-    </require_modules>
+  <require_modules>
+    <require_module>
+      org.openmrs.module.registrationcore
+    </require_module>
+  </require_modules>
 
-    <aware_of_modules>
-        <aware_of_module>org.openmrs.module.registrationcore</aware_of_module>
-    </aware_of_modules>
+  <aware_of_modules>
+    <aware_of_module>org.openmrs.module.registrationcore</aware_of_module>
+  </aware_of_modules>
 
-    <require_modules>
-        <require_module>
-            org.apache.commons.httpclient
-        </require_module>
-    </require_modules>
+  <require_modules>
+    <require_module>
+      org.apache.commons.httpclient
+    </require_module>
+  </require_modules>
 
-    <aware_of_modules>
-        <aware_of_module>org.apache.commons.httpclient</aware_of_module>
-    </aware_of_modules>
+  <aware_of_modules>
+    <aware_of_module>org.apache.commons.httpclient</aware_of_module>
+  </aware_of_modules>
 
-    <require_modules>
-        <require_module>
-            org.springframework.web.client
-        </require_module>
-    </require_modules>
+  <require_modules>
+    <require_module>
+      org.springframework.web.client
+    </require_module>
+  </require_modules>
 
-    <aware_of_modules>
-        <aware_of_module>org.springframework.web.client</aware_of_module>
-    </aware_of_modules>
+  <aware_of_modules>
+    <aware_of_module>org.springframework.web.client</aware_of_module>
+  </aware_of_modules>
 
-    <!-- AOP
-    <advice>
-        <point>org.openmrs.api.FormService</point>
-        <class>@MODULE_PACKAGE@.advice.DuplicateFormAdvisor</class>
-    </advice>
-     /AOP -->
+  <!-- AOP
+  <advice>
+      <point>org.openmrs.api.FormService</point>
+      <class>@MODULE_PACKAGE@.advice.DuplicateFormAdvisor</class>
+  </advice>
+   /AOP -->
 
-    <!-- Required Privileges
-    <privilege>
-        <name>Form Entry</name>
-        <description>Allows user to access Form Entry pages/functions</description>
-    </privilege>
-     /Required Privileges -->
-
-
-    <!-- Required Global Properties  -->
-    <globalProperty>
-        <property>${project.parent.artifactId}.server.url</property>
-        <defaultValue></defaultValue>
-        <description>
-            The m2sys CloudScanr url.
-        </description>
-    </globalProperty>
-
-    <globalProperty>
-        <property>${project.parent.artifactId}.server.user</property>
-        <defaultValue></defaultValue>
-        <description>
-            The m2sys CloudScanr username.
-        </description>
-    </globalProperty>
-
-    <globalProperty>
-        <property>${project.parent.artifactId}.server.national.user</property>
-        <defaultValue></defaultValue>
-        <description>
-            The m2sys national server username.
-        </description>
-    </globalProperty>
-
-    <globalProperty>
-        <property>${project.parent.artifactId}.server.password</property>
-        <defaultValue></defaultValue>
-        <description>
-            The m2sys CloudScanr password.
-        </description>
-    </globalProperty>
-
-    <globalProperty>
-        <property>${project.parent.artifactId}.server.national.password</property>
-        <defaultValue></defaultValue>
-        <description>
-            The m2sys national server password.
-        </description>
-    </globalProperty>
-
-    <globalProperty>
-        <property>${project.parent.artifactId}.locationID</property>
-        <defaultValue></defaultValue>
-        <description>
-            The m2sys server location ID.
-        </description>
-    </globalProperty>
-
-    <globalProperty>
-        <property>${project.parent.artifactId}.customKey</property>
-        <defaultValue></defaultValue>
-        <description>
-            The m2sys server CustomKey.
-        </description>
-    </globalProperty>
-
-    <globalProperty>
-        <property>${project.parent.artifactId}.accessPointID</property>
-        <defaultValue></defaultValue>
-        <description>
-            The m2sys server AccessPointID. This is used by default unless a mapping that matches the callers IP
-            is found in the accessPointMap property.
-        </description>
-    </globalProperty>
-
-    <globalProperty>
-        <property>${project.parent.artifactId}.captureTimeout</property>
-        <defaultValue></defaultValue>
-        <description>
-            The m2sys server CaptureTimeout.
-        </description>
-    </globalProperty>
-
-    <globalProperty>
-        <property>${project.parent.artifactId}.device.name</property>
-        <defaultValue>DigitalPersona</defaultValue>
-        <description>
-            The m2sys fingerprint scanning device name.
-        </description>
-    </globalProperty>
-
-    <globalProperty>
-        <property>${project.parent.artifactId}.local-service.url</property>
-        <defaultValue></defaultValue>
-        <description>
-            The URL to the SOAP service of the local (local to the clinic) M2Sys BioPlugin Server.
-        </description>
-    </globalProperty>
-
-    <globalProperty>
-        <property>${project.parent.artifactId}.national-service.url</property>
-        <defaultValue></defaultValue>
-        <description>
-            The URL to the SOAP service of the national M2Sys BioPlugin Server.
-        </description>
-    </globalProperty>
-
-    <globalProperty>
-        <property>${project.parent.artifactId}.server.constTestTemplate</property>
-        <defaultValue></defaultValue>
-        <description>
-            A default test fingerprint template for instances when the fingerprint scanner is not available.
-        </description>
-    </globalProperty>
-    <globalProperty>
-        <property>${project.parent.artifactId}.cloudabis.app.key</property>
-        <defaultValue></defaultValue>
-        <description>
-            Client assigned CLOUDABIS APP KEY for access to the cloud fingerprint matching engine API endpoints.
-        </description>
-    </globalProperty>
-    <globalProperty>
-        <property>${project.parent.artifactId}.cloudabis.secret.key</property>
-        <defaultValue></defaultValue>
-        <description>
-            Client assigned SECRET KEY for access to the cloud fingerprint matching engine API endpoints.
-        </description>
-    </globalProperty>
-    <globalProperty>
-        <property>${project.parent.artifactId}.cloudabis.grant.type</property>
-        <defaultValue></defaultValue>
-        <description>
-            Client preferred grant type for access to the cloud fingerprint matching engine API endpoints.
-        </description>
-    </globalProperty>
-    <globalProperty>
-        <property>${project.parent.artifactId}.cloudabis.api.url</property>
-        <defaultValue></defaultValue>
-        <description>
-            Base URL to the cloud fingerprint matching engine API endpoints.
-        </description>
-    </globalProperty>
-    <globalProperty>
-        <property>${project.parent.artifactId}.cloudabis.customer.key</property>
-        <defaultValue></defaultValue>
-        <description>
-            User assigned customer key for grouping different CLOUDABIS Apps.
-        </description>
-    </globalProperty>
-    <globalProperty>
-        <property>${project.parent.artifactId}.cloudabis.engine.name</property>
-        <defaultValue></defaultValue>
-        <description>
-            User preffered engine for processing CLOUDABIS requests.
-        </description>
-    </globalProperty>
-    <globalProperty>
-        <property>${project.parent.artifactId}.cloudabis.template.format</property>
-        <defaultValue>ISO</defaultValue>
-        <description>
-            Preferred template format - Usually tied to the capabilities of the user-procured fingerprint scanner.
-        </description>
-    </globalProperty>
-
-    <globalProperty>
-        <property>${project.parent.artifactId}.accessPointMap</property>
-        <defaultValue></defaultValue>
-        <description>
-            A map of IP addresses to Access Point IDs. Has format of IP1:AccessPointID1;IP2:AccessPointID2;...
-            For example 127.0.0.1:APID1;8.8.8.8:APID2... The IPs must match the IPs of the clients calling the
-            server.
-        </description>
-    </globalProperty>
-
-    <globalProperty>
-        <property>${project.parent.artifactId}.nationalRegistrationTaskInterval</property>
-        <description>
-            Interval time (in seconds) to execute retry of national registration failures task.
-        </description>
-    </globalProperty>
-
-    <!-- /Required Global Properties -->
-
-    <!--
-    <dwr>
-        <allow>
-            <create creator="new" javascript="DWRFormEntryService">
-                <param name="class" value="org.openmrs.module.@MODULE_ID@.web.DWRFormEntryService"/>
-                <include method="enterForm"/>
-            </create>
-        </allow>
-
-        <signatures>
-            <![CDATA[
-            import @MODULE_PACKAGE@.web.DWRFormEntryService;
-            DWRFormEntryService.enterForm(Integer patientId, Integer formId, boolean useEncounter, List<String> fields);
-            ]]>
-        </signatures>
-    </dwr>
-    -->
-
-    <!-- Servlets -->
-    <!-- Accessed through the url /pageContext()/moduleServlet/<moduleId>/<servlet-name>
-    <servlet>
-        <servlet-name>formDownload</servlet-name>
-        <servlet-class>@MODULE_PACKAGE@.web.FormDownloadServlet</servlet-class>
-    </servlet>
-    -->
-    <!-- /Servlets -->
+  <!-- Required Privileges
+  <privilege>
+      <name>Form Entry</name>
+      <description>Allows user to access Form Entry pages/functions</description>
+  </privilege>
+   /Required Privileges -->
 
 
-    <!-- Internationalization -->
-    <!-- All message codes should start with @MODULE_ID@.* -->
-    <messages>
-        <lang>en</lang>
-        <file>messages.properties</file>
-    </messages>
-    <messages>
-        <lang>fr</lang>
-        <file>messages_fr.properties</file>
-    </messages>
-    <messages>
-        <lang>es</lang>
-        <file>messages_es.properties</file>
-    </messages>
-    <!-- /Internationalization -->
+  <!-- Required Global Properties  -->
+  <globalProperty>
+    <property>${project.parent.artifactId}.server.url</property>
+    <defaultValue></defaultValue>
+    <description>
+      The m2sys CloudScanr url.
+    </description>
+  </globalProperty>
+
+  <globalProperty>
+    <property>${project.parent.artifactId}.server.user</property>
+    <defaultValue></defaultValue>
+    <description>
+      The m2sys CloudScanr username.
+    </description>
+  </globalProperty>
+
+  <globalProperty>
+    <property>${project.parent.artifactId}.server.national.user</property>
+    <defaultValue></defaultValue>
+    <description>
+      The m2sys national server username.
+    </description>
+  </globalProperty>
+
+  <globalProperty>
+    <property>${project.parent.artifactId}.server.password</property>
+    <defaultValue></defaultValue>
+    <description>
+      The m2sys CloudScanr password.
+    </description>
+  </globalProperty>
+
+  <globalProperty>
+    <property>${project.parent.artifactId}.server.national.password</property>
+    <defaultValue></defaultValue>
+    <description>
+      The m2sys national server password.
+    </description>
+  </globalProperty>
+
+  <globalProperty>
+    <property>${project.parent.artifactId}.locationID</property>
+    <defaultValue></defaultValue>
+    <description>
+      The m2sys server location ID.
+    </description>
+  </globalProperty>
+
+  <globalProperty>
+    <property>${project.parent.artifactId}.customKey</property>
+    <defaultValue></defaultValue>
+    <description>
+      The m2sys server CustomKey.
+    </description>
+  </globalProperty>
+
+  <globalProperty>
+    <property>${project.parent.artifactId}.accessPointID</property>
+    <defaultValue></defaultValue>
+    <description>
+      The m2sys server AccessPointID. This is used by default unless a mapping that matches the callers IP
+      is found in the accessPointMap property.
+    </description>
+  </globalProperty>
+
+  <globalProperty>
+    <property>${project.parent.artifactId}.captureTimeout</property>
+    <defaultValue></defaultValue>
+    <description>
+      The m2sys server CaptureTimeout.
+    </description>
+  </globalProperty>
+
+  <globalProperty>
+    <property>${project.parent.artifactId}.device.name</property>
+    <defaultValue>DigitalPersona</defaultValue>
+    <description>
+      The m2sys fingerprint scanning device name.
+    </description>
+  </globalProperty>
+
+  <globalProperty>
+    <property>${project.parent.artifactId}.local-service.url</property>
+    <defaultValue></defaultValue>
+    <description>
+      The URL to the SOAP service of the local (local to the clinic) M2Sys BioPlugin Server.
+    </description>
+  </globalProperty>
+
+  <globalProperty>
+    <property>${project.parent.artifactId}.national-service.url</property>
+    <defaultValue></defaultValue>
+    <description>
+      The URL to the SOAP service of the national M2Sys BioPlugin Server.
+    </description>
+  </globalProperty>
+
+  <globalProperty>
+    <property>${project.parent.artifactId}.server.constTestTemplate</property>
+    <defaultValue></defaultValue>
+    <description>
+      A default test fingerprint template for instances when the fingerprint scanner is not available.
+    </description>
+  </globalProperty>
+  <globalProperty>
+    <property>${project.parent.artifactId}.cloudabis.app.key</property>
+    <defaultValue></defaultValue>
+    <description>
+      Client assigned CLOUDABIS APP KEY for access to the cloud fingerprint matching engine API endpoints.
+    </description>
+  </globalProperty>
+  <globalProperty>
+    <property>${project.parent.artifactId}.cloudabis.secret.key</property>
+    <defaultValue></defaultValue>
+    <description>
+      Client assigned SECRET KEY for access to the cloud fingerprint matching engine API endpoints.
+    </description>
+  </globalProperty>
+  <globalProperty>
+    <property>${project.parent.artifactId}.cloudabis.grant.type</property>
+    <defaultValue></defaultValue>
+    <description>
+      Client preferred grant type for access to the cloud fingerprint matching engine API endpoints.
+    </description>
+  </globalProperty>
+  <globalProperty>
+    <property>${project.parent.artifactId}.cloudabis.api.url</property>
+    <defaultValue></defaultValue>
+    <description>
+      Base URL to the cloud fingerprint matching engine API endpoints.
+    </description>
+  </globalProperty>
+  <globalProperty>
+    <property>${project.parent.artifactId}.cloudabis.customer.key</property>
+    <defaultValue></defaultValue>
+    <description>
+      User assigned customer key for grouping different CLOUDABIS Apps.
+    </description>
+  </globalProperty>
+  <globalProperty>
+    <property>${project.parent.artifactId}.cloudabis.engine.name</property>
+    <defaultValue></defaultValue>
+    <description>
+      User preffered engine for processing CLOUDABIS requests.
+    </description>
+  </globalProperty>
+  <globalProperty>
+    <property>${project.parent.artifactId}.cloudabis.template.format</property>
+    <defaultValue>ISO</defaultValue>
+    <description>
+      Preferred template format - Usually tied to the capabilities of the user-procured fingerprint scanner.
+    </description>
+  </globalProperty>
+
+  <globalProperty>
+    <property>${project.parent.artifactId}.accessPointMap</property>
+    <defaultValue></defaultValue>
+    <description>
+      A map of IP addresses to Access Point IDs. Has format of IP1:AccessPointID1;IP2:AccessPointID2;...
+      For example 127.0.0.1:APID1;8.8.8.8:APID2... The IPs must match the IPs of the clients calling the
+      server.
+    </description>
+  </globalProperty>
+
+  <globalProperty>
+    <property>${project.parent.artifactId}.nationalRegistrationTaskInterval</property>
+    <description>
+      Interval time (in seconds) to execute retry of national registration failures task.
+    </description>
+  </globalProperty>
+
+  <!-- /Required Global Properties -->
+
+  <!--
+  <dwr>
+      <allow>
+          <create creator="new" javascript="DWRFormEntryService">
+              <param name="class" value="org.openmrs.module.@MODULE_ID@.web.DWRFormEntryService"/>
+              <include method="enterForm"/>
+          </create>
+      </allow>
+
+      <signatures>
+          <![CDATA[
+          import @MODULE_PACKAGE@.web.DWRFormEntryService;
+          DWRFormEntryService.enterForm(Integer patientId, Integer formId, boolean useEncounter, List<String> fields);
+          ]]>
+      </signatures>
+  </dwr>
+  -->
+
+  <!-- Servlets -->
+  <!-- Accessed through the url /pageContext()/moduleServlet/<moduleId>/<servlet-name>
+  <servlet>
+      <servlet-name>formDownload</servlet-name>
+      <servlet-class>@MODULE_PACKAGE@.web.FormDownloadServlet</servlet-class>
+  </servlet>
+  -->
+  <!-- /Servlets -->
+
+
+  <!-- Internationalization -->
+  <!-- All message codes should start with @MODULE_ID@.* -->
+  <messages>
+    <lang>en</lang>
+    <file>messages.properties</file>
+  </messages>
+  <messages>
+    <lang>fr</lang>
+    <file>messages_fr.properties</file>
+  </messages>
+  <messages>
+    <lang>es</lang>
+    <file>messages_es.properties</file>
+  </messages>
+  <!-- /Internationalization -->
 
 </module>

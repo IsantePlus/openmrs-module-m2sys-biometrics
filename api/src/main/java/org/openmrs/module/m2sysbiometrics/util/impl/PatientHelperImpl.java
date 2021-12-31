@@ -16,56 +16,56 @@ import org.springframework.stereotype.Component;
 @Component
 public class PatientHelperImpl implements PatientHelper {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(PatientHelperImpl.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(PatientHelperImpl.class);
 
-    @Autowired
-    private RegistrationCoreService registrationCoreService;
+	@Autowired
+	private RegistrationCoreService registrationCoreService;
 
-    @Autowired
-    private PatientService patientService;
+	@Autowired
+	private PatientService patientService;
 
-    @Autowired
-    private M2SysProperties properties;
+	@Autowired
+	private M2SysProperties properties;
 
-    @Override
-    public Patient findByLocalFpId(String subjectId) {
-        return findByIdType(subjectId,
-                RegistrationCoreConstants.GP_BIOMETRICS_PERSON_IDENTIFIER_TYPE_UUID);
-    }
+	@Override
+	public Patient findByLocalFpId(String subjectId) {
+		return findByIdType(subjectId,
+				RegistrationCoreConstants.GP_BIOMETRICS_PERSON_IDENTIFIER_TYPE_UUID);
+	}
 
-    @Override
-    public Patient findByNationalFpId(String nationalSubjectId) {
-        return findByIdType(nationalSubjectId,
-                RegistrationCoreConstants.GP_BIOMETRICS_NATIONAL_PERSON_IDENTIFIER_TYPE_UUID);
-    }
+	@Override
+	public Patient findByNationalFpId(String nationalSubjectId) {
+		return findByIdType(nationalSubjectId,
+				RegistrationCoreConstants.GP_BIOMETRICS_NATIONAL_PERSON_IDENTIFIER_TYPE_UUID);
+	}
 
-    @Override
-    public PatientIdentifierType getPatientIdentifierTypeByUuid(String patientIdentifierTypeUuid) {
-        PatientIdentifierType patientIdentifierType = patientService
-                .getPatientIdentifierTypeByUuid(patientIdentifierTypeUuid);
-        if (patientIdentifierType != null) {
-            Context.refreshEntity(patientIdentifierType);
-        }
-        return patientIdentifierType;
-    }
+	@Override
+	public PatientIdentifierType getPatientIdentifierTypeByUuid(String patientIdentifierTypeUuid) {
+		PatientIdentifierType patientIdentifierType = patientService
+				.getPatientIdentifierTypeByUuid(patientIdentifierTypeUuid);
+		if (patientIdentifierType != null) {
+			Context.refreshEntity(patientIdentifierType);
+		}
+		return patientIdentifierType;
+	}
 
-    private Patient findByIdType(String subjectId, String idTypeProp) {
-        Patient patient = null;
-        if (properties.isGlobalPropertySet(idTypeProp)) {
-            String identifierUuid = properties.getGlobalProperty(idTypeProp);
-            if (patientIdentifierTypeExists(identifierUuid)) {
-                patient = registrationCoreService.findByPatientIdentifier(subjectId, identifierUuid);
-                if (patient != null) {
-                    Context.refreshEntity(patient);
-                }
-            } else {
-                LOGGER.warn("Identifier type defined by prop {} is missing: {}", idTypeProp, identifierUuid);
-            }
-        }
-        return patient;
-    }
+	private Patient findByIdType(String subjectId, String idTypeProp) {
+		Patient patient = null;
+		if (properties.isGlobalPropertySet(idTypeProp)) {
+			String identifierUuid = properties.getGlobalProperty(idTypeProp);
+			if (patientIdentifierTypeExists(identifierUuid)) {
+				patient = registrationCoreService.findByPatientIdentifier(subjectId, identifierUuid);
+				if (patient != null) {
+					Context.refreshEntity(patient);
+				}
+			} else {
+				LOGGER.warn("Identifier type defined by prop {} is missing: {}", idTypeProp, identifierUuid);
+			}
+		}
+		return patient;
+	}
 
-    private boolean patientIdentifierTypeExists(String patientIdentifierTypeUuid) {
-        return getPatientIdentifierTypeByUuid(patientIdentifierTypeUuid) != null;
-    }
+	private boolean patientIdentifierTypeExists(String patientIdentifierTypeUuid) {
+		return getPatientIdentifierTypeByUuid(patientIdentifierTypeUuid) != null;
+	}
 }
