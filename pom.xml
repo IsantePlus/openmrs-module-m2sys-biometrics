@@ -18,11 +18,14 @@
         <developer>
             <name>SolDevelo Developers</name>
         </developer>
+        <developer>
+            <name>I-TECH-UW</name>
+        </developer>
     </developers>
 
     <organization>
-        <name>SolDevelo</name>
-        <url>https://www.soldevelo.com</url>
+        <name>I-TECH-UW</name>
+        <url>https://github.com/I-TECH-UW</url>
     </organization>
 
     <properties>
