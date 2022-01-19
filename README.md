@@ -2,8 +2,6 @@
 # iSantePlus m2Sys Biometrics Module
 [![CI](https://github.com/IsantePlus/openmrs-module-m2sys-biometrics/actions/workflows/ci.yml/badge.svg)](https://github.com/IsantePlus/openmrs-module-m2sys-biometrics/actions/workflows/ci.yml)
 
-[![Publish package to GitHub Packages](https://github.com/IsantePlus/openmrs-module-m2sys-biometrics/actions/workflows/release.yml/badge.svg)](https://github.com/IsantePlus/openmrs-module-m2sys-biometrics/actions/workflows/release.yml)
-
 This an implementation of the Biometrics interfaces from the registration core module that use the m2sys Biometrics server. The module uses the CloudScanner API by m2sys in order to communicate with the server and invoke the fingerprint reader.
 
 ## Requirements
