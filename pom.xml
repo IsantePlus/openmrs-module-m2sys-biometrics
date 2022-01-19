@@ -9,7 +9,7 @@
 
     <groupId>org.openmrs.module</groupId>
     <artifactId>m2sys-biometrics</artifactId>
-    <version>1.2.0-SNAPSHOT</version>
+    <version>${revision}</version>
     <packaging>pom</packaging>
     <name>m2sys Biometrics Module</name>
     <description>Module for iSantePlus m2sys Biometrics</description>
@@ -18,14 +18,18 @@
         <developer>
             <name>SolDevelo Developers</name>
         </developer>
+        <developer>
+            <name>I-TECH-UW</name>
+        </developer>
     </developers>
 
     <organization>
-        <name>SolDevelo</name>
-        <url>https://www.soldevelo.com</url>
+        <name>I-TECH-UW</name>
+        <url>https://github.com/I-TECH-UW</url>
     </organization>
 
     <properties>
+        <revision>1.2.0</revision>
         <openmrsPlatformVersion>2.0.5</openmrsPlatformVersion>
         <javaCompilerVersion>1.8</javaCompilerVersion>
 
@@ -223,6 +227,31 @@
             </plugins>
         </pluginManagement>
         <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>flatten-maven-plugin</artifactId>
+                <version>1.1.0</version>
+                <configuration>
+                    <updatePomFile>true</updatePomFile>
+                    <flattenMode>resolveCiFriendliesOnly</flattenMode>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>flatten</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>flatten</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>flatten.clean</id>
+                        <phase>clean</phase>
+                        <goals>
+                            <goal>clean</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>com.googlecode.maven-java-formatter-plugin</groupId>
                 <artifactId>maven-java-formatter-plugin</artifactId>
