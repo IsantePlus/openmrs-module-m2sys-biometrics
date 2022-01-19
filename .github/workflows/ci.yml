@@ -58,7 +58,7 @@ jobs:
       - name: Build with Maven
         run: mvn -P 'github-packages' install
       - name: Publish package
-        run: mvn -P github-packages -DskipTests -Dfindbugs.skip=true -Dpmd.skip=true -Dcpd.skip=true -B deploy
+        run: mvn -P github-packages -pl '!build-tools' -DskipTests -Dfindbugs.skip=true -Dpmd.skip=true -Dcpd.skip=true -B deploy
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
         if: github.event_name == 'release' && github.event.action == 'created'
