@@ -29,12 +29,12 @@
     </organization>
 
     <properties>
-        <revision>1.2.0</revision>
+        <revision>1.2.1</revision>
         <openmrsPlatformVersion>2.0.5</openmrsPlatformVersion>
         <javaCompilerVersion>1.8</javaCompilerVersion>
 
         <mockitoVersion>1.9.5</mockitoVersion>
-        <registrationCoreVersion>2.2.0-SNAPSHOT</registrationCoreVersion>
+        <registrationCoreVersion>2.2.0</registrationCoreVersion>
         <idgenVersion>4.3</idgenVersion>
         <eventVersion>2.3</eventVersion>
 
