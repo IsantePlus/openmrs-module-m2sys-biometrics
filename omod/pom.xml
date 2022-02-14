@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.openmrs.module</groupId>
         <artifactId>m2sys-biometrics</artifactId>
-        <version>1.2.1</version>
+        <version>${revision}</version>
     </parent>
 
     <artifactId>m2sys-biometrics-omod</artifactId>
