@@ -39,15 +39,31 @@ public class Fingers {
     }
 
     public List<Fingerprint> toTwoOpenMrsFingerprints() {
-        Finger leftFinger = fingers.get(0);
-        Finger rightFinger = fingers.get(1);
+        ArrayList<Fingerprint> fingerList=new ArrayList<>();
 
-        return new ArrayList<>(Arrays.asList(leftFinger.toOpenMRSFingerprint(),
-                rightFinger.toOpenMRSFingerprint()));
+        if (fingers.size()==1) {
+            Finger leftFinger = fingers.get(0);
+            fingerList=new ArrayList<>(Arrays.asList(leftFinger.toOpenMRSFingerprint()));
+        }
+
+        if (fingers.size()==2) {
+            Finger leftFinger = fingers.get(0);
+            Finger rightFinger = fingers.get(1);
+            fingerList=new ArrayList<>(Arrays.asList(leftFinger.toOpenMRSFingerprint(),
+                    rightFinger.toOpenMRSFingerprint()));
+        }
+
+        return fingerList;
     }
 
     public void trimData() {
+        if (fingers.size()==1) {
         fingers.get(0).setTemplateData(fingers.get(0).getTemplateData().trim());
-        fingers.get(1).setTemplateData(fingers.get(1).getTemplateData().trim());
+        }
+
+        if (fingers.size()==2) {
+            fingers.get(1).setTemplateData(fingers.get(1).getTemplateData().trim());
+        }
+
     }
 }

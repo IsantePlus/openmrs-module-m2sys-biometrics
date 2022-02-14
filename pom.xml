@@ -9,7 +9,7 @@
 
     <groupId>org.openmrs.module</groupId>
     <artifactId>m2sys-biometrics</artifactId>
-    <version>${revision}</version>
+    <version>1.2.1</version>
     <packaging>pom</packaging>
     <name>m2sys Biometrics Module</name>
     <description>Module for iSantePlus m2sys Biometrics</description>
