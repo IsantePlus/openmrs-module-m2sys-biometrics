@@ -29,7 +29,7 @@
     </organization>
 
     <properties>
-        <revision>1.2.2</revision>
+        <revision>1.2.4</revision>
         <openmrsPlatformVersion>2.0.5</openmrsPlatformVersion>
         <javaCompilerVersion>1.8</javaCompilerVersion>
 
