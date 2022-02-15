@@ -81,11 +81,16 @@ public class M2SysV105Client extends AbstractM2SysClient {
         subjectId.setFingerprints(fingers.toTwoOpenMrsFingerprints());
         nationalSubject.setFingerprints(fingers.toTwoOpenMrsFingerprints());
 
+        log.error("Fingerscan after response =>>>>>>>>>>>>>: Local ==> "+ fingerScanStatus.isRegisteredLocally() + ", National ==> " + fingerScanStatus.isRegisteredNationally());
+
 //        1. If registered both locally and nationally, return the IDs
         if(fingerScanStatus.isRegisteredLocally() && fingerScanStatus.isRegisteredNationally()){
             subjectId = fingerScanStatus.getLocalBiometricSubject();
             nationalSubject = fingerScanStatus.getNationalBiometricSubject();
             enrollmentStatus = EnrollmentStatus.ALREADY_REGISTERED;
+            log.error("Fingerscan After after response =>>>>>>>>>>>>>: Local ==> "+ fingerScanStatus.isRegisteredLocally() + ", National ==> " + fingerScanStatus.isRegisteredNationally());
+
+
         }else if (fingerScanStatus.isRegisteredLocally() || fingerScanStatus.isRegisteredNationally()) {
 //        2. If registered locally but not nationally, try register nationally. If successful, return both IDs, if not, return local ID and queue for later national registration
 //        3. If registered nationally but not locally, try register locally. If successful, return both IDs, if not, return national ID and queue for later local registration - should be very rare
